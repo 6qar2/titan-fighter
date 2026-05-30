@@ -407,7 +407,7 @@ let pName='TITAN';
 let score,lives,wave,timeLeft,combo,comboT,shootCD,spawnT;
 let ammo,maxAmmo;
 let ammoRegenAccum=0; // passive regen accumulator
-const AMMO_REGEN_RATE=1/5; // 1 round per 5 seconds (passive)
+const AMMO_REGEN_RATE=1/3; // 1 round per 3 seconds (passive)
 let bullets=[],eBullets=[],enemies=[],parts=[],stars=[],ammoPacks=[];
 let keys={},mxP=0,myP=0;
 let shooting=false;
@@ -419,9 +419,9 @@ let lowAmmoWarnShown=false;
 let lastEmptyClick=0;
 
 // Ammo pack config — drops frequently, small refill
-const AMMO_PACK_INTERVAL_MIN=7;   // seconds between drops
-const AMMO_PACK_INTERVAL_MAX=10;
-const AMMO_REFILL=8;              // rounds per pack
+const AMMO_PACK_INTERVAL_MIN=5;   // seconds between drops
+const AMMO_PACK_INTERVAL_MAX=8;
+const AMMO_REFILL=12;              // rounds per pack
 let nextAmmoPackTime=0;
 let spiralAngle=0; // for warlord spiral shots
 
@@ -567,7 +567,7 @@ function update(dt){
   // Shoot
   shootCD-=dt;if(shooting&&shootCD<=0){fireBullet();shootCD=ch.fire;}
 
-  // Passive ammo regen (1 round per 5s)
+  // Passive ammo regen (1 round per 3s)
   if(ammo<maxAmmo){
     ammoRegenAccum+=dt*AMMO_REGEN_RATE;
     if(ammoRegenAccum>=1){const gained=Math.floor(ammoRegenAccum);ammo=Math.min(maxAmmo,ammo+gained);ammoRegenAccum-=gained;updateAmmoHUD();}
