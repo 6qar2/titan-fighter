@@ -162,7 +162,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .spop.ammo{color:var(--ammo-col);text-shadow:0 0 10px rgba(0,200,168,0.6);}
 .spop.boss{color:#FF8C00;font-size:1.15rem;text-shadow:0 0 14px rgba(255,140,0,0.7);}
 #xhair{position:fixed;width:24px;height:24px;z-index:300;pointer-events:none;transform:translate(-50%,-50%);}
-@keyframes gatePulse{0%,100%{opacity:.6;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.04)}}
+@keyframes gatePulse{0%,100%{opacity:.7;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.04)}}
+#gate-prompt.visible{animation:gatePulse 1.2s ease-in-out infinite;}
 @keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,3px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,2px)}80%{transform:translate(3px,-2px)}}
 </style>
 </head>
@@ -208,7 +209,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 <div id="wave-announce"></div>
 <div id="low-ammo-warn">⚠ LOW AMMO</div>
 <div id="enemy-warn"></div>
-<div id="gate-prompt" style="position:fixed;bottom:170px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:5px;color:#E2C06A;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 14px rgba(200,168,75,0.8);animation:gatePulse 1.2s ease-in-out infinite;">⬡ WALK INTO THE GATE TO ADVANCE ⬡</div>
+<div id="kills-left" style="position:fixed;top:58px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:4px;color:var(--ash);z-index:90;pointer-events:none;white-space:nowrap;text-transform:uppercase;display:none;">▸ <span id="kills-left-num">0</span> ENEMIES REMAIN</div>
+<div id="gate-prompt" style="position:fixed;bottom:170px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:5px;color:#E2C06A;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 14px rgba(200,168,75,0.8);">⬡ WALK INTO THE GATE TO ADVANCE ⬡</div>
 
 <!-- MOBILE CONTROLS -->
 <div id="mctrl" class="off">
@@ -590,7 +592,7 @@ function pickEnemyDef(wave){const pool=[];EDEFS.forEach(d=>{const w=d.weight(wav
 const DURATION=300;
 let gState='menu';
 let pName='TITAN';
-let score,lives,wave,timeLeft,combo,comboT,shootCD,spawnT,waveAdvancing;
+let score,lives,wave,timeLeft,combo,comboT,shootCD,spawnT,waveAdvancing,waveKills;
 let gate=null,gateOpen=false; // portal gate
 let bgCol={r:4,g:4,b:10},bgColTarget={r:4,g:4,b:10}; // background color lerp
 let ammo,maxAmmo,ammoRegenAccum;
@@ -613,8 +615,9 @@ function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   const ch=CHARS[selChar];
   score=0;lives=diffCfg.lives;wave=1;timeLeft=DURATION;
-  combo=0;comboT=0;shootCD=0;spawnT=0;waveAdvancing=false;
+  combo=0;comboT=0;shootCD=0;spawnT=0;waveAdvancing=false;waveKills=0;
   gate=null;gateOpen=false;
+  const gp2=document.getElementById('gate-prompt');gp2.style.opacity='0';gp2.classList.remove('visible');
   bgCol={r:4,g:4,b:10};bgColTarget={r:4,g:4,b:10};
   totalKills=0;bestCombo=0;
   ammo=ch.maxAmmo;maxAmmo=ch.maxAmmo;ammoRegenAccum=0;
@@ -647,7 +650,23 @@ function startTimer(){
   },1000);
 }
 
-function updateHUD(){document.getElementById('hscore').textContent=score.toLocaleString();const m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById('htimer').textContent=`${m}:${s.toString().padStart(2,'0')}`;document.getElementById('hwave').textContent=toRoman(wave);}
+function updateHUD(){
+  document.getElementById('hscore').textContent=score.toLocaleString();
+  const m=Math.floor(timeLeft/60),s=timeLeft%60;
+  document.getElementById('htimer').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  document.getElementById('hwave').textContent=toRoman(wave);
+  // kills remaining indicator
+  const quota=6+wave*3;
+  const remaining=Math.max(0,quota-waveKills);
+  const kl=document.getElementById('kills-left');
+  const klNum=document.getElementById('kills-left-num');
+  if(!gateOpen&&!waveAdvancing&&gState==='play'){
+    kl.style.display='block';
+    klNum.textContent=remaining;
+  } else {
+    kl.style.display='none';
+  }
+}
 
 function updateAmmoHUD(){
   const pct=ammo/maxAmmo;
@@ -747,19 +766,24 @@ function update(dt){
   // Combo decay
   if(comboT>0){comboT-=dt;if(comboT<=0){combo=0;document.getElementById('combo').style.opacity='0';}}
 
-  // Spawn enemies
+  // Spawn enemies — stop once quota for this wave is reached
   const spawnBase=diffCfg.spawnRateBase;
   const sr=Math.max(.25,spawnBase-wave*.12);
-  spawnT-=dt;if(spawnT<=0&&!gateOpen&&!waveAdvancing){if(enemies.length<9+wave*2)spawnEnemy();spawnT=sr;}
+  const waveQuota=6+wave*3; // enemies to kill before gate opens
+  spawnT-=dt;
+  if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){
+    if(enemies.length<Math.min(4+wave,12))spawnEnemy();
+    spawnT=sr;
+  }
 
-  // Gate system: when all enemies dead + no spawns pending → open the gate
-  if(!waveAdvancing&&!gateOpen&&gate===null&&enemies.length===0&&spawnT<=0){
-    if(wave>=10){endGame();return;} // 10 waves done
+  // Gate system: quota reached AND all on-screen enemies dead → open gate
+  if(!waveAdvancing&&!gateOpen&&gate===null&&waveKills>=waveQuota&&enemies.length===0){
+    if(wave>=10){endGame();return;}
     gateOpen=true;
     openGate();
   }
-  // Player walks into gate → advance wave
-  if(gate&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5){
+  // Player walks into gate → advance wave (waveAdvancing guard prevents multi-frame firing)
+  if(gate&&!waveAdvancing&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5){
     enterGate();
   }
   // Lerp background color
@@ -865,7 +889,7 @@ function update(dt){
           score+=pts;spawnParts(e.x,e.y,e.col,isBoss?40:11);
           spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss?'boss':'');
           if(combo>=3){const cd=document.getElementById('combo');cd.textContent=`${combo}× COMBO`;cd.style.opacity='1';if(combo>=5)sfxCombo();}
-          enemies.splice(i,1);updateHUD();
+          enemies.splice(i,1);waveKills++;updateHUD();
         }
         return false;
       }
@@ -915,6 +939,7 @@ function openGate(){
   gate={x:gx,y:gy,r:36,spin:0,pulse:0,col,age:0};
   // Show prompt
   const el=document.getElementById('gate-prompt');
+  el.classList.add('visible');
   el.style.opacity='1';
   sfxCombo();
   spawnParts(gx,gy,col,20);
@@ -924,7 +949,7 @@ function enterGate(){
   if(waveAdvancing)return;
   waveAdvancing=true;
   gate=null;gateOpen=false;
-  document.getElementById('gate-prompt').style.opacity='0';
+  const gp=document.getElementById('gate-prompt');gp.style.opacity='0';gp.classList.remove('visible');
   // Flash screen with gate color
   const col=WAVE_GATE_COLS[Math.min(wave-1,WAVE_GATE_COLS.length-1)];
   const fl=document.getElementById('flash');
@@ -941,6 +966,7 @@ function enterGate(){
   document.getElementById('hwave').textContent=toRoman(wave);
   spawnParts(cv.width/2,cv.height/2,WAVE_GATE_COLS[Math.min(wave-2,WAVE_GATE_COLS.length-1)],22);
   bgTransition(wave);
+  waveKills=0;
   setTimeout(()=>{waveAdvancing=false;spawnT=1.8;},1400);
 }
 
@@ -1030,7 +1056,7 @@ function draw(){
 function loop(ts){if(gState!=='play')return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);draw();animID=requestAnimationFrame(loop);}
 
 function rankMsg(sc){if(sc>=15000)return 'ALPHA TITAN · FIRST AMONG ALL';if(sc>=8000)return 'PRIMUS · ELITE OF THE LEGION';if(sc>=3000)return 'MILES · SENIOR WARRIOR';return 'TIRO · THE JOURNEY BEGINS';}
-function endGame(){gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);document.getElementById('f-score').textContent=score.toLocaleString();document.getElementById('f-rank').textContent=rankMsg(score);document.getElementById('fstat-wave').textContent=toRoman(wave);document.getElementById('fstat-kills').textContent=totalKills;document.getElementById('fstat-combo').textContent=bestCombo+'×';showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>document.getElementById(id).style.opacity='0');menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);}
+function endGame(){gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);document.getElementById('f-score').textContent=score.toLocaleString();document.getElementById('f-rank').textContent=rankMsg(score);document.getElementById('fstat-wave').textContent=toRoman(wave);document.getElementById('fstat-kills').textContent=totalKills;document.getElementById('fstat-combo').textContent=bestCombo+'×';showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);}
 
 /* ═══ SCREEN HELPER ═══ */
 function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
@@ -1082,7 +1108,7 @@ document.getElementById('btn-replay').addEventListener('click',()=>{
   wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;
   showScr(null);document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
-  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>document.getElementById(id).style.opacity='0');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';
   gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);animID=requestAnimationFrame(loop);
 });
 // Menu
@@ -1090,7 +1116,7 @@ document.getElementById('btn-menu').addEventListener('click',()=>{
   bgStop();gState='menu';menuAnimActive=true;showScr('s-start');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
   document.getElementById('htimer').classList.remove('warn');
-  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>document.getElementById(id).style.opacity='0');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';
   initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
 });
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
