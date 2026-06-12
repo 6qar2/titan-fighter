@@ -580,9 +580,6 @@ const EDEFS=[
   // NEW wave 4: LEECH — heals HP over time, must be killed fast
   {type:'leech',label:'LEECH',minWave:4,hp:4,spd:0.75,sz:19,pts:350,col:'#4CAF50',sRate:0.6,ability:'regen',weight(w){return w<4?0:w<=7?20:12;}},
 
-  // NEW wave 4: MIRROR — reflects bullets back at player
-  {type:'mirror',label:'MIRROR',minWave:4,hp:3,spd:0.65,sz:21,pts:400,col:'#B0BEC5',sRate:0,ability:'reflect',weight(w){return w<4?0:w<=7?18:10;}},
-
   /* ─── WAVE 5-6: Advanced enemies ─── */
   {type:'tribune',label:'TRIBUNE',minWave:4,hp:5,spd:0.65,sz:28,pts:550,col:'#8B0015',sRate:2.0,ability:'spread',weight(w){return w<4?0:w<=7?22:12;}},
   {type:'phantom',label:'PHANTOM',minWave:4,hp:2,spd:1.4,sz:18,pts:420,col:'#9B59B6',sRate:1.0,ability:'teleport',weight(w){return w<4?0:w<=7?20:12;}},
