@@ -291,8 +291,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .btn-enter:active::before,.btn-ghost:active::before,.btn-cta:active::before{opacity:1;}
 
 /* ═══ SCREEN TRANSITIONS ═══ */
-.scr{transition:opacity .3s ease;}
-.scr.off{opacity:0;pointer-events:none;}
+.scr{transition:opacity .25s ease;}
+.scr.off{display:none;}
 
 /* ═══ IMPROVED MOBILE CONTROLS ═══ */
 @media (max-width: 768px) {
@@ -402,7 +402,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <span class="start-badge red">♛ ELITE WARRIOR</span>
     </div>
     <div class="input-label">Enter Your Name, Warrior</div>
-    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text" autocapitalize="characters">
+    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
     <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
   </div>
@@ -429,6 +429,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="diff-icon">💀</div>
         <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies · Scarce ammo · No mercy</div></div>
         <div class="diff-badge hard">HARD</div>
+      </div>
+    </div>
+    <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR →</button>
+    <button class="btn-ghost" id="btn-diff-back">← RETURN</button>
   </div>
 </div>
 
@@ -1571,7 +1575,7 @@ pb2.addEventListener('touchstart',e=>{e.preventDefault();activatePower();wake();
 pb2.addEventListener('mousedown',()=>{activatePower();wake();});
 
 /* ═══ BUTTON WIRING ═══ */
-document.getElementById('btn-start').addEventListener('click',()=>{wake();const v=document.getElementById('pname').value.trim();pName=v?v.toUpperCase():'TITAN';showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
+document.getElementById('btn-start').addEventListener('click',()=>{console.log('btn-start clicked');wake();const v=document.getElementById('pname').value.trim();pName=v?v.toUpperCase():'TITAN';showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
 document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-chars');});
 document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-enter-arena').addEventListener('click',()=>{
