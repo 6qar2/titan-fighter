@@ -1828,7 +1828,7 @@ function spawnEnemyVariant(){
 function rollCrit(){return Math.random()<(window.critChance||0);}
 
 /* ═══ ENHANCED BULLET COLLISION ═══ */
-function checkBulletCollision(b,e){
+function checkBulletCollision(b,e,i){
   if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){
     if(e.ability==='reflect'&&e.visible!==false){spawnParts(b.x,b.y,'#B0BEC5',4);eBullets.push({x:b.x,y:b.y,vx:-b.vx*.8,vy:-b.vy*.8,r:b.r,col:'#B0BEC5'});stats.accuracy.hits++;return false;}
     if(e.ability==='shield'){const ba=Math.atan2(-b.vy,-b.vx);const ad=Math.abs(((ba-e.shieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI);if(ad<1.05){spawnParts(b.x,b.y,'#4A7EC7',4);return false;}}
@@ -1997,7 +1997,7 @@ function update(dt){
     for(let i=enemies.length-1;i>=0;i--){
       const e=enemies[i];if(deadEnemies.includes(e))continue;
       if(b.pierce){if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){e.hp-=b.dmg;spawnParts(b.x,b.y,e.col,3);stats.accuracy.hits++;if(e.hp<=0){killEnemy(e,i);}continue;}}
-      else{if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){checkBulletCollision(b,e);return false;}}
+      else{if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){checkBulletCollision(b,e,i);return false;}}
     }
     return true;
   });
