@@ -28,7 +28,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 #s-start{background:var(--ink);justify-content:center;padding:0;}
 #start-canvas{position:absolute;inset:0;pointer-events:none;}
 .start-inner{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;width:100%;padding:2rem 1.2rem max(2rem,env(safe-area-inset-bottom));}
-.crest-ring-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;}
+.crest-ring-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;animation:crestGlow 3s ease-in-out infinite;}
+@keyframes crestGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(200,168,75,0.3))}50%{filter:drop-shadow(0 0 20px rgba(200,168,75,0.6))}}
 .ring{position:absolute;border-radius:50%;border:1px solid rgba(200,168,75,0.18);}
 .ring-1{width:130px;height:130px;animation:ringPulse 3s ease-in-out infinite;}
 .ring-2{width:100px;height:100px;animation:ringPulse 3s ease-in-out infinite .5s;}
@@ -124,6 +125,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 #diff-badge-hud.hard{color:var(--red-hot);border-color:rgba(232,0,31,0.4);}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 #combo{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);font-family:'Cinzel Decorative',serif;font-size:1.3rem;letter-spacing:2px;color:var(--gold-lit);text-shadow:0 0 20px rgba(200,168,75,0.5);z-index:90;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+#combo.milestone{animation:comboMilestone .5s ease-out;color:#FFD700;text-shadow:0 0 30px rgba(255,215,0,0.8);}
+@keyframes comboMilestone{0%{transform:translateX(-50%) scale(1.5)}100%{transform:translateX(-50%) scale(1)}}
 #wave-announce{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cinzel Decorative',serif;font-size:clamp(1.5rem,7vw,2.4rem);letter-spacing:3px;color:var(--gold-lit);text-shadow:0 0 40px rgba(200,168,75,0.4);z-index:95;pointer-events:none;text-align:center;opacity:0;transition:opacity .4s;}
 #low-ammo-warn{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:4px;color:var(--red-hot);z-index:90;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;text-transform:uppercase;}
 #enemy-warn{position:fixed;top:80px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:4px;color:#FF8C00;z-index:90;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 12px rgba(255,140,0,0.6);}
@@ -138,7 +141,65 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 #fire-btn .fire-icon{font-size:1.25rem;line-height:1;}
 #fire-btn .fire-lbl{font-size:.42rem;letter-spacing:2px;opacity:.7;}
 #power-btn{width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(124,58,237,0.75),rgba(60,10,140,0.95));border:1px solid rgba(167,139,250,0.42);font-family:'Cinzel',serif;font-size:.45rem;letter-spacing:2px;color:#DDD6FE;touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;box-shadow:0 0 16px rgba(124,58,237,0.35);-webkit-tap-highlight-color:transparent;transition:all .2s;}
-#power-btn.ready{box-shadow:0 0 28px rgba(167,139,250,0.7);border-color:rgba(221,214,254,0.7);}
+#power-btn.ready{box-shadow:0 0 28px rgba(167,139,250,0.7);border-color:rgba(221,214,254,0.7);animation:powerPulse 1s ease-in-out infinite;}
+@keyframes powerPulse{0%,100%{box-shadow:0 0 28px rgba(167,139,250,0.7);transform:scale(1)}50%{box-shadow:0 0 40px rgba(167,139,250,1);transform:scale(1.05)}}
+/* ═══ NEW ENHANCEMENTS CSS ═══ */
+#weapon-hud{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);display:flex;gap:.6rem;align-items:center;z-index:105;pointer-events:none;opacity:0;transition:opacity .3s;}
+#weapon-hud.visible{opacity:1;}
+.weapon-icon{width:36px;height:36px;border-radius:8px;border:2px solid rgba(200,168,75,0.4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(4,4,10,0.8);position:relative;}
+.weapon-icon.active{border-color:var(--gold-lit);box-shadow:0 0 12px rgba(200,168,75,0.5);}
+.weapon-icon .w-ammo{position:absolute;bottom:-8px;right:-8px;background:var(--crimson);color:var(--gold-pale);font-size:.4rem;padding:.1rem .25rem;border-radius:4px;font-family:'Cinzel',serif;letter-spacing:1px;}
+.weapon-name{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;position:absolute;top:-16px;white-space:nowrap;}
+#skill-hud{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:105;pointer-events:none;}
+.skill-pip{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(200,168,75,0.3);transition:all .3s;}
+.skill-pip.active{background:var(--gold);border-color:var(--gold-lit);box-shadow:0 0 8px rgba(200,168,75,0.6);}
+.skill-pip.ultimate{background:var(--red-hot);border-color:var(--red-hot);box-shadow:0 0 10px rgba(232,0,31,0.7);}
+#dmg-nums{position:fixed;inset:0;z-index:92;pointer-events:none;overflow:hidden;}
+.dmg-num{position:absolute;font-family:'Cinzel',serif;font-weight:700;pointer-events:none;animation:dmgFloat .9s ease-out forwards;text-shadow:0 0 6px rgba(0,0,0,0.8);}
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-60px) scale(0.6)}}
+#powerups{position:fixed;inset:0;z-index:88;pointer-events:none;}
+.powerup-icon{position:absolute;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;animation:powerupBob 1.5s ease-in-out infinite;box-shadow:0 0 15px rgba(0,0,0,0.5);}
+@keyframes powerupBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#kill-feed{position:fixed;top:70px;right:12px;display:flex;flex-direction:column;gap:4px;z-index:91;pointer-events:none;align-items:flex-end;}
+.kill-msg{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;padding:.2rem .5rem;background:rgba(4,4,10,0.85);border-left:2px solid;animation:killFade 2.5s ease-out forwards;text-transform:uppercase;}
+@keyframes killFade{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(30px)}}
+.scr.overlay{background:rgba(4,4,10,0.97);backdrop-filter:blur(8px);}
+.screen-header{text-align:center;padding:.7rem 0 .25rem;}
+.screen-eyebrow{font-family:'Cinzel Decorative',serif;font-size:.5rem;letter-spacing:4px;color:var(--gold-dim);}
+.screen-title{font-family:'Cinzel',serif;font-size:1.4rem;letter-spacing:3px;color:var(--gold-lit);margin:.2rem 0;}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem;width:min(340px,92vw);margin:.7rem 0;}
+.stat-card{border:1px solid rgba(200,168,75,0.15);padding:.6rem .8rem;background:linear-gradient(160deg,rgba(16,12,10,0.95),rgba(6,4,2,0.98));display:flex;flex-direction:column;gap:2px;}
+.stat-card .sv{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold-lit);}
+.stat-card .sl{font-size:.48rem;letter-spacing:2px;color:var(--ash);text-transform:uppercase;}
+.upgrade-card{border:1px solid rgba(200,168,75,0.15);padding:.8rem 1rem;cursor:pointer;transition:all .22s;background:linear-gradient(160deg,rgba(16,12,10,0.95),rgba(6,4,2,0.98));display:flex;align-items:center;gap:.8rem;width:min(340px,92vw);margin:.3rem 0;}
+.upgrade-card:hover{border-color:rgba(200,168,75,0.5);transform:translateY(-2px);}
+.upgrade-card.owned{border-color:rgba(76,175,80,0.4);opacity:.6;cursor:default;}
+.upgrade-card.owned:hover{transform:none;}
+.upg-icon{font-size:1.4rem;width:40px;text-align:center;flex-shrink:0;}
+.upg-info{flex:1;}
+.upg-name{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2px;color:var(--gold-lit);}
+.upg-desc{font-size:.55rem;letter-spacing:1px;color:var(--ash);margin-top:2px;}
+.upg-cost{font-family:'Cinzel',serif;font-size:.6rem;color:var(--red-hot);letter-spacing:2px;}
+.weapon-card{border:1px solid rgba(200,168,75,0.15);padding:.6rem .8rem;cursor:pointer;transition:all .22s;background:linear-gradient(160deg,rgba(16,12,10,0.95),rgba(6,4,2,0.98));display:flex;align-items:center;gap:.6rem;width:min(280px,88vw);margin:.3rem 0;}
+.weapon-card.selected{border-color:rgba(200,168,75,0.55);background:linear-gradient(160deg,rgba(200,168,75,0.06),rgba(139,0,21,0.05));}
+.weapon-card.locked{opacity:.4;cursor:not-allowed;}
+.weapon-card:active{transform:scale(.97);}
+.wep-icon{font-size:1.3rem;width:36px;text-align:center;flex-shrink:0;}
+.wep-info{flex:1;}
+.wep-name{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);}
+.wep-stats{font-size:.5rem;color:var(--ash);margin-top:1px;}
+.achievement-card{border:1px solid rgba(200,168,75,0.1);padding:.5rem .7rem;background:rgba(16,12,10,0.9);display:flex;align-items:center;gap:.6rem;width:min(340px,92vw);margin:.2rem 0;opacity:.5;}
+.achievement-card.unlocked{opacity:1;border-color:rgba(200,168,75,0.3);}
+.ach-icon{font-size:1.2rem;width:32px;text-align:center;flex-shrink:0;}
+.ach-info{flex:1;}
+.ach-name{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);}
+.ach-desc{font-size:.48rem;color:var(--ash);margin-top:1px;}
+#pause-overlay{position:fixed;inset:0;z-index:250;background:rgba(4,4,10,0.92);backdrop-filter:blur(6px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+#pause-overlay.visible{display:flex;}
+.pause-title{font-family:'Cinzel Decorative',serif;font-size:1.6rem;letter-spacing:4px;color:var(--gold-lit);}
+.pause-btn{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:3px;padding:.7rem 2rem;cursor:pointer;text-transform:uppercase;background:transparent;color:var(--parchment);border:1px solid rgba(200,168,75,0.3);transition:all .2s;width:min(240px,80vw);}
+.pause-btn:hover{background:rgba(200,168,75,0.08);border-color:rgba(200,168,75,0.6);}
+.pause-btn.primary{background:linear-gradient(135deg,var(--crimson),var(--red));color:var(--gold-pale);border-color:rgba(200,168,75,0.4);}
 #power-btn:active{transform:scale(.91);}
 #power-btn .power-icon{font-size:1.1rem;line-height:1;}
 #power-btn .power-lbl{font-size:.38rem;letter-spacing:2px;opacity:.7;}
@@ -186,6 +247,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <span class="hud-lbl">Score</span>
     <span class="hud-val" id="hscore">0</span>
   </div>
+  <div class="hud-block" id="pname-hud" style="display:none;">
+    <span class="hud-lbl">Warrior</span>
+    <span class="hud-val" style="font-size:.6rem;color:var(--gold-lit);letter-spacing:2px;" id="hname">TITAN</span>
+  </div>
   <div class="hud-block" id="ammo-hud">
     <span class="hud-lbl">Ammo</span>
     <span class="hud-val" id="ammo-count">30</span>
@@ -208,6 +273,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <span class="hud-lbl">Wave</span>
     <span class="hud-val" id="hwave">I</span>
     <span id="diff-badge-hud" class="normal">NORMAL</span>
+  </div>
+  <div class="hud-block" id="club-hud" style="display:none;">
+    <span class="hud-lbl">Club</span>
+    <span class="hud-val" style="font-size:.55rem;color:var(--gold-dim);letter-spacing:2px;">♛ TITANS</span>
   </div>
 </div>
 <div id="combo"></div>
@@ -240,10 +309,15 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <path d="M30 22 L32 27 L38 27 L33 31 L35 37 L30 33 L25 37 L27 31 L22 27 L28 27 Z" fill="#E2C06A" opacity=".9"/>
       </svg>
     </div>
-    <div class="titan-eyebrow">Titans Club · Galala University</div>
+    <div class="titan-eyebrow">Titans Club · Galala University · Est. MMXXVI</div>
     <div class="titan-title"><span class="t1">TITANS</span><span class="t2">STRIKE</span></div>
-    <div class="titan-tagline">Forged in Glory · Bound by Discipline</div>
+    <div class="titan-tagline">Forged in Glory · Bound by Discipline · United as Titans</div>
     <div class="div-line"><div class="div-gem"></div></div>
+    <div style="display:flex;gap:.5rem;margin-bottom:1.2rem;flex-wrap:wrap;justify-content:center;">
+      <span style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--gold-dim);border:1px solid rgba(200,168,75,0.2);padding:.2rem .6rem;">✦ TITANS CLUB LEGEND</span>
+      <span style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--ash);border:1px solid rgba(107,98,89,0.2);padding:.2rem .6rem;">⚔ GALALA UNIVERSITY</span>
+      <span style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--red);border:1px solid rgba(192,0,26,0.2);padding:.2rem .6rem;">♛ ELITE WARRIOR</span>
+    </div>
     <div class="input-label">Enter Your Name, Warrior</div>
     <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
@@ -272,8 +346,85 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="diff-icon">💀</div>
         <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies · Scarce ammo · No mercy</div></div>
         <div class="diff-badge hard">HARD</div>
-      </div>
+  </div>
+</div>
+
+<!-- PAUSE OVERLAY -->
+<div id="pause-overlay">
+  <div class="pause-title">PAUSED</div>
+  <button class="pause-btn primary" id="btn-resume">RESUME</button>
+  <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
+  <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
+  <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
+  <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div class="scr off overlay" id="s-settings">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">SETTINGS</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:.8rem;width:min(340px,92vw);margin:.5rem 0;">
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">MUSIC VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="music-vol-lbl">80%</span></div>
+      <input type="range" id="music-vol" min="0" max="100" value="80" style="width:100%;accent-color:var(--gold);">
     </div>
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">SFX VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="sfx-vol-lbl">100%</span></div>
+      <input type="range" id="sfx-vol" min="0" max="100" value="100" style="width:100%;accent-color:var(--gold);">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">PARTICLE DENSITY</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="particle-lbl">HIGH</span></div>
+      <input type="range" id="particle-density" min="1" max="3" value="3" style="width:100%;accent-color:var(--gold);">
+    </div>
+    <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
+  </div>
+</div>
+
+<!-- STATISTICS SCREEN -->
+<div class="scr off overlay" id="s-stats">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">WARRIOR STATISTICS</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div class="stat-grid" id="stats-grid">
+    <div class="stat-card"><span class="sv" id="st-total-kills">0</span><span class="sl">Total Kills</span></div>
+    <div class="stat-card"><span class="sv" id="st-games">0</span><span class="sl">Games Played</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-score">0</span><span class="sl">Best Score</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-wave">I</span><span class="sl">Best Wave</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-combo">0</span><span class="sl">Best Combo</span></div>
+    <div class="stat-card"><span class="sv" id="st-accuracy">0%</span><span class="sl">Accuracy</span></div>
+    <div class="stat-card"><span class="sv" id="st-headshots">0</span><span class="sl">Titan Club Kills</span></div>
+    <div class="stat-card"><span class="sv" id="st-time">0h</span><span class="sl">Play Time</span></div>
+  </div>
+  <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
+<!-- UPGRADES SCREEN -->
+<div class="scr off overlay" id="s-upgrades">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB · ARMORY</div>
+    <div class="screen-title">PERMANENT UPGRADES</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div style="font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);margin:.3rem 0;">♛ TITANS CLUB CREDITS: <span id="credits-count" style="color:var(--red-hot);">0</span></div>
+  <div id="upgrades-list" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;max-height:50vh;overflow-y:auto;width:min(360px,95vw);"></div>
+  <button class="btn-ghost" id="btn-upgrades-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
+<!-- ACHIEVEMENTS SCREEN -->
+<div class="scr off overlay" id="s-achievements">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">HALL OF FAME</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div id="achievements-list" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;max-height:55vh;overflow-y:auto;width:min(380px,95vw);"></div>
+  <button class="btn-ghost" id="btn-achievements-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
     <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR →</button>
     <button class="btn-ghost" id="btn-diff-back">← RETURN</button>
   </div>
@@ -298,15 +449,21 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 <!-- GAME OVER -->
 <div class="scr off" id="s-over">
   <div class="over-inner">
-    <div class="over-eyebrow">BATTLE REPORT</div>
+    <div class="over-eyebrow">TITANS CLUB · BATTLE REPORT</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
+    <div style="font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:4px;color:var(--ash);margin-bottom:.4rem;text-transform:uppercase;">Club Rank Earned</div>
     <div class="final-score-lbl">Final Score</div>
     <div class="final-num" id="f-score">0</div>
     <div class="final-rank" id="f-rank">TITAN RECRUIT</div>
+    <div style="font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.6rem;" id="f-club-rank">♛ TITANS CLUB MEMBER</div>
     <div class="final-stats">
       <div class="fstat"><span class="fstat-num" id="fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
       <div class="fstat"><span class="fstat-num" id="fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>
       <div class="fstat"><span class="fstat-num" id="fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
+    </div>
+    <div style="display:flex;gap:.8rem;margin:.3rem 0 .8rem;flex-wrap:wrap;justify-content:center;">
+      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--gold-dim);border:1px solid rgba(200,168,75,0.2);padding:.15rem .5rem;">✦ FORGED IN GLORY</span>
+      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--red);border:1px solid rgba(192,0,26,0.2);padding:.15rem .5rem;">♛ BOUND BY DISCIPLINE</span>
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-replay" style="margin-top:1rem;">FIGHT AGAIN</button>
@@ -643,17 +800,21 @@ let poisonTrails=[];
 let smokeClods=[];
 let shockwave=null;
 let meteorState=null;
+let powerups=[];
 let keys={},mxP=0,myP=0;
 let shooting=false;
 let lastTS=0,timerID=null,animID=null;
 let totalKills=0,bestCombo=0;
 let nextAmmoPackTime=0;
 let powerBuff=null;
+let powerWasReady=false;
 const P={x:0,y:0,w:32,h:32,invinc:0};
 let joystick={active:false,dx:0,dy:0};
 let lowAmmoWarnShown=false,lastEmptyClick=0;
 let diffCfg=DIFFICULTIES.normal;
 let gameState2={powerBuff:null,shockwave:null,meteorCount:0,meteorTimer:0};
+let slowMo=1,slowMoTimer=0;
+let shakeX=0,shakeY=0,shakeIntensity=0;
 
 function initStars(){stars=[];for(let i=0;i<80;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.2,spd:Math.random()*16+3,a:Math.random()*.35+.07});}
 
@@ -675,6 +836,9 @@ function initGame(){
   const [mn,mx]=diffCfg.ammoPackInterval;nextAmmoPackTime=timeLeft-(mn+Math.random()*(mx-mn));
   mxP=cv.width/2;myP=cv.height/2;
   const badge=document.getElementById('diff-badge-hud');badge.textContent=diffCfg.label;badge.className='';badge.classList.add(selDiff);
+  document.getElementById('club-hud').style.display='flex';
+  document.getElementById('pname-hud').style.display='flex';
+  document.getElementById('hname').textContent=pName;
   initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();
   bgStart(1);startTimer();
 }
@@ -727,16 +891,28 @@ function updatePowerHUD(){
 
 function showPowerAnnounce(txt){const el=document.getElementById('power-announce');el.textContent=txt;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2000);document.getElementById('power-flash').style.opacity='1';setTimeout(()=>{document.getElementById('power-flash').style.opacity='0';},200);}
 
+function triggerSlowMo(duration, intensity){
+  slowMoTimer=duration;
+  slowMo=intensity||0.25;
+}
+
+function triggerShake(intensity, duration){
+  shakeIntensity=intensity||8;
+  setTimeout(()=>{shakeIntensity=0;},duration||300);
+}
+
 function activatePower(){
   const ch=CHARS[selChar];if(powerCharge<1||powerCooldownTimer>0)return;
   powerCharge=0;powerCooldownTimer=ch.powerCooldown;
+  triggerSlowMo(0.4, 0.3);
+  triggerShake(6, 250);
   sfxPower();spawnPop(P.x,P.y-30,'✦ '+ch.powerName,'power');
   ch.power(gameState2);updatePowerHUD();
 }
 
 /* ═══ AMMO PACK ═══ */
-function spawnAmmoPack(){const margin=60;ammoPacks.push({x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:14,pulse:0,age:0,maxAge:18});}
-function drawAmmoPackGlyph(ctx,x,y,r,pulse){ctx.save();ctx.translate(x,y);const glow=ctx.createRadialGradient(0,0,r*.3,0,0,r*2.2);glow.addColorStop(0,'rgba(0,200,168,0.22)');glow.addColorStop(1,'rgba(0,200,168,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,r*2.2,0,Math.PI*2);ctx.fill();const pr=r*(1+pulse*.4);ctx.strokeStyle=`rgba(0,200,168,${.6-pulse*.4})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,pr,0,Math.PI*2);ctx.stroke();ctx.fillStyle='rgba(0,30,26,0.85)';ctx.strokeStyle='rgba(0,200,168,0.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='rgba(0,200,168,0.95)';ctx.fillRect(-3,-7,6,10);ctx.beginPath();ctx.moveTo(-3,3);ctx.lineTo(3,3);ctx.lineTo(0,8);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(0,200,168,0.5)';ctx.fillRect(-3,-9,6,3);ctx.restore();}
+function spawnAmmoPack(){const margin=60;ammoPacks.push({x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:14,pulse:0,age:0,maxAge:18,club:Math.random()<.2});}
+function drawAmmoPackGlyph(ctx,x,y,r,pulse,isClub){ctx.save();ctx.translate(x,y);const glow=ctx.createRadialGradient(0,0,r*.3,0,0,r*2.2);glow.addColorStop(0,isClub?'rgba(212,175,55,0.35)':'rgba(0,200,168,0.22)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,r*2.2,0,Math.PI*2);ctx.fill();const pr=r*(1+pulse*.4);ctx.strokeStyle=isClub?`rgba(212,175,55,${.8-pulse*.4})`:`rgba(0,200,168,${.6-pulse*.4})`;ctx.lineWidth=isClub?2.5:1.5;ctx.beginPath();ctx.arc(0,0,pr,0,Math.PI*2);ctx.stroke();if(isClub){ctx.fillStyle='rgba(212,175,55,0.15)';ctx.beginPath();ctx.arc(0,0,r*1.3,0,Math.PI*2);ctx.fill();}ctx.fillStyle='rgba(0,30,26,0.85)';ctx.strokeStyle=isClub?'rgba(212,175,55,0.85)':'rgba(0,200,168,0.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=isClub?'rgba(212,175,55,0.95)':'rgba(0,200,168,0.95)';ctx.fillRect(-3,-7,6,10);ctx.beginPath();ctx.moveTo(-3,3);ctx.lineTo(3,3);ctx.lineTo(0,8);ctx.closePath();ctx.fill();ctx.fillStyle=isClub?'rgba(245,228,168,0.5)':'rgba(0,200,168,0.5)';ctx.fillRect(-3,-9,6,3);ctx.restore();}
 
 /* ═══ SPAWN ENEMY ═══ */
 function spawnEnemy(forceDef,forceX,forceY){
@@ -774,11 +950,13 @@ function spawnEnemy(forceDef,forceX,forceY){
   if(def.ability==='poison'){e.trail=[];}
   if(def.ability==='revive'){e.revived=false;e.revivedTarget=null;}
   if(def.ability==='armored'){e.armorMod=0.2;}// takes only 20% damage
-  if(def.type==='caesar')showEnemyWarn('⚠ CAESAR APPROACHES');
-  if(def.type==='warlord')showEnemyWarn('WARLORD INBOUND');
-  if(def.type==='titangod')showEnemyWarn('☀ TITAN GOD DESCENDS');
-  if(def.type==='herald')showEnemyWarn('⚑ TITAN HERALD ARRIVES');
-  if(def.type==='chaoslord')showEnemyWarn('✦ CHAOS LORD AWAKENS');
+  if(def.type==='caesar')showEnemyWarn('♛ CAESAR · TITANS CLUB LEGEND');
+  if(def.type==='warlord')showEnemyWarn('⚔ WARLORD · TITANS CLUB ELITE');
+  if(def.type==='titangod')showEnemyWarn('☀ TITAN GOD · TITANS CLUB PRIME');
+  if(def.type==='herald')showEnemyWarn('⚑ TITAN HERALD · TITANS CLUB');
+  if(def.type==='chaoslord')showEnemyWarn('✦ CHAOS LORD · TITANS CLUB');
+  if(def.type==='irontitan')showEnemyWarn('♛ IRON TITAN · TITANS CLUB VANGUARD');
+  if(def.type==='colossusg')showEnemyWarn('⚔ TITAN GUARD · TITANS CLUB');
   enemies.push(e);
 }
 
@@ -814,8 +992,40 @@ function fireBullet(){
 
 function showWaveAnnounce(n){
   const el=document.getElementById('wave-announce');const prof=getWaveMusic(n);const moodLabel=n<=2?'MARCH':n<=4?'ADVANCE':n<=5?'ASSAULT':'FURY';
-  el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} · ${prof.bpm} BPM</span>`;
-  el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);
+  const clubMsg=n>=10?'♛ TITANS CLUB · FINAL STAND':n>=7?'✦ TITANS CLUB · ELITE ONSLAUGHT':n>=5?'⚔ TITANS CLUB · ADVANCE':n>=3?'✦ TITANS CLUB · MARCH':'♛ TITANS CLUB · RECRUIT TRIAL';
+  const extraMsg=n>=10?'☀ FACE THE TITAN GOD':n>=9?'⚑ TITAN HERALD APPROACHES':'';
+  el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} · ${prof.bpm} BPM</span><br><span style="font-family:'Cinzel';font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);">${clubMsg}</span>${extraMsg?`<br><span style="font-family:'Cinzel Decorative';font-size:.6rem;letter-spacing:2px;color:var(--red-hot);">${extraMsg}</span>`:''}`;
+  el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2500);
+  if(n>=5)triggerShake(3,200);
+  if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
+}
+
+function sfxStartGame(){
+  wake();
+  [523,659,784,1047,1319].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.1;
+    o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(.1,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.25);
+  });
+}
+function sfxGateEnter(){
+  wake();
+  [392,523,659,784,1047].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.08;
+    o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.2);
+  });
+}
+function sfxComboMilestone(){
+  wake();
+  [523,659,784,1047,1319,1568].forEach((f,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.06;
+    o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.18);
+  });
 }
 
 function fireAt(e,tx,ty,speed,r){const a=Math.atan2(ty-e.y,tx-e.x);eBullets.push({x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:r||5,col:e.col});}
@@ -825,10 +1035,23 @@ function fireAngle(e,ang,speed,r){eBullets.push({x:e.x,y:e.y,vx:Math.cos(ang)*sp
 function update(dt){
   const ch=CHARS[selChar];
 
+  // Slow motion
+  if(slowMoTimer>0){slowMoTimer-=dt;if(slowMoTimer<=0){slowMo=1;}else{dt*=slowMo;}}
+  
   // Power cooldown tick
   if(powerCooldownTimer>0){powerCooldownTimer-=dt;if(powerCooldownTimer<0)powerCooldownTimer=0;}
   // Power charge from kills (handled in kill event) + passive over time
   if(powerCharge<1){powerCharge=Math.min(1,powerCharge+dt*(1/30));updatePowerHUD();}
+  
+  // Power ready pulse effect
+  if(powerCharge>=1&&powerCooldownTimer<=0&&!powerWasReady){
+    powerWasReady=true;
+    sfxCombo();
+    document.getElementById('power-btn').classList.add('ready');
+  }else if(powerCharge<1||powerCooldownTimer>0){
+    powerWasReady=false;
+    document.getElementById('power-btn').classList.remove('ready');
+  }
 
   // Power key
   if(keys['KeyE']){keys['KeyE']=false;activatePower();}
@@ -859,6 +1082,11 @@ function update(dt){
     gameState2.shockwave.r+=dt*480;gameState2.shockwave.alpha-=dt*1.1;
     if(gameState2.shockwave.alpha<=0)gameState2.shockwave=null;
   }
+  
+  // Screen shake decay
+  if(shakeIntensity>0){shakeIntensity*=0.92;if(shakeIntensity<0.3)shakeIntensity=0;}
+  shakeX=(Math.random()-.5)*shakeIntensity*2;
+  shakeY=(Math.random()-.5)*shakeIntensity*2;
 
   // Meteor rain
   if(gameState2.meteorCount>0){
@@ -902,7 +1130,10 @@ function update(dt){
     if(Math.hypot(pk.x-P.x,pk.y-P.y)<pk.r+P.w*.45){
       const gained=Math.min(diffCfg.ammoRefill,maxAmmo-ammo);ammo=Math.min(maxAmmo,ammo+diffCfg.ammoRefill);
       sfxAmmoPickup();document.getElementById('ammo-flash').style.opacity='1';setTimeout(()=>{document.getElementById('ammo-flash').style.opacity='0';},150);
-      spawnParts(pk.x,pk.y,'#00C8A8',10);spawnPop(pk.x,pk.y,`+${gained} AMMO`,'ammo');updateAmmoHUD();return false;
+      spawnParts(pk.x,pk.y,pk.club?'#D4AF37':'#00C8A8',pk.club?15:10);
+      spawnPop(pk.x,pk.y,pk.club?`+${gained} ♛ TITANS CLUB`:`+${gained} AMMO`,pk.club?'power':'ammo');
+      if(pk.club){showPowerAnnounce('♛ TITANS CLUB AMMO');triggerShake(3,150);}
+      updateAmmoHUD();return false;
     }
     return pk.age<pk.maxAge;
   });
@@ -1057,13 +1288,27 @@ function update(dt){
 
 function killEnemy(e,idx){
   const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord';
-  if(isBoss)sfxBigBoom();else sfxExplode();
+  const isTitanClub=e.type==='irontitan'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='colossusg';
+  if(isBoss){sfxBigBoom();triggerSlowMo(0.5, 0.35);triggerShake(14, 400);}
+  else if(isTitanClub){sfxBigBoom();triggerSlowMo(0.35,0.3);triggerShake(8,250);}
+  else sfxExplode();
   combo++;comboT=2.5;totalKills++;if(combo>bestCombo)bestCombo=combo;
   const mult=combo>=5?2:combo>=3?1.5:1;
   const pts=Math.round(e.pts*mult*diffCfg.scoreMult);
-  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?40:11);
-  spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss?'boss':'');
-  if(combo>=3){const cd=document.getElementById('combo');cd.textContent=`${combo}× COMBO`;cd.style.opacity='1';if(combo>=5)sfxCombo();}
+  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?60:isTitanClub?25:15);
+  if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} ♛ TITANS CLUB`,'boss');
+  else spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
+  if(combo>=3){
+    const cd=document.getElementById('combo');
+    const comboName=combo>=20?'☀ IMMORTAL':combo>=15?'⚔ TITAN WRATH':combo>=10?'♛ LEGIONARY':combo>=5?'✦ CLUB STRIKE':'';
+    cd.textContent=comboName?`${combo}× ${comboName}`:`${combo}× COMBO`;
+    cd.style.opacity='1';cd.classList.remove('milestone');void cd.offsetWidth;cd.classList.add('milestone');if(combo>=5)sfxCombo();
+  }
+  // Combo milestones - Titans Club announcements
+  if(combo===5){showPowerAnnounce('✦ 5× COMBO · TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',20);sfxComboMilestone();}
+  if(combo===10){showPowerAnnounce('♛ 10× COMBO · LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',30);sfxComboMilestone();}
+  if(combo===15){showPowerAnnounce('⚔ 15× COMBO · TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',40);sfxComboMilestone();}
+  if(combo===20){showPowerAnnounce('☀ 20× COMBO · IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',60);sfxComboMilestone();}
   // Power charge on kill
   powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
   // TWIN: spawn 2 smaller enemies
@@ -1096,6 +1341,7 @@ function enterGate(){
   const col=WAVE_GATE_COLS[Math.min(wave-1,WAVE_GATE_COLS.length-1)];
   const fl=document.getElementById('flash');const r2=parseInt(col.slice(1,3),16),g2=parseInt(col.slice(3,5),16),b2=parseInt(col.slice(5,7),16);
   fl.style.background=`rgba(${r2},${g2},${b2},0.38)`;fl.style.opacity='1';setTimeout(()=>{fl.style.opacity='0';fl.style.background='rgba(200,0,26,0.35)';},200);
+  sfxGateEnter();
   wave++;if(wave>10){endGame();return;}
   bgColTarget={...WAVE_BGS[Math.min(wave-1,WAVE_BGS.length-1)]};showWaveAnnounce(wave);sfxCombo();
   document.getElementById('hwave').textContent=toRoman(wave);spawnParts(cv.width/2,cv.height/2,WAVE_GATE_COLS[Math.min(wave-2,WAVE_GATE_COLS.length-1)],22);
@@ -1177,7 +1423,9 @@ function drawEnemy(e){
 
 /* ═══ DRAW ═══ */
 function draw(){
-  cx.fillStyle=`rgb(${Math.round(bgCol.r)},${Math.round(bgCol.g)},${Math.round(bgCol.b)})`;cx.fillRect(0,0,cv.width,cv.height);
+  cx.save();
+  cx.translate(shakeX, shakeY);
+  cx.fillStyle=`rgb(${Math.round(bgCol.r)},${Math.round(bgCol.g)},${Math.round(bgCol.b)})`;cx.fillRect(-10,-10,cv.width+20,cv.height+20);
   const vg=cx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');cx.fillStyle=vg;cx.fillRect(0,0,cv.width,cv.height);
   cx.strokeStyle='rgba(200,168,75,.022)';cx.lineWidth=1;for(let x=0;x<cv.width;x+=55){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,cv.height);cx.stroke();}for(let y=0;y<cv.height;y+=55){cx.beginPath();cx.moveTo(0,y);cx.lineTo(cv.width,y);cx.stroke();}
   stars.forEach(s=>{cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=`rgba(237,229,204,${s.a})`;cx.fill();});
@@ -1188,7 +1436,7 @@ function draw(){
   smokeClods.forEach(s=>{cx.save();cx.globalAlpha=s.alpha;cx.fillStyle='rgba(120,144,156,.4)';cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fill();cx.restore();});
 
   parts.forEach(p=>{cx.save();cx.globalAlpha=p.life;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fillStyle=p.col;cx.fill();cx.restore();});
-  ammoPacks.forEach(pk=>drawAmmoPackGlyph(cx,pk.x,pk.y,pk.r,pk.pulse));
+  ammoPacks.forEach(pk=>drawAmmoPackGlyph(cx,pk.x,pk.y,pk.r,pk.pulse,pk.club));
 
   // Shockwave
   if(gameState2.shockwave){const sw=gameState2.shockwave;cx.save();cx.globalAlpha=sw.alpha*.6;cx.strokeStyle='#FFCC80';cx.lineWidth=5;cx.beginPath();cx.arc(sw.x,sw.y,sw.r,0,Math.PI*2);cx.stroke();cx.restore();}
@@ -1208,21 +1456,26 @@ function draw(){
   const ch=CHARS[selChar];
   if(!(P.invinc>0&&Math.floor(P.invinc*10)%2===0)){cx.save();cx.shadowColor=ch.color;cx.shadowBlur=14;const ang=Math.atan2(myP-P.y,mxP-P.x)+Math.PI/2;ch.draw(P.x,P.y,ang,cx);cx.restore();}
   const sl=(Date.now()*.03)%cv.height;cx.fillStyle='rgba(200,168,75,.01)';cx.fillRect(0,sl,cv.width,2);
+  cx.restore();
 }
 
 /* ═══ LOOP / END ═══ */
 function loop(ts){if(gState!=='play')return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);draw();animID=requestAnimationFrame(loop);}
 
 function rankMsg(sc){if(sc>=20000)return 'TITAN PRIME · IMMORTAL LEGEND';if(sc>=15000)return 'ALPHA TITAN · FIRST AMONG ALL';if(sc>=8000)return 'PRIMUS · ELITE OF THE LEGION';if(sc>=3000)return 'MILES · SENIOR WARRIOR';return 'TIRO · THE JOURNEY BEGINS';}
+function clubRank(sc){if(sc>=20000)return '♛ TITANS CLUB · LEGENDARY MEMBER';if(sc>=15000)return '♛ TITANS CLUB · ALPHA TITAN';if(sc>=8000)return '✦ TITANS CLUB · PRIMUS ELITE';if(sc>=3000)return '✦ TITANS CLUB · SENIOR WARRIOR';return '✦ TITANS CLUB · RECRUIT';}
 
 function endGame(){
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   document.getElementById('f-score').textContent=score.toLocaleString();
   document.getElementById('f-rank').textContent=rankMsg(score);
+  document.getElementById('f-club-rank').textContent=clubRank(score);
   document.getElementById('fstat-wave').textContent=toRoman(wave);
   document.getElementById('fstat-kills').textContent=totalKills;
   document.getElementById('fstat-combo').textContent=bestCombo+'×';
   showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';
+  document.getElementById('pname-hud').style.display='none';
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
@@ -1263,7 +1516,7 @@ document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('
 document.getElementById('btn-enter-arena').addEventListener('click',()=>{
   wake();showScr(null);document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
-  gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);animID=requestAnimationFrame(loop);
+  gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
 });
 document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
 document.getElementById('btn-replay').addEventListener('click',()=>{
@@ -1272,11 +1525,13 @@ document.getElementById('btn-replay').addEventListener('click',()=>{
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
-  gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);animID=requestAnimationFrame(loop);
+  gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
 });
 document.getElementById('btn-menu').addEventListener('click',()=>{
   bgStop();gState='menu';menuAnimActive=true;showScr('s-start');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';
+  document.getElementById('pname-hud').style.display='none';
   document.getElementById('htimer').classList.remove('warn');
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
@@ -1285,6 +1540,621 @@ document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Ente
 
 /* ═══ BOOT ═══ */
 initStartCanvas();menuAnimActive=true;menuRAF=requestAnimationFrame(drawStartBG);
+
+/* ═══════════════════════════════════════════
+   NEW ENHANCEMENT SYSTEMS
+   ═══════════════════════════════════════════ */
+
+/* ═══ PAUSE MENU ═══ */
+let isPaused=false;
+const pauseOverlay=document.getElementById('pause-overlay');
+function togglePause(){
+  if(gState!=='play')return;
+  isPaused=!isPaused;
+  if(isPaused){pauseOverlay.classList.add('visible');bgStop();}
+  else{pauseOverlay.classList.remove('visible');bgStart(wave);}
+}
+document.addEventListener('keydown',e=>{
+  if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();togglePause();}
+});
+document.getElementById('btn-resume').addEventListener('click',()=>{isPaused=false;pauseOverlay.classList.remove('visible');bgStart(wave);});
+document.getElementById('btn-quit').addEventListener('click',()=>{isPaused=false;pauseOverlay.classList.remove('visible');endGame();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-pause-settings').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-settings');});
+document.getElementById('btn-pause-stats').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-stats');renderStats();});
+document.getElementById('btn-pause-upgrades').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-upgrades');renderUpgrades();});
+document.getElementById('btn-settings-back').addEventListener('click',()=>{showScr(null);pauseOverlay.classList.add('visible');});
+document.getElementById('btn-stats-back').addEventListener('click',()=>{showScr(null);pauseOverlay.classList.add('visible');});
+document.getElementById('btn-upgrades-back').addEventListener('click',()=>{showScr(null);pauseOverlay.classList.add('visible');});
+
+/* ═══ SETTINGS ═══ */
+let settings={musicVol:0.8,sfxVol:1.0,particleDensity:3};
+function loadSettings(){
+  try{const s=JSON.parse(localStorage.getItem('titans_settings'));if(s)settings={...settings,...s};}catch(e){}
+  document.getElementById('music-vol').value=settings.musicVol*100;
+  document.getElementById('sfx-vol').value=settings.sfxVol*100;
+  document.getElementById('particle-density').value=settings.particleDensity;
+  updateSettingsLabels();
+}
+function saveSettings(){localStorage.setItem('titans_settings',JSON.stringify(settings));}
+function updateSettingsLabels(){
+  document.getElementById('music-vol-lbl').textContent=Math.round(settings.musicVol*100)+'%';
+  document.getElementById('sfx-vol-lbl').textContent=Math.round(settings.sfxVol*100)+'%';
+  const pLbl={1:'LOW',2:'MED',3:'HIGH'};document.getElementById('particle-lbl').textContent=pLbl[settings.particleDensity]||'HIGH';
+}
+document.getElementById('music-vol').addEventListener('input',e=>{settings.musicVol=e.target.value/100;updateSettingsLabels();saveSettings();});
+document.getElementById('sfx-vol').addEventListener('input',e=>{settings.sfxVol=e.target.value/100;updateSettingsLabels();saveSettings();});
+document.getElementById('particle-density').addEventListener('input',e=>{settings.particleDensity=parseInt(e.target.value);updateSettingsLabels();saveSettings();});
+
+/* ═══ STATISTICS ═══ */
+let stats={totalKills:0,gamesPlayed:0,bestScore:0,bestWave:1,bestCombo:0,headshots:0,playTime:0,accuracy:{shots:0,hits:0}};
+function loadStats(){
+  try{const s=JSON.parse(localStorage.getItem('titans_stats'));if(s)stats={...stats,...s};}catch(e){}
+}
+function saveStats(){localStorage.setItem('titans_stats',JSON.stringify(stats));}
+function updateStats(){
+  stats.totalKills+=totalKills;stats.gamesPlayed++;stats.bestScore=Math.max(stats.bestScore,score);
+  stats.bestWave=Math.max(stats.bestWave,wave);stats.bestCombo=Math.max(stats.bestCombo,bestCombo);
+  stats.playTime+=Math.floor((Date.now()-gameStartTime)/1000);
+  saveStats();
+}
+function renderStats(){
+  document.getElementById('st-total-kills').textContent=stats.totalKills.toLocaleString();
+  document.getElementById('st-games').textContent=stats.gamesPlayed;
+  document.getElementById('st-best-score').textContent=stats.bestScore.toLocaleString();
+  document.getElementById('st-best-wave').textContent=toRoman(stats.bestWave);
+  document.getElementById('st-best-combo').textContent=stats.bestCombo+'×';
+  const acc=stats.accuracy.shots>0?Math.round(stats.accuracy.hits/stats.accuracy.shots*100):0;
+  document.getElementById('st-accuracy').textContent=acc+'%';
+  document.getElementById('st-headshots').textContent=stats.headshots;
+  const hrs=Math.floor(stats.playTime/3600);const mins=Math.floor((stats.playTime%3600)/60);
+  document.getElementById('st-time').textContent=hrs>0?`${hrs}h ${mins}m`:`${mins}m`;
+}
+let gameStartTime=0;
+
+/* ═══ ACHIEVEMENTS ═══ */
+const ACHIEVEMENTS=[
+  {id:'first_blood',name:'FIRST BLOOD',desc:'Kill your first enemy',icon:'⚔',check:s=>s.totalKills>=1},
+  {id:'combo_5',name:'CLUB STRIKE',desc:'Reach a 5× combo',icon:'✦',check:s=>s.bestCombo>=5},
+  {id:'combo_10',name:'LEGIONARY',desc:'Reach a 10× combo',icon:'♛',check:s=>s.bestCombo>=10},
+  {id:'combo_20',name:'IMMORTAL',desc:'Reach a 20× combo',icon:'☀',check:s=>s.bestCombo>=20},
+  {id:'wave_5',name:'ADVANCE',desc:'Reach Wave 5',icon:'⚔',check:s=>s.bestWave>=5},
+  {id:'wave_10',name:'FINAL STAND',desc:'Reach Wave 10',icon:'♛',check:s=>s.bestWave>=10},
+  {id:'score_5k',name:'RISING STAR',desc:'Score 5,000 points',icon:'⭐',check:s=>s.bestScore>=5000},
+  {id:'score_20k',name:'TITAN PRIME',desc:'Score 20,000 points',icon:'☀',check:s=>s.bestScore>=20000},
+  {id:'games_10',name:'VETERAN',desc:'Play 10 games',icon:'🏆',check:s=>s.gamesPlayed>=10},
+  {id:'games_50',name:'LEGEND',desc:'Play 50 games',icon:'♛',check:s=>s.gamesPlayed>=50},
+  {id:'accuracy',name:'SHARPSHOOTER',desc:'90%+ accuracy',icon:'🎯',check:s=>s.accuracy.shots>10&&s.accuracy.hits/s.accuracy.shots>=0.9},
+  {id:'titan_hunter',name:'TITAN HUNTER',desc:'Defeat 50 Titan Club enemies',icon:'⚔',check:s=>s.headshots>=50},
+];
+let unlockedAchievements=new Set();
+function loadAchievements(){try{const a=JSON.parse(localStorage.getItem('titans_achievements'));if(a)unlockedAchievements=new Set(a);}catch(e){unlockedAchievements=new Set();}}
+function saveAchievements(){localStorage.setItem('titans_achievements',JSON.stringify([...unlockedAchievements]));}
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(ach=>{
+    if(!unlockedAchievements.has(ach.id)&&ach.check(stats)){
+      unlockedAchievements.add(ach.id);saveAchievements();showPowerAnnounce('🏆 '+ach.name);spawnParts(cv.width/2,cv.height/2,'#FFD700',30);triggerShake(5,200);sfxComboMilestone();
+    }
+  });
+}
+function renderAchievements(){
+  const list=document.getElementById('achievements-list');list.innerHTML='';
+  ACHIEVEMENTS.forEach(ach=>{
+    const unlocked=unlockedAchievements.has(ach.id);
+    const card=document.createElement('div');card.className='achievement-card'+(unlocked?' unlocked':'');
+    card.innerHTML=`<div class="ach-icon">${ach.icon}</div><div class="ach-info"><div class="ach-name">${ach.name}</div><div class="ach-desc">${ach.desc}</div></div>`;
+    list.appendChild(card);
+  });
+}
+
+/* ═══ UPGRADES ═══ */
+const UPGRADES=[
+  {id:'ammo_cap',name:'AMMO CAPACITY',desc:'+5 max ammo',icon:'📦',cost:100,type:'ammo',maxLevel:5,current:0,apply:()=>{maxAmmo+=5;}},
+  {id:'fire_rate',name:'RAPID FIRE',desc:'15% faster fire rate',icon:'⚡',cost:150,type:'fire',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.fire*=0.85;});}},
+  {id:'damage',name:'HEAVY ROUNDS',desc:'+20% bullet damage',icon:'💥',cost:200,type:'dmg',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.dmg*=1.2;});}},
+  {id:'speed',name:'AGILITY',desc:'+10% movement speed',icon:'👟',cost:120,type:'spd',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.spd*=1.1;});}},
+  {id:'regen',name:'AMMO REGEN',desc:'Faster ammo regeneration',icon:'🔄',cost:180,type:'regen',maxLevel:3,current:0,apply:()=>{diffCfg.ammoRegenRate*=1.4;}},
+  {id:'shield',name:'EXTRA LIFE',desc:'+1 maximum life',icon:'🛡️',cost:250,type:'life',maxLevel:3,current:0,apply:()=>{diffCfg.lives+=1;}},
+  {id:'crit',name:'CRITICAL STRIKE',desc:'10% chance for 2× damage',icon:'🎯',cost:300,type:'crit',maxLevel:3,current:0,apply:()=>{window.critChance=(window.critChance||0)+0.1;}},
+];
+let credits=0;
+let upgrades={};
+function loadUpgrades(){try{const u=JSON.parse(localStorage.getItem('titans_upgrades'));if(u){upgrades=u;credits=u.credits||0;}const u2=JSON.parse(localStorage.getItem('titans_upgrade_levels'));if(u2)UPGRADES.forEach(u=>{if(u2[u.id]!==undefined)u.current=u2[u.id];});}catch(e){}}
+function saveUpgrades(){localStorage.setItem('titans_upgrades',JSON.stringify({...upgrades,credits}));localStorage.setItem('titans_upgrade_levels',JSON.stringify(UPGRADES.reduce((a,u)=>(a[u.id]=u.current,a),{})));}
+function earnCredits(amount){credits+=amount;document.getElementById('credits-count').textContent=credits;saveUpgrades();}
+function renderUpgrades(){
+  document.getElementById('credits-count').textContent=credits;
+  const list=document.getElementById('upgrades-list');list.innerHTML='';
+  UPGRADES.forEach(upg=>{
+    const owned=upg.current>=upg.maxLevel;const canAfford=credits>=upg.cost;
+    const card=document.createElement('div');card.className='upgrade-card'+(owned?' owned':'');
+    card.innerHTML=`<div class="upg-icon">${upg.icon}</div><div class="upg-info"><div class="upg-name">${upg.name} ${owned?'[MAX]':`[${upg.current}/${upg.maxLevel}]`}</div><div class="upg-desc">${upg.desc}</div></div><div class="upg-cost">${owned?'MAXED':upg.cost+' CREDITS'}</div>`;
+    if(!owned&&canAfford){
+      card.addEventListener('click',()=>{
+        if(credits>=upg.cost&&upg.current<upg.maxLevel){credits-=upg.cost;upg.current++;upg.apply();saveUpgrades();renderUpgrades();showPowerAnnounce('⬆ '+upg.name+' UPGRADED');sfxCombo();}
+      });
+    }
+    list.appendChild(card);
+  });
+}
+
+/* ═══ WEAPON SYSTEM ═══ */
+const WEAPONS=[
+  {id:'pistol',name:'SIDEARM',icon:'🔫',fireRate:0.16,spread:0,dmg:1,bulletSpd:690,count:1, Pierce:false,unlockScore:0,owned:true},
+  {id:'rifle',name:'RIFLE',icon:'🎯',fireRate:0.1,spread:0.02,dmg:1.3,bulletSpd:850,count:1,pierce:false,unlockScore:2000,owned:false},
+  {id:'shotgun',name:'BLASTER',icon:'💥',fireRate:0.3,spread:0.18,dmg:0.8,bulletSpd:600,count:5,pierce:false,unlockScore:5000,owned:false},
+  {id:'smg',name:'SMG',icon:'⚡',fireRate:0.05,spread:0.06,dmg:0.7,bulletSpd:720,count:1,pierce:false,unlockScore:8000,owned:false},
+  {id:'sniper',name:'SNIPER',icon:'🎯',fireRate:0.5,spread:0,dmg:4,bulletSpd:1200,count:1,pierce:true,unlockScore:12000,owned:false},
+  {id:'laser',name:'LASER',icon:'🔮',fireRate:0.08,spread:0,dmg:1.5,bulletSpd:1400,count:1,pierce:true,unlockScore:15000,owned:false},
+];
+let currentWeapon=0;
+function unlockWeapon(weaponId){const w=WEAPONS.find(w=>w.id===weaponId);if(w)w.owned=true;}
+function switchWeapon(){currentWeapon=(currentWeapon+1)%WEAPONS.length;while(!WEAPONS[currentWeapon].owned&&WEAPONS[currentWeapon].unlockScore>stats.bestScore){currentWeapon=(currentWeapon+1)%WEAPONS.length;}showPowerAnnounce('🔫 '+WEAPONS[currentWeapon].name);updateWeaponHUD();}
+function updateWeaponHUD(){
+  const hud=document.getElementById('weapon-hud');if(!hud)return;
+  hud.innerHTML='';hud.classList.add('visible');
+  WEAPONS.forEach((w,i)=>{
+    const div=document.createElement('div');div.className='weapon-icon'+(i===currentWeapon?' active':'')+(w.owned?'':'');
+    div.innerHTML=`<span class="weapon-name">${w.name}</span>${w.icon}`;
+    if(i===currentWeapon){const ammoDiv=document.createElement('div');ammoDiv.className='w-ammo';ammoDiv.textContent=ammo;div.appendChild(ammoDiv);}
+    div.addEventListener('click',()=>{if(w.owned){currentWeapon=i;updateWeaponHUD();showPowerAnnounce('🔫 '+w.name);}});
+    hud.appendChild(div);
+  });
+}
+
+/* ═══ POWER-UPS ═══ */
+const POWERUP_TYPES=[
+  {id:'speed',name:'SPEED BOOST',icon:'⚡',color:'#00C8A8',duration:8,effect:'speed'},
+  {id:'damage',name:'DAMAGE BOOST',icon:'💥',color:'#FF6D00',duration:6,effect:'damage'},
+  {id:'shield',name:'SHIELD',icon:'🛡️',color:'#4A9EFF',duration:10,effect:'shield'},
+  {id:'rapid',name:'RAPID FIRE',icon:'🔥',color:'#E8001F',duration:5,effect:'rapid'},
+  {id:'magnet',name:'AMMO MAGNET',icon:'🧲',color:'#D4AF37',duration:12,effect:'magnet'},
+];
+let activePowerups=[];
+function spawnPowerup(){
+  if(Math.random()>0.015)return;
+  const type=POWERUP_TYPES[Math.floor(Math.random()*POWERUP_TYPES.length)];
+  const margin=60;powerups.push({x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:16,type,...type,age:0,maxAge:20,pulse:0});
+}
+function updatePowerups(dt){
+  powerups=powerups.filter(pu=>{
+    pu.pulse+=dt*3;if(pu.pulse>1)pu.pulse=0;pu.age+=dt;
+    if(Math.hypot(pu.x-P.x,pu.y-P.y)<pu.r+P.w*.5){
+      activatePowerup(pu);return false;
+    }
+    return pu.age<pu.maxAge;
+  });
+}
+function activatePowerup(pu){
+  sfxAmmoPickup();spawnParts(pu.x,pu.y,pu.color,12);spawnPop(pu.x,pu.y,pu.name,'power');
+  showPowerAnnounce(pu.icon+' '+pu.name);
+  activePowerups.push({type:pu.effect,timer:pu.duration});
+  if(pu.effect==='speed')P.spdBuff=1.5;
+  if(pu.effect==='damage')window.dmgBuff=(window.dmgBuff||1)*2;
+  if(pu.effect==='rapid')window.fireRateBuff=0.5;
+  if(pu.effect==='magnet')window.magnetRange=200;
+  triggerShake(3,150);
+}
+function updateActivePowerups(dt){
+  activePowerups=activePowerups.filter(pu=>{pu.timer-=dt;if(pu.timer<=0){if(pu.type==='speed')P.spdBuff=null;if(pu.type==='damage')window.dmgBuff=1;if(pu.type==='rapid')window.fireRateBuff=null;if(pu.type==='magnet')window.magnetRange=null;return false;}return true;});
+}
+let powerups=[];
+function drawPowerups(){
+  powerups.forEach(pu=>{
+    cx.save();cx.translate(pu.x,pu.y);
+    const glow=cx.createRadialGradient(0,0,pu.r*.3,0,0,pu.r*2);glow.addColorStop(0,pu.color+'44');glow.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=glow;cx.beginPath();cx.arc(0,0,pu.r*2,0,Math.PI*2);cx.fill();
+    const pr=pu.r*(1+pu.pulse*.3);cx.strokeStyle=pu.color+'88';cx.lineWidth=2;cx.beginPath();cx.arc(0,0,pr,0,Math.PI*2);cx.stroke();
+    cx.fillStyle=pu.color+'22';cx.beginPath();cx.arc(0,0,pu.r*1.2,0,Math.PI*2);cx.fill();
+    cx.fillStyle=pu.color;cx.font="bold 14px sans-serif";cx.textAlign='center';cx.textBaseline='middle';cx.fillText(pu.icon,0,0);
+    cx.restore();
+  });
+}
+
+/* ═══ DAMAGE NUMBERS ═══ */
+let dmgNums=[];
+function spawnDmgNum(x,y,amount,color){
+  dmgNums.push({x,y,amount:Math.round(amount),color:color||'#E2C06A',life:1,vy:-60});
+}
+function updateDmgNums(dt){
+  dmgNums=dmgNums.filter(d=>{d.y+=d.vy*dt;d.life-=dt*1.1;return d.life>0;});
+}
+function drawDmgNums(){
+  dmgNums.forEach(d=>{
+    cx.save();cx.globalAlpha=Math.max(0,d.life);cx.font="bold 14px 'Cinzel',serif";cx.textAlign='center';cx.fillStyle=d.color;cx.shadowColor='rgba(0,0,0,0.8)';cx.shadowBlur=4;cx.fillText(d.amount,d.x,d.y);cx.restore();
+  });
+}
+
+/* ═══ KILL FEED ═══ */
+let killFeed=[];
+function addKillFeed(msg,col){killFeed.unshift({msg,col,time:2.5});if(killFeed.length>5)killFeed.pop();}
+function updateKillFeed(dt){killFeed=killFeed.filter(k=>{k.time-=dt;return k.time>0;});}
+function drawKillFeed(){
+  killFeed.forEach((k,i)=>{
+    cx.save();cx.globalAlpha=Math.min(1,k.time*.5);cx.font="9px 'Cinzel',serif";cx.textAlign='right';cx.fillStyle=k.col;cx.shadowColor='rgba(0,0,0,0.8)';cx.shadowBlur=3;cx.fillText(k.msg,cv.width-10,70+i*18);cx.restore();
+  });
+}
+
+/* ═══ NEW WEAPON FIRE LOGIC ═══ */
+function fireBullet(){
+  if(ammo<=0){const now=Date.now();if(now-lastEmptyClick>350){sfxEmpty();lastEmptyClick=now;}return;}
+  const ch=CHARS[selChar];
+  const w=WEAPONS[currentWeapon];
+  const ang=Math.atan2(myP-P.y,mxP-P.x);
+  let dmg=ch.dmg*w.dmg*(window.dmgBuff||1);
+  if(gameState2.powerBuff&&gameState2.powerBuff.type==='battlecry')dmg*=gameState2.powerBuff.dmgMult;
+  const fireInterval=(w.fireRate||ch.fire)/(window.fireRateBuff||1);
+  for(let i=0;i<w.count;i++){
+    const a=ang+(i-Math.floor(w.count/2))*w.spread;
+    const bullet={x:P.x,y:P.y,vx:Math.cos(a)*w.bulletSpd,vy:Math.sin(a)*w.bulletSpd,r:w.id==='sniper'?6:w.id==='shotgun'?3:4,dmg};
+    if(w.pierce)bullet.pierce=true;
+    bullets.push(bullet);
+  }
+  ammo=Math.max(0,ammo-1);sfxShoot();spawnParts(P.x,P.y,'#FFA500',2);updateAmmoHUD();
+  stats.accuracy.shots++;
+}
+
+/* ═══ ENHANCED ENEMY SPAWN ═══ */
+let spawnVariantTimer=0;
+function spawnEnemyVariant(){
+  if(Math.random()>0.08)return;
+  const variants=['elite','berserker','skirmisher'];
+  const def=EDEFS.find(d=>d.type===variants[Math.floor(Math.random()*variants.length)]);
+  if(def)spawnEnemy(def);
+}
+
+/* ═══ CRITICAL HIT SYSTEM ═══ */
+function rollCrit(){return Math.random()<(window.critChance||0);}
+
+/* ═══ ENHANCED BULLET COLLISION ═══ */
+function checkBulletCollision(b,e){
+  if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){
+    if(e.ability==='reflect'&&e.visible!==false){spawnParts(b.x,b.y,'#B0BEC5',4);eBullets.push({x:b.x,y:b.y,vx:-b.vx*.8,vy:-b.vy*.8,r:b.r,col:'#B0BEC5'});stats.accuracy.hits++;return false;}
+    if(e.ability==='shield'){const ba=Math.atan2(-b.vy,-b.vx);const ad=Math.abs(((ba-e.shieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI);if(ad<1.05){spawnParts(b.x,b.y,'#4A7EC7',4);return false;}}
+    if(e.ability==='fortify'&&e.fortified){const actualDmg=b.dmg*0.15;e.hp-=actualDmg;spawnParts(b.x,b.y,'#5C6BC0',3);return false;}
+    const dmgMult=e.ability==='armored'?e.armorMod:1;
+    if(e.ability==='phase'&&!e.visible){spawnParts(b.x,b.y,'#37474F',3);return false;}
+    if(e.ability==='godmode'&&e.godShield&&e.hp/e.maxHp>0.66){spawnParts(b.x,b.y,'#FFD700',4);return false;}
+    let finalDmg=b.dmg*dmgMult;
+    if(rollCrit()){finalDmg*=2;spawnDmgNum(e.x,e.y,finalDmg,'#FFD700');stats.headshots++;}else{spawnDmgNum(e.x,e.y,finalDmg,'#E2C06A');}
+    e.hp-=finalDmg;spawnParts(b.x,b.y,e.col,5);
+    if(e.hp<=0){killEnemy(e,i);return false;}
+    return false;
+  }
+}
+
+/* ═══ MAGNET EFFECT ═══ */
+function updateMagnet(){
+  if(window.magnetRange&&ammoPacks.length>0){
+    ammoPacks.forEach(pk=>{const d=Math.hypot(pk.x-P.x,pk.y-P.y);if(d<window.magnetRange){const force=(window.magnetRange-d)/window.magnetRange*8;pk.x+=(P.x-pk.x)/d*force;pk.y+=(P.y-pk.y)/d*force;}});
+  }
+}
+
+/* ═══ GAME INITIALIZATION ENHANCEMENT ═══ */
+function initGame(){
+  diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
+  const ch=CHARS[selChar];
+  score=0;lives=diffCfg.lives;wave=1;timeLeft=DURATION;
+  combo=0;comboT=0;shootCD=0;spawnT=0;waveAdvancing=false;waveKills=0;
+  gate=null;gateOpen=false;
+  document.getElementById('gate-prompt').style.opacity='0';document.getElementById('gate-prompt').classList.remove('visible');
+  bgCol={r:4,g:4,b:10};bgColTarget={r:4,g:4,b:10};
+  totalKills=0;bestCombo=0;
+  ammo=ch.maxAmmo;maxAmmo=ch.maxAmmo;ammoRegenAccum=0;
+  powerCharge=0;powerCooldownTimer=0;
+  gameState2={powerBuff:null,shockwave:null,meteorCount:0,meteorTimer:0};
+  bullets=[];eBullets=[];enemies=[];parts=[];ammoPacks=[];poisonTrails=[];smokeClods=[];shockwave=null;meteorState=null;powerups=[];dmgNums=[];killFeed=[];
+  P.x=cv.width/2;P.y=cv.height-100;P.invinc=0;P.spdBuff=null;
+  lowAmmoWarnShown=false;slowMo=1;slowMoTimer=0;shakeIntensity=0;shakeX=0;shakeY=0;currentWeapon=0;activePowerups=[];
+  const [mn,mx]=diffCfg.ammoPackInterval;nextAmmoPackTime=timeLeft-(mn+Math.random()*(mx-mn));
+  mxP=cv.width/2;myP=cv.height/2;
+  const badge=document.getElementById('diff-badge-hud');badge.textContent=diffCfg.label;badge.className='';badge.classList.add(selDiff);
+  document.getElementById('club-hud').style.display='flex';
+  document.getElementById('pname-hud').style.display='flex';
+  document.getElementById('hname').textContent=pName;
+  document.getElementById('weapon-hud').classList.add('visible');
+  initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();updateWeaponHUD();
+  bgStart(1);startTimer();gameStartTime=Date.now();
+}
+
+/* ═══ ENHANCED UPDATE LOOP ═══ */
+function update(dt){
+  const ch=CHARS[selChar];
+  if(slowMoTimer>0){slowMoTimer-=dt;if(slowMoTimer<=0){slowMo=1;}else{dt*=slowMo;}}
+  if(powerCooldownTimer>0){powerCooldownTimer-=dt;if(powerCooldownTimer<0)powerCooldownTimer=0;}
+  if(powerCharge<1){powerCharge=Math.min(1,powerCharge+dt*(1/30));updatePowerHUD();}
+  if(powerCharge>=1&&powerCooldownTimer<=0&&!powerWasReady){powerWasReady=true;sfxCombo();document.getElementById('power-btn').classList.add('ready');}
+  else if(powerCharge<1||powerCooldownTimer>0){powerWasReady=false;document.getElementById('power-btn').classList.remove('ready');}
+  if(keys['KeyE']){keys['KeyE']=false;activatePower();}
+  if(keys['KeyQ']){keys['KeyQ']=false;switchWeapon();}
+  let mvx=0,mvy=0;
+  if(keys['ArrowUp']||keys['KeyW'])mvy-=1;if(keys['ArrowDown']||keys['KeyS'])mvy+=1;
+  if(keys['ArrowLeft']||keys['KeyA'])mvx-=1;if(keys['ArrowRight']||keys['KeyD'])mvx+=1;
+  if(joystick.active){mvx+=joystick.dx;mvy+=joystick.dy;}
+  const ml=Math.hypot(mvx,mvy);if(ml>0){mvx/=ml;mvy/=ml;}
+  let pspd=ch.spd*(P.spdBuff||1);
+  P.x+=mvx*pspd*dt;P.y+=mvy*pspd*dt;
+  const pad=P.w/2+2,hudH=48;
+  P.x=Math.max(pad,Math.min(cv.width-pad,P.x));P.y=Math.max(hudH+pad,Math.min(cv.height-pad,P.y));
+  if(P.invinc>0)P.invinc-=dt;
+  if(gameState2.powerBuff){gameState2.powerBuff.timer-=dt;if(gameState2.powerBuff.timer<=0){if(gameState2.powerBuff.type==='battlecry'){enemies.forEach(e=>{e.spdMod=1;});}gameState2.powerBuff=null;}}
+  if(gameState2.shockwave){gameState2.shockwave.r+=dt*480;gameState2.shockwave.alpha-=dt*1.1;if(gameState2.shockwave.alpha<=0)gameState2.shockwave=null;}
+  if(shakeIntensity>0){shakeIntensity*=0.92;if(shakeIntensity<0.3)shakeIntensity=0;}
+  shakeX=(Math.random()-.5)*shakeIntensity*2;shakeY=(Math.random()-.5)*shakeIntensity*2;
+  if(gameState2.meteorCount>0){
+    gameState2.meteorTimer-=dt;
+    if(gameState2.meteorTimer<=0){
+      gameState2.meteorCount--;gameState2.meteorTimer=0.12;
+      let mx2,my2;
+      if(enemies.length>0){const te=enemies[Math.floor(Math.random()*enemies.length)];mx2=te.x+(Math.random()-0.5)*50;my2=te.y+(Math.random()-0.5)*50;}
+      else{mx2=Math.random()*cv.width;my2=80+Math.random()*cv.height*.6;}
+      for(let i=enemies.length-1;i>=0;i--){const e=enemies[i];if(Math.hypot(e.x-mx2,e.y-my2)<55){e.hp-=4;spawnParts(mx2,my2,'#FF6D00',6);}}
+      spawnParts(mx2,my2,'#FFD54F',12);
+      eBullets.push({x:mx2,y:my2-300,vx:0,vy:800,r:10,col:'#FF6D00',isMeteor:true});
+    }
+  }
+  if(window.innerWidth<=768&&enemies.length>0){let near=enemies[0],best=Infinity;enemies.forEach(e=>{const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<best){best=d;near=e;}});mxP=near.x;myP=near.y;}
+  const w=WEAPONS[currentWeapon];const fireInterval=(w.fireRate||ch.fire)/(window.fireRateBuff||1);
+  shootCD-=dt;if(shooting&&shootCD<=0){fireBullet();shootCD=fireInterval;}
+  if(ammo<maxAmmo){ammoRegenAccum+=dt*diffCfg.ammoRegenRate;if(ammoRegenAccum>=1){const g=Math.floor(ammoRegenAccum);ammo=Math.min(maxAmmo,ammo+g);ammoRegenAccum-=g;updateAmmoHUD();}}
+  if(comboT>0){comboT-=dt;if(comboT<=0){combo=0;document.getElementById('combo').style.opacity='0';}}
+  const spawnBase=diffCfg.spawnRateBase;const sr=Math.max(.25,spawnBase-wave*.12);
+  const waveQuota=6+wave*3;spawnT-=dt;
+  if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){if(enemies.length<Math.min(4+wave,14)){spawnEnemy();spawnEnemyVariant();}spawnT=sr;}
+  if(!waveAdvancing&&!gateOpen&&gate===null&&waveKills>=waveQuota&&enemies.length===0){if(wave>=10){endGame();return;}gateOpen=true;openGate();}
+  if(gate&&!waveAdvancing&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5)enterGate();
+  bgCol.r+=(bgColTarget.r-bgCol.r)*.018;bgCol.g+=(bgColTarget.g-bgCol.g)*.018;bgCol.b+=(bgColTarget.b-bgCol.b)*.018;
+  if(gate){gate.spin+=dt*1.4;gate.pulse+=dt*2.2;if(gate.pulse>1)gate.pulse=0;}
+  poisonTrails=poisonTrails.filter(t=>{t.life-=dt*.4;return t.life>0;});
+  updateMagnet();
+  ammoPacks=ammoPacks.filter(pk=>{
+    pk.pulse+=dt*2.5;if(pk.pulse>1)pk.pulse=0;pk.age+=dt;
+    if(Math.hypot(pk.x-P.x,pk.y-P.y)<pk.r+P.w*.45){
+      const gained=Math.min(diffCfg.ammoRefill,maxAmmo-ammo);ammo=Math.min(maxAmmo,ammo+diffCfg.ammoRefill);
+      sfxAmmoPickup();document.getElementById('ammo-flash').style.opacity='1';setTimeout(()=>{document.getElementById('ammo-flash').style.opacity='0';},150);
+      spawnParts(pk.x,pk.y,pk.club?'#D4AF37':'#00C8A8',pk.club?15:10);
+      spawnPop(pk.x,pk.y,pk.club?`+${gained} ♛ TITANS CLUB`:`+${gained} AMMO`,pk.club?'power':'ammo');
+      if(pk.club){showPowerAnnounce('♛ TITANS CLUB AMMO');triggerShake(3,150);}
+      updateAmmoHUD();return false;
+    }
+    return pk.age<pk.maxAge;
+  });
+  poisonTrails.forEach(t=>{if(P.invinc<=0&&Math.hypot(P.x-t.x,P.y-t.y)<18)takeDmg();});
+  spawnPowerup();updatePowerups(dt);updateActivePowerups(dt);
+  updateDmgNums(dt);updateKillFeed(dt);
+
+  /* ─── ENEMY UPDATE ─── */
+  const deadEnemies=[];
+  enemies.forEach(e=>{
+    e.wob+=dt*2.2;
+    if(e.stunT>0){e.stunT-=dt;return;}
+    const dx=P.x-e.x,dy=P.y-e.y,dist=Math.hypot(dx,dy)||1;
+    const baseSpd=e.spd*e.wm*(e.spdMod||1)*90;
+    if(e.ability==='regen'){e.regenT-=dt;if(e.regenT<=0){e.hp=Math.min(e.maxHp,e.hp+1);e.regenT=2;spawnParts(e.x,e.y,'#4CAF50',3);}}
+    if(e.ability==='phase'){e.teleportCD-=dt;if(e.teleportCD<=0){e.visible=!e.visible;e.teleportCD=1.5+Math.random()*2;}}
+    if(e.ability==='zigzag'){e.zigT-=dt;if(e.zigT<=0){e.zigDir*=-1;e.zigT=.8+Math.random()*.5;}const perp={x:-dy/dist,y:dx/dist};e.vx+=(dx/dist*baseSpd+perp.x*baseSpd*e.zigDir*1.5)*dt*3;e.vy+=(dy/dist*baseSpd+perp.y*baseSpd*e.zigDir*1.5)*dt*3;}
+    else if(e.ability==='strafe'){e.strafeT+=dt;const targetDist=220;const distErr=dist-targetDist;const tx2=dx/dist*distErr*.8;const ty2=dy/dist*distErr*.8;const perp={x:-dy/dist*e.strafeDir,y:dx/dist*e.strafeDir};e.vx+=(tx2+perp.x*baseSpd)*dt*2.5;e.vy+=(ty2+perp.y*baseSpd)*dt*2.5;if(e.strafeT>3+Math.random()){e.strafeDir*=-1;e.strafeT=0;}}
+    else if(e.ability==='charge'||e.ability==='explode'){e.chargeCD-=dt;e.chargeT-=dt;if(e.chargeCD<=0){const sp2=baseSpd*(e.ability==='explode'?3.5:2.8);e.chargeVx=(dx/dist)*sp2;e.chargeVy=(dy/dist)*sp2;e.chargeT=.55;e.chargeCD=(e.ability==='explode'?2:2.5)+Math.random()*1.5;}if(e.chargeT>0){e.vx=e.chargeVx;e.vy=e.chargeVy;if(e.ability==='explode'&&Math.hypot(e.x-P.x,e.y-P.y)<30){takeDmg();e.hp=0;spawnParts(e.x,e.y,e.col,25);deadEnemies.push(e);}}else{e.vx+=(dx/dist)*baseSpd*dt*2;e.vy+=(dy/dist)*baseSpd*dt*2;}}
+    else if(e.ability==='teleport'){e.vx+=(dx/dist)*baseSpd*dt*3;e.vy+=(dy/dist)*baseSpd*dt*3;e.teleportCD-=dt;if(e.teleportCD<=0){sfxTeleport();spawnParts(e.x,e.y,'#9B59B6',8);const a2=Math.random()*Math.PI*2,r2=120+Math.random()*120;e.x=Math.max(40,Math.min(cv.width-40,P.x+Math.cos(a2)*r2));e.y=Math.max(80,Math.min(cv.height-40,P.y+Math.sin(a2)*r2));e.vx=0;e.vy=0;spawnParts(e.x,e.y,'#CE9EF5',8);e.teleportCD=2.5+Math.random()*2;}}
+    else if(e.ability==='snipe'){const targetDist=e.preferDist;const distErr=dist-targetDist;e.vx+=(dx/dist)*distErr*.5*dt*3;e.vy+=(dy/dist)*distErr*.5*dt*3;}
+    else if(e.ability==='dive'){e.diveCD-=dt;if(!e.diveMode&&e.diveCD<=0){e.diveMode=true;e.chargeVx=(dx/dist)*baseSpd*2.8;e.chargeVy=(dy/dist)*baseSpd*2.8;e.chargeT=.7;e.diveCD=2+Math.random()*2;}if(e.diveMode&&e.chargeT>0){e.vx=e.chargeVx;e.vy=e.chargeVy;e.chargeT-=dt;}else{e.diveMode=false;e.vx+=(dx/dist)*baseSpd*dt*2;e.vy+=(dy/dist)*baseSpd*dt*2;}}
+    else{e.vx+=(dx/dist)*baseSpd*dt*3;e.vy+=(dy/dist)*baseSpd*dt*3;}
+    if(e.ability==='shield')e.shieldAngle=(e.shieldAngle||0)+dt*0.9;
+    if(e.ability==='reflect')e.reflectAngle=(e.reflectAngle||0)+dt*1.2;
+    if(e.ability==='smoke'){e.smokeT-=dt;if(e.smokeT<=0){smokeClods.push({x:e.x,y:e.y,r:8,maxR:55,alpha:.45,t:0});e.smokeT=3+Math.random();}}
+    if(e.ability==='poison'){e.trail.push({x:e.x,y:e.y,t:0});if(e.trail.length>80)e.trail.shift();if(Math.floor(Date.now()/200)%3===0)poisonTrails.push({x:e.x,y:e.y,life:1});}
+    if(e.ability==='fortify'){e.fortifyT-=dt;if(e.fortifyT<=0){e.fortified=!e.fortified;e.fortifyT=4+Math.random()*2;if(e.fortified)spawnParts(e.x,e.y,'#5C6BC0',10);}}
+    if(e.ability==='summon'){e.summonT-=dt;if(e.summonT<=0){const minorDef=EDEFS.find(d=>d.type==='scout');for(let i=0;i<3;i++){const a=(i/3)*Math.PI*2;spawnEnemy(minorDef,e.x+Math.cos(a)*60,e.y+Math.sin(a)*60);}spawnParts(e.x,e.y,e.col,15);e.summonT=8+Math.random()*4;}}
+    if(e.ability==='godmode'){e.godT-=dt;const hpPct=e.hp/e.maxHp;if(hpPct<0.33&&e.godPhase<2){e.godPhase=2;e.godShield=false;spawnParts(e.x,e.y,'#FFD700',30);}else if(hpPct<0.66&&e.godPhase<1){e.godPhase=1;}}
+    const mv=Math.hypot(e.vx,e.vy);const maxV=((e.ability==='charge'||e.ability==='dive')&&e.chargeT>0)?baseSpd*3:baseSpd;
+    if(mv>maxV){e.vx=e.vx/mv*maxV;e.vy=e.vy/mv*maxV;}
+    e.x+=e.vx*dt;e.y+=e.vy*dt;e.ang=Math.atan2(dy,dx);
+    if(e.sRate>0&&(e.ability!=='phase'||e.visible)){
+      e.st-=dt;const fireCD=1/e.sRate;
+      if(e.st<=0){
+        if(e.ability==='spread'||e.ability==='chaos'){[-0.28,0,0.28].forEach(off=>{fireAngle(e,Math.atan2(P.y-e.y,P.x-e.x)+off,200,5);});}
+        if(e.ability==='chaos'){e.spiralAng+=0.33;fireAngle(e,e.spiralAng,175,5);fireAngle(e,e.spiralAng+Math.PI,175,5);}
+        else if(e.ability==='burst'){if(!e.burstMode){e.burstMode=true;e.burstCount=0;e.burstCD=0;}e.burstCD-=dt;if(e.burstCD<=0&&e.burstCount<3){fireAt(e,P.x,P.y,225,5);e.burstCount++;e.burstCD=.12;}if(e.burstCount>=3){e.burstMode=false;e.st=fireCD*1.2;}}
+        else if(e.ability==='spiral'){e.spiralAng+=0.44;fireAngle(e,e.spiralAng,185,5);fireAngle(e,e.spiralAng+Math.PI,185,5);e.st=fireCD;}
+        else if(e.ability==='nova'||e.ability==='godmode'){e.novaCD-=dt;if(e.novaCD<=0){const count2=e.ability==='godmode'?(e.godPhase>=1?12:8):8;for(let i=0;i<count2;i++)fireAngle(e,(i/count2)*Math.PI*2,e.ability==='godmode'?200:170,6);e.novaCD=(e.ability==='godmode'?2:4)+Math.random();spawnParts(e.x,e.y,'#D4AF37',14);}e.st=.1;}
+        else if(e.ability==='snipe'){e.snipeT-=dt;if(e.snipeT<=0){fireAt(e,P.x,P.y,380,7);e.snipeT=2.5+Math.random()*2;}e.st=.1;}
+        else if(e.ability==='lob'){e.lobT-=dt;if(e.lobT<=0){eBullets.push({x:e.x,y:e.y,vx:(P.x-e.x)*.8,vy:(P.y-e.y)*.8-80,r:7,col:e.col,gravity:320,lob:true});e.lobT=2+Math.random()*1.5;}e.st=.1;}
+        else if(e.ability==='lightning'){e.lightT-=dt;if(e.lightT<=0){eBullets.push({x:P.x+(Math.random()-0.5)*40,y:-20,vx:0,vy:600,r:6,col:'#FFF176',lightning:true});e.lightT=2+Math.random()*1.5;spawnParts(P.x,P.y,'#FFF176',6);}e.st=.1;}
+        else if(e.ability==='fortify'){if(!e.fortified)fireAt(e,P.x,P.y,200,5);e.st=fireCD;}
+        else if(e.ability==='revive'){fireAt(e,P.x,P.y,180,5);e.st=fireCD;}
+        else if(e.ability==='summon'){fireAt(e,P.x,P.y,190,5);e.st=fireCD;}
+        else if(e.ability==='godmode'){if(e.godPhase>=1){[-0.2,0,0.2].forEach(off=>{fireAngle(e,Math.atan2(P.y-e.y,P.x-e.x)+off,220,6);});}else fireAt(e,P.x,P.y,200,5);e.st=fireCD;}
+        else{fireAt(e,P.x,P.y,200,5);e.st=fireCD;}
+      }
+    }
+    if(P.invinc<=0&&Math.hypot(e.x-P.x,e.y-P.y)<e.sz+(e.ability==='phase'&&!e.visible?-100:0)+P.w*.38)takeDmg();
+  });
+  smokeClods=smokeClods.filter(s=>{s.t+=dt;s.r=s.maxR*(s.t/2);s.alpha=.45*(1-s.t/4);return s.t<4;});
+
+  // Player bullets
+  bullets=bullets.filter(b=>{
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.x<-20||b.x>cv.width+20||b.y<-20||b.y>cv.height+20)return false;
+    for(let i=enemies.length-1;i>=0;i--){
+      const e=enemies[i];if(deadEnemies.includes(e))continue;
+      if(b.pierce){if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){e.hp-=b.dmg;spawnParts(b.x,b.y,e.col,3);stats.accuracy.hits++;if(e.hp<=0){killEnemy(e,i);}continue;}}
+      else{if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){checkBulletCollision(b,e);return false;}}
+    }
+    return true;
+  });
+  deadEnemies.forEach(e=>{const idx=enemies.indexOf(e);if(idx>=0)killEnemy(e,idx);});
+  eBullets=eBullets.filter(b=>{
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    if(b.gravity)b.vy+=b.gravity*dt;
+    if(b.x<-20||b.x>cv.width+20||b.y<-300||b.y>cv.height+20)return false;
+    if(gameState2.powerBuff&&gameState2.powerBuff.type==='aegis'&&gameState2.powerBuff.reflect){if(Math.hypot(b.x-P.x,b.y-P.y)<P.w*.7+b.r){b.vx=-b.vx;b.vy=-b.vy;return true;}}
+    if(P.invinc<=0&&Math.hypot(b.x-P.x,b.y-P.y)<P.w*.38+b.r){takeDmg();return false;}
+    return true;
+  });
+  parts=parts.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=65*dt;p.life-=p.dec;return p.life>0;});
+  stars.forEach(s=>{s.y+=s.spd*dt;if(s.y>cv.height){s.y=0;s.x=Math.random()*cv.width;}});
+}
+
+/* ═══ ENHANCED KILL SYSTEM ═══ */
+function killEnemy(e,idx){
+  const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord';
+  const isTitanClub=e.type==='irontitan'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='colossusg';
+  if(isBoss){sfxBigBoom();triggerSlowMo(0.5,0.35);triggerShake(14,400);earnCredits(e.pts);}
+  else if(isTitanClub){sfxBigBoom();triggerSlowMo(0.35,0.3);triggerShake(8,250);earnCredits(Math.floor(e.pts/2));}
+  else sfxExplode();
+  combo++;comboT=2.5;totalKills++;if(combo>bestCombo)bestCombo=combo;
+  const mult=combo>=5?2:combo>=3?1.5:1;
+  const pts=Math.round(e.pts*mult*diffCfg.scoreMult);
+  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?60:isTitanClub?25:15);
+  if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} ♛ TITANS CLUB`,'boss');
+  else spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
+  if(combo>=3){
+    const cd=document.getElementById('combo');
+    const comboName=combo>=20?'☀ IMMORTAL':combo>=15?'⚔ TITAN WRATH':combo>=10?'♛ LEGIONARY':combo>=5?'✦ CLUB STRIKE':'';
+    cd.textContent=comboName?`${combo}× ${comboName}`:`${combo}× COMBO`;
+    cd.style.opacity='1';cd.classList.remove('milestone');void cd.offsetWidth;cd.classList.add('milestone');if(combo>=5)sfxCombo();
+  }
+  if(combo===5){showPowerAnnounce('✦ 5× COMBO · TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',20);sfxComboMilestone();}
+  if(combo===10){showPowerAnnounce('♛ 10× COMBO · LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',30);sfxComboMilestone();}
+  if(combo===15){showPowerAnnounce('⚔ 15× COMBO · TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',40);sfxComboMilestone();}
+  if(combo===20){showPowerAnnounce('☀ 20× COMBO · IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',60);sfxComboMilestone();}
+  if(isBoss){addKillFeed('⚔ '+e.label+' DEFEATED','#FFD700');triggerSlowMo(0.6,0.3);triggerShake(12,350);spawnParts(cv.width/2,cv.height/2,'#FFD700',50);showPowerAnnounce('♛ '+e.label+' FALLEN');sfxBigBoom();}
+  else if(isTitanClub){addKillFeed('♛ '+e.label+' SLAIN','#C8A84B');}
+  else{addKillFeed('⚔ '+e.label+' KILLED','#E2C06A');}
+  powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
+  if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
+  enemies.splice(idx,1);waveKills++;updateHUD();
+}
+
+/* ═══ END GAME ═══ */
+function endGame(){
+  gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  document.getElementById('f-score').textContent=score.toLocaleString();
+  document.getElementById('f-rank').textContent=rankMsg(score);
+  document.getElementById('f-club-rank').textContent=clubRank(score);
+  document.getElementById('fstat-wave').textContent=toRoman(wave);
+  document.getElementById('fstat-kills').textContent=totalKills;
+  document.getElementById('fstat-combo').textContent=bestCombo+'×';
+  showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('weapon-hud').classList.remove('visible');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
+  menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
+  updateStats();checkAchievements();
+  // Unlock weapons based on best score
+  WEAPONS.forEach(w=>{if(!w.owned&&stats.bestScore>=w.unlockScore){w.owned=true;showPowerAnnounce('🔫 NEW WEAPON UNLOCKED: '+w.name);sfxComboMilestone();}});
+}
+
+/* ═══ ENHANCED DRAW ═══ */
+function draw(){
+  cx.save();
+  cx.translate(shakeX,shakeY);
+  cx.fillStyle=`rgb(${Math.round(bgCol.r)},${Math.round(bgCol.g)},${Math.round(bgCol.b)})`;cx.fillRect(-10,-10,cv.width+20,cv.height+20);
+  const vg=cx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');cx.fillStyle=vg;cx.fillRect(0,0,cv.width,cv.height);
+  cx.strokeStyle='rgba(200,168,75,.022)';cx.lineWidth=1;for(let x=0;x<cv.width;x+=55){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,cv.height);cx.stroke();}for(let y=0;y<cv.height;y+=55){cx.beginPath();cx.moveTo(0,y);cx.lineTo(cv.width,y);cx.stroke();}
+  stars.forEach(s=>{cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=`rgba(237,229,204,${s.a})`;cx.fill();});
+  poisonTrails.forEach(t=>{cx.save();cx.globalAlpha=t.life*.5;cx.fillStyle='rgba(174,213,129,.6)';cx.beginPath();cx.arc(t.x,t.y,8,0,Math.PI*2);cx.fill();cx.restore();});
+  smokeClods.forEach(s=>{cx.save();cx.globalAlpha=s.alpha;cx.fillStyle='rgba(120,144,156,.4)';cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fill();cx.restore();});
+  parts.forEach(p=>{cx.save();cx.globalAlpha=p.life;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fillStyle=p.col;cx.fill();cx.restore();});
+  ammoPacks.forEach(pk=>drawAmmoPackGlyph(cx,pk.x,pk.y,pk.r,pk.pulse,pk.club));
+  drawPowerups();
+  if(gameState2.shockwave){const sw=gameState2.shockwave;cx.save();cx.globalAlpha=sw.alpha*.6;cx.strokeStyle='#FFCC80';cx.lineWidth=5;cx.beginPath();cx.arc(sw.x,sw.y,sw.r,0,Math.PI*2);cx.stroke();cx.restore();}
+  if(gameState2.powerBuff){
+    const pb=gameState2.powerBuff;cx.save();
+    if(pb.type==='aegis'){const r=P.w+10+Math.sin(Date.now()*.01)*4;cx.strokeStyle='rgba(130,177,255,.7)';cx.lineWidth=3;cx.beginPath();cx.arc(P.x,P.y,r,0,Math.PI*2);cx.stroke();}
+    if(pb.type==='battlecry'){cx.strokeStyle='rgba(255,68,34,.5)';cx.lineWidth=2;cx.beginPath();cx.arc(P.x,P.y,P.w+8+Math.sin(Date.now()*.015)*3,0,Math.PI*2);cx.stroke();}
+    cx.restore();
+  }
+  eBullets.forEach(b=>{cx.save();cx.shadowColor=b.col;cx.shadowBlur=b.lightning?18:9;cx.beginPath();cx.arc(b.x,b.y,b.r,0,Math.PI*2);cx.fillStyle=b.col;cx.fill();cx.restore();});
+  bullets.forEach(b=>{cx.save();cx.translate(b.x,b.y);cx.rotate(Math.atan2(b.vy,b.vx));cx.shadowColor='#E2C06A';cx.shadowBlur=11;const g=cx.createLinearGradient(-13,0,13,0);g.addColorStop(0,'rgba(242,193,68,0)');g.addColorStop(.5,'#F5E4A8');g.addColorStop(1,'rgba(242,193,68,0)');cx.fillStyle=g;cx.beginPath();cx.ellipse(0,0,13,b.r,0,0,Math.PI*2);cx.fill();cx.restore();});
+  enemies.forEach(drawEnemy);
+  if(gate)drawGate(cx,gate);
+  const ch=CHARS[selChar];
+  if(!(P.invinc>0&&Math.floor(P.invinc*10)%2===0)){cx.save();cx.shadowColor=ch.color;cx.shadowBlur=14;const ang=Math.atan2(myP-P.y,mxP-P.x)+Math.PI/2;ch.draw(P.x,P.y,ang,cx);cx.restore();}
+  drawDmgNums();drawKillFeed();
+  const sl=(Date.now()*.03)%cv.height;cx.fillStyle='rgba(200,168,75,.01)';cx.fillRect(0,sl,cv.width,2);
+  cx.restore();
+}
+
+/* ═══ ENHANCED LOOP ═══ */
+function loop(ts){if(gState!=='play'||isPaused)return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);draw();animID=requestAnimationFrame(loop);}
+
+/* ═══ ENHANCED END GAME ═══ */
+function endGame(){
+  gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  document.getElementById('f-score').textContent=score.toLocaleString();
+  document.getElementById('f-rank').textContent=rankMsg(score);
+  document.getElementById('f-club-rank').textContent=clubRank(score);
+  document.getElementById('fstat-wave').textContent=toRoman(wave);
+  document.getElementById('fstat-kills').textContent=totalKills;
+  document.getElementById('fstat-combo').textContent=bestCombo+'×';
+  showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('weapon-hud').classList.remove('visible');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
+  menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
+  updateStats();checkAchievements();
+  WEAPONS.forEach(w=>{if(!w.owned&&stats.bestScore>=w.unlockScore){w.owned=true;}});
+}
+
+/* ═══ SCREEN MANAGEMENT ═══ */
+function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
+
+/* ═══ INPUT ENHANCEMENTS ═══ */
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}if(e.code==='KeyE'){e.preventDefault();activatePower();}if(e.code==='KeyQ'){e.preventDefault();switchWeapon();}if(e.code==='KeyR'){e.preventDefault();if(ammo<maxAmmo*0.3)showPowerAnnounce('⚠ LOW AMMO');}});
+document.addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='Space')shooting=false;});
+cv.addEventListener('mousemove',e=>{mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
+cv.addEventListener('mousedown',e=>{if(e.button===0){shooting=true;wake();}});
+cv.addEventListener('mouseup',e=>{if(e.button===0)shooting=false;});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.style.cursor='none';
+if('ontouchstart' in window)document.getElementById('xhair').style.display='none';
+
+const jz=document.getElementById('joystick-zone'),jk=document.getElementById('joystick-knob'),JR=50;
+function jMove(cx2,cy2){const r=jz.getBoundingClientRect();const ox=cx2-r.left-r.width/2,oy=cy2-r.top-r.height/2;const dist=Math.hypot(ox,oy),cap=Math.min(dist,JR);const nx=dist>0?ox/dist:0,ny=dist>0?oy/dist:0;jk.style.left=(50+nx*cap/r.width*100)+'%';jk.style.top=(50+ny*cap/r.height*100)+'%';joystick.dx=nx*(cap/JR);joystick.dy=ny*(cap/JR);}
+jz.addEventListener('touchstart',e=>{e.preventDefault();wake();joystick.active=true;jMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+jz.addEventListener('touchmove',e=>{e.preventDefault();jMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+jz.addEventListener('touchend',e=>{e.preventDefault();joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';},{passive:false});
+jz.addEventListener('mousedown',e=>{joystick.active=true;jMove(e.clientX,e.clientY);});
+document.addEventListener('mousemove',e=>{if(joystick.active)jMove(e.clientX,e.clientY);});
+document.addEventListener('mouseup',()=>{if(joystick.active){joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';}});
+const fb=document.getElementById('fire-btn');
+fb.addEventListener('touchstart',e=>{e.preventDefault();shooting=true;wake();},{passive:false});
+fb.addEventListener('touchend',e=>{e.preventDefault();shooting=false;},{passive:false});
+fb.addEventListener('mousedown',()=>{shooting=true;wake();});
+fb.addEventListener('mouseup',()=>shooting=false);
+const pb2=document.getElementById('power-btn');
+pb2.addEventListener('touchstart',e=>{e.preventDefault();activatePower();wake();},{passive:false});
+pb2.addEventListener('mousedown',()=>{activatePower();wake();});
+
+/* ═══ BUTTON WIRING ═══ */
+document.getElementById('btn-start').addEventListener('click',()=>{wake();const v=document.getElementById('pname').value.trim();pName=v?v.toUpperCase():'TITAN';showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
+document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-chars');});
+document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-enter-arena').addEventListener('click',()=>{
+  wake();showScr(null);document.getElementById('hud').classList.remove('off');
+  if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
+  gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
+});
+document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
+document.getElementById('btn-replay').addEventListener('click',()=>{
+  wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
+  document.getElementById('hud').classList.remove('off');
+  if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';document.getElementById('weapon-hud').classList.add('visible');
+  gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
+});
+document.getElementById('btn-menu').addEventListener('click',()=>{
+  bgStop();gState='menu';menuAnimActive=true;showScr('s-start');
+  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('weapon-hud').classList.remove('visible');
+  document.getElementById('htimer').classList.remove('warn');
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
+});
+document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
+
+/* ═══ INITIALIZATION ═══ */
+loadSettings();loadStats();loadAchievements();loadUpgrades();
 </script>
 </body>
 </html>
