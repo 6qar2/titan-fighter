@@ -144,12 +144,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 #power-btn.ready{box-shadow:0 0 28px rgba(167,139,250,0.7);border-color:rgba(221,214,254,0.7);animation:powerPulse 1s ease-in-out infinite;}
 @keyframes powerPulse{0%,100%{box-shadow:0 0 28px rgba(167,139,250,0.7);transform:scale(1)}50%{box-shadow:0 0 40px rgba(167,139,250,1);transform:scale(1.05)}}
 /* ═══ NEW ENHANCEMENTS CSS ═══ */
-#weapon-hud{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);display:flex;gap:.6rem;align-items:center;z-index:105;pointer-events:none;opacity:0;transition:opacity .3s;}
-#weapon-hud.visible{opacity:1;}
-.weapon-icon{width:36px;height:36px;border-radius:8px;border:2px solid rgba(200,168,75,0.4);display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(4,4,10,0.8);position:relative;}
-.weapon-icon.active{border-color:var(--gold-lit);box-shadow:0 0 12px rgba(200,168,75,0.5);}
-.weapon-icon .w-ammo{position:absolute;bottom:-8px;right:-8px;background:var(--crimson);color:var(--gold-pale);font-size:.4rem;padding:.1rem .25rem;border-radius:4px;font-family:'Cinzel',serif;letter-spacing:1px;}
-.weapon-name{font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;position:absolute;top:-16px;white-space:nowrap;}
 #skill-hud{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:105;pointer-events:none;}
 .skill-pip{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(200,168,75,0.3);transition:all .3s;}
 .skill-pip.active{background:var(--gold);border-color:var(--gold-lit);box-shadow:0 0 8px rgba(200,168,75,0.6);}
@@ -234,10 +228,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   .hud-val{font-size:.6rem;}
   #ammo-bar-wrap,#power-bar-wrap{width:36px;height:3px;}
   #ammo-count,#power-count{font-size:.5rem;}
-  .ldot{width:5px;height:5px;}
-  #weapon-hud{bottom:110px;gap:.4rem;}
-  .weapon-icon{width:30px;height:30px;font-size:.9rem;border-radius:6px;}
-  #mctrl{padding:.5rem 1rem max(1rem,env(safe-area-inset-bottom));}
+   .ldot{width:5px;height:5px;}
+   #mctrl{padding:.5rem 1rem max(1rem,env(safe-area-inset-bottom));}
   #joystick-zone{width:80px;height:80px;}
   #joystick-knob{width:32px;height:32px;}
   #fire-btn{width:64px;height:64px;font-size:.45rem;}
@@ -266,8 +258,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   .hud-lbl{font-size:.35rem;}
   .hud-val{font-size:.8rem;}
   #ammo-bar-wrap,#power-bar-wrap{width:48px;height:3px;}
-  #weapon-hud{bottom:120px;}
-  .weapon-icon{width:32px;height:32px;}
 }
 
 /* ═══ VIGNETTE EFFECT ═══ */
@@ -378,7 +368,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <button id="fire-btn"><span class="fire-icon">⚔</span><span class="fire-lbl">FIRE</span></button>
   </div>
 </div>
-<div id="weapon-hud"></div>
 
 <!-- START SCREEN -->
 <div class="scr" id="s-start">
@@ -1047,7 +1036,7 @@ function spawnEnemy(forceDef,forceX,forceY){
 function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
 
 /* ═══ PARTICLES / POPS ═══ */
-function spawnParts(x,y,col,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=50+Math.random()*190;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dec:.025+Math.random()*.04,r:2+Math.random()*5,col});}}
+function spawnParts(x,y,col,n){if(parts.length>300)return;for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=40+Math.random()*140;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dec:.04+Math.random()*.06,r:1.5+Math.random()*3.5,col});}}
 function spawnPop(x,y,txt,cls){const el=document.createElement('div');el.className='spop'+(cls?' '+cls:'');el.textContent=txt;el.style.left=(x-30)+'px';el.style.top=(y-15)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),750);}
 
 function takeDmg(amount){
@@ -1519,7 +1508,7 @@ function draw(){
   // Smoke clouds
   smokeClods.forEach(s=>{cx.save();cx.globalAlpha=s.alpha;cx.fillStyle='rgba(120,144,156,.4)';cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fill();cx.restore();});
 
-  parts.forEach(p=>{cx.save();cx.globalAlpha=p.life;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fillStyle=p.col;cx.fill();cx.restore();});
+  parts.forEach(p=>{cx.globalAlpha=p.life;cx.fillStyle=p.col;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fill();});
   ammoPacks.forEach(pk=>drawAmmoPackGlyph(cx,pk.x,pk.y,pk.r,pk.pulse,pk.club));
 
   // Shockwave
@@ -1582,7 +1571,6 @@ document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('
 document.getElementById('btn-enter-arena').addEventListener('click',()=>{
   wake();showScr(null);document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
-  document.getElementById('weapon-hud').classList.add('visible');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
 });
 document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
@@ -1590,7 +1578,6 @@ document.getElementById('btn-replay').addEventListener('click',()=>{
   wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
   document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
-  document.getElementById('weapon-hud').classList.add('visible');
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
   gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
@@ -1598,7 +1585,7 @@ document.getElementById('btn-replay').addEventListener('click',()=>{
 document.getElementById('btn-menu').addEventListener('click',()=>{
   bgStop();gState='menu';menuAnimActive=true;showScr('s-start');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
-  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('weapon-hud').classList.remove('visible');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   document.getElementById('htimer').classList.remove('warn');
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
@@ -1745,29 +1732,6 @@ function renderUpgrades(){
 }
 
 /* ═══ WEAPON SYSTEM ═══ */
-const WEAPONS=[
-  {id:'pistol',name:'SIDEARM',icon:'🔫',fireRate:0.16,spread:0,dmg:1,bulletSpd:690,count:1,pierce:false,unlockScore:0,owned:true},
-  {id:'rifle',name:'RIFLE',icon:'🎯',fireRate:0.1,spread:0.02,dmg:1.3,bulletSpd:850,count:1,pierce:false,unlockScore:2000,owned:false},
-  {id:'shotgun',name:'BLASTER',icon:'💥',fireRate:0.3,spread:0.18,dmg:0.8,bulletSpd:600,count:5,pierce:false,unlockScore:5000,owned:false},
-  {id:'smg',name:'SMG',icon:'⚡',fireRate:0.05,spread:0.06,dmg:0.7,bulletSpd:720,count:1,pierce:false,unlockScore:8000,owned:false},
-  {id:'sniper',name:'SNIPER',icon:'🎯',fireRate:0.5,spread:0,dmg:4,bulletSpd:1200,count:1,pierce:true,unlockScore:12000,owned:false},
-  {id:'laser',name:'LASER',icon:'🔮',fireRate:0.08,spread:0,dmg:1.5,bulletSpd:1400,count:1,pierce:true,unlockScore:15000,owned:false},
-];
-let currentWeapon=0;
-function unlockWeapon(weaponId){const w=WEAPONS.find(w=>w.id===weaponId);if(w)w.owned=true;}
-function switchWeapon(){currentWeapon=(currentWeapon+1)%WEAPONS.length;while(!WEAPONS[currentWeapon].owned&&WEAPONS[currentWeapon].unlockScore>stats.bestScore){currentWeapon=(currentWeapon+1)%WEAPONS.length;}showPowerAnnounce('🔫 '+WEAPONS[currentWeapon].name);updateWeaponHUD();}
-function updateWeaponHUD(){
-  const hud=document.getElementById('weapon-hud');if(!hud)return;
-  hud.innerHTML='';hud.classList.add('visible');
-  WEAPONS.forEach((w,i)=>{
-    const div=document.createElement('div');div.className='weapon-icon'+(i===currentWeapon?' active':'')+(w.owned?'':'');
-    div.innerHTML=`<span class="weapon-name">${w.name}</span>${w.icon}`;
-    if(i===currentWeapon){const ammoDiv=document.createElement('div');ammoDiv.className='w-ammo';ammoDiv.textContent=ammo;div.appendChild(ammoDiv);}
-    div.addEventListener('click',()=>{if(w.owned){currentWeapon=i;updateWeaponHUD();showPowerAnnounce('🔫 '+w.name);}});
-    hud.appendChild(div);
-  });
-}
-
 /* ═══ POWER-UPS ═══ */
 const POWERUP_TYPES=[
   {id:'speed',name:'SPEED BOOST',icon:'⚡',color:'#00C8A8',duration:8,effect:'speed'},
@@ -1818,7 +1782,7 @@ function drawPowerups(){
 /* ═══ DAMAGE NUMBERS ═══ */
 let dmgNums=[];
 function spawnDmgNum(x,y,amount,color){
-  dmgNums.push({x,y,amount:Math.round(amount),color:color||'#E2C06A',life:1,vy:-60});
+  if(dmgNums.length<20)dmgNums.push({x,y,amount:Math.round(amount),color:color||'#E2C06A',life:1,vy:-60});
 }
 function updateDmgNums(dt){
   dmgNums=dmgNums.filter(d=>{d.y+=d.vy*dt;d.life-=dt*1.1;return d.life>0;});
@@ -1843,19 +1807,12 @@ function drawKillFeed(){
 function fireBullet(){
   if(ammo<=0){const now=Date.now();if(now-lastEmptyClick>350){sfxEmpty();lastEmptyClick=now;}return;}
   const ch=CHARS[selChar];
-  const w=WEAPONS[currentWeapon];
-  const ang=Math.atan2(myP-P.y,mxP-P.x);
-  let dmg=ch.dmg*w.dmg*(window.dmgBuff||1);
+  const ang=Math.atan2(myP-P.y,mxP-P.x),spd=690;
+  const count=ch.id==='imperator'?3:1,spread=ch.id==='imperator'?.18:0;
+  let dmg=ch.dmg;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='battlecry')dmg*=gameState2.powerBuff.dmgMult;
-  const fireInterval=(w.fireRate||ch.fire)/(window.fireRateBuff||1);
-  for(let i=0;i<w.count;i++){
-    const a=ang+(i-Math.floor(w.count/2))*w.spread;
-    const bullet={x:P.x,y:P.y,vx:Math.cos(a)*w.bulletSpd,vy:Math.sin(a)*w.bulletSpd,r:w.id==='sniper'?6:w.id==='shotgun'?3:4,dmg};
-    if(w.pierce)bullet.pierce=true;
-    bullets.push(bullet);
-  }
-  ammo=Math.max(0,ammo-1);sfxShoot();spawnParts(P.x,P.y,'#FFA500',2);updateAmmoHUD();
-  stats.accuracy.shots++;
+  for(let i=0;i<count;i++){const a=ang+(i-Math.floor(count/2))*spread;bullets.push({x:P.x,y:P.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,r:ch.id==='centurion'?7:4,dmg});}
+  ammo=Math.max(0,ammo-(ch.id==='imperator'?3:1));sfxShoot();spawnParts(P.x,P.y,'#FFA500',2);updateAmmoHUD();
 }
 
 /* ═══ ENHANCED ENEMY SPAWN ═══ */
@@ -1909,15 +1866,14 @@ function initGame(){
   gameState2={powerBuff:null,shockwave:null,meteorCount:0,meteorTimer:0};
   bullets=[];eBullets=[];enemies=[];parts=[];ammoPacks=[];poisonTrails=[];smokeClods=[];shockwave=null;meteorState=null;powerups=[];dmgNums=[];killFeed=[];
   P.x=cv.width/2;P.y=cv.height-100;P.invinc=0;P.spdBuff=null;
-  lowAmmoWarnShown=false;slowMo=1;slowMoTimer=0;shakeIntensity=0;shakeX=0;shakeY=0;currentWeapon=0;activePowerups=[];
+  lowAmmoWarnShown=false;slowMo=1;slowMoTimer=0;shakeIntensity=0;shakeX=0;shakeY=0;activePowerups=[];
   const [mn,mx]=diffCfg.ammoPackInterval;nextAmmoPackTime=timeLeft-(mn+Math.random()*(mx-mn));
   mxP=cv.width/2;myP=cv.height/2;
   const badge=document.getElementById('diff-badge-hud');badge.textContent=diffCfg.label;badge.className='';badge.classList.add(selDiff);
   document.getElementById('club-hud').style.display='flex';
   document.getElementById('pname-hud').style.display='flex';
   document.getElementById('hname').textContent=pName;
-  document.getElementById('weapon-hud').classList.add('visible');
-  initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();updateWeaponHUD();
+  initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();
   bgStart(1);startTimer();gameStartTime=Date.now();
 }
 
@@ -1930,7 +1886,6 @@ function update(dt){
   if(powerCharge>=1&&powerCooldownTimer<=0&&!powerWasReady){powerWasReady=true;sfxCombo();document.getElementById('power-btn').classList.add('ready');}
   else if(powerCharge<1||powerCooldownTimer>0){powerWasReady=false;document.getElementById('power-btn').classList.remove('ready');}
   if(keys['KeyE']){keys['KeyE']=false;activatePower();}
-  if(keys['KeyQ']){keys['KeyQ']=false;switchWeapon();}
   let mvx=0,mvy=0;
   if(keys['ArrowUp']||keys['KeyW'])mvy-=1;if(keys['ArrowDown']||keys['KeyS'])mvy+=1;
   if(keys['ArrowLeft']||keys['KeyA'])mvx-=1;if(keys['ArrowRight']||keys['KeyD'])mvx+=1;
@@ -1958,7 +1913,7 @@ function update(dt){
     }
   }
   if(window.innerWidth<=768&&enemies.length>0){let near=enemies[0],best=Infinity;enemies.forEach(e=>{const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<best){best=d;near=e;}});mxP=near.x;myP=near.y;}
-  const w=WEAPONS[currentWeapon];const fireInterval=(w.fireRate||ch.fire)/(window.fireRateBuff||1);
+  const fireInterval=ch.fire/(window.fireRateBuff||1);
   shootCD-=dt;if(shooting&&shootCD<=0){fireBullet();shootCD=fireInterval;}
   if(ammo<maxAmmo){ammoRegenAccum+=dt*diffCfg.ammoRegenRate;if(ammoRegenAccum>=1){const g=Math.floor(ammoRegenAccum);ammo=Math.min(maxAmmo,ammo+g);ammoRegenAccum-=g;updateAmmoHUD();}}
   if(comboT>0){comboT-=dt;if(comboT<=0){combo=0;document.getElementById('combo').style.opacity='0';}}
@@ -2069,7 +2024,7 @@ function killEnemy(e,idx){
   combo++;comboT=2.5;totalKills++;if(combo>bestCombo)bestCombo=combo;
   const mult=combo>=5?2:combo>=3?1.5:1;
   const pts=Math.round(e.pts*mult*diffCfg.scoreMult);
-  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?60:isTitanClub?25:15);
+  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?20:isTitanClub?10:8);
   if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} ♛ TITANS CLUB`,'boss');
   else spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
   if(combo>=3){
@@ -2078,11 +2033,11 @@ function killEnemy(e,idx){
     cd.textContent=comboName?`${combo}× ${comboName}`:`${combo}× COMBO`;
     cd.style.opacity='1';cd.classList.remove('milestone');void cd.offsetWidth;cd.classList.add('milestone');if(combo>=5)sfxCombo();
   }
-  if(combo===5){showPowerAnnounce('✦ 5× COMBO · TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',20);sfxComboMilestone();}
-  if(combo===10){showPowerAnnounce('♛ 10× COMBO · LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',30);sfxComboMilestone();}
-  if(combo===15){showPowerAnnounce('⚔ 15× COMBO · TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',40);sfxComboMilestone();}
-  if(combo===20){showPowerAnnounce('☀ 20× COMBO · IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',60);sfxComboMilestone();}
-  if(isBoss){addKillFeed('⚔ '+e.label+' DEFEATED','#FFD700');triggerSlowMo(0.6,0.3);triggerShake(12,350);spawnParts(cv.width/2,cv.height/2,'#FFD700',50);showPowerAnnounce('♛ '+e.label+' FALLEN');sfxBigBoom();}
+  if(combo===5){showPowerAnnounce('✦ 5× COMBO · TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',8);sfxComboMilestone();}
+  if(combo===10){showPowerAnnounce('♛ 10× COMBO · LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',12);sfxComboMilestone();}
+  if(combo===15){showPowerAnnounce('⚔ 15× COMBO · TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',15);sfxComboMilestone();}
+  if(combo===20){showPowerAnnounce('☀ 20× COMBO · IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',20);sfxComboMilestone();}
+  if(isBoss){addKillFeed('⚔ '+e.label+' DEFEATED','#FFD700');triggerSlowMo(0.6,0.3);triggerShake(12,350);spawnParts(cv.width/2,cv.height/2,'#FFD700',20);showPowerAnnounce('♛ '+e.label+' FALLEN');sfxBigBoom();}
   else if(isTitanClub){addKillFeed('♛ '+e.label+' SLAIN','#C8A84B');}
   else{addKillFeed('⚔ '+e.label+' KILLED','#E2C06A');}
   powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
@@ -2100,13 +2055,11 @@ function endGame(){
   document.getElementById('fstat-kills').textContent=totalKills;
   document.getElementById('fstat-combo').textContent=bestCombo+'×';
   showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
-  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('weapon-hud').classList.remove('visible');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();
-  // Unlock weapons based on best score
-  WEAPONS.forEach(w=>{if(!w.owned&&stats.bestScore>=w.unlockScore){w.owned=true;showPowerAnnounce('🔫 NEW WEAPON UNLOCKED: '+w.name);sfxComboMilestone();}});
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -2119,7 +2072,7 @@ function draw(){
   stars.forEach(s=>{cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fillStyle=`rgba(237,229,204,${s.a})`;cx.fill();});
   poisonTrails.forEach(t=>{cx.save();cx.globalAlpha=t.life*.5;cx.fillStyle='rgba(174,213,129,.6)';cx.beginPath();cx.arc(t.x,t.y,8,0,Math.PI*2);cx.fill();cx.restore();});
   smokeClods.forEach(s=>{cx.save();cx.globalAlpha=s.alpha;cx.fillStyle='rgba(120,144,156,.4)';cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fill();cx.restore();});
-  parts.forEach(p=>{cx.save();cx.globalAlpha=p.life;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fillStyle=p.col;cx.fill();cx.restore();});
+  parts.forEach(p=>{cx.globalAlpha=p.life;cx.fillStyle=p.col;cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);cx.fill();});
   ammoPacks.forEach(pk=>drawAmmoPackGlyph(cx,pk.x,pk.y,pk.r,pk.pulse,pk.club));
   drawPowerups();
   if(gameState2.shockwave){const sw=gameState2.shockwave;cx.save();cx.globalAlpha=sw.alpha*.6;cx.strokeStyle='#FFCC80';cx.lineWidth=5;cx.beginPath();cx.arc(sw.x,sw.y,sw.r,0,Math.PI*2);cx.stroke();cx.restore();}
