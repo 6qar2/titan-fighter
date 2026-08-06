@@ -1803,7 +1803,6 @@ function activatePowerup(pu){
 function updateActivePowerups(dt){
   activePowerups=activePowerups.filter(pu=>{pu.timer-=dt;if(pu.timer<=0){if(pu.type==='speed')P.spdBuff=null;if(pu.type==='damage')window.dmgBuff=1;if(pu.type==='rapid')window.fireRateBuff=null;if(pu.type==='magnet')window.magnetRange=null;return false;}return true;});
 }
-let powerups=[];
 function drawPowerups(){
   powerups.forEach(pu=>{
     cx.save();cx.translate(pu.x,pu.y);
