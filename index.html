@@ -2122,6 +2122,7 @@ function killEnemy(e,idx){
 
 /* ═══ END GAME ═══ */
 function endGame(){
+  if(gState==='over')return;
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   document.getElementById('minimap').style.display='none';
   document.getElementById('f-score').textContent=score.toLocaleString();
@@ -2136,7 +2137,27 @@ function endGame(){
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();sfxVictory();
-  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}else{spSubmitScore(score);}
+  if(MP.roomCode&&MP.playerId){
+    mpSubmitScore(score);
+    if(MP.host&&MP.roomRef){
+      MP.roomRef.child('status').set('ended');
+      MP.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
+    }
+  }else{
+    spSubmitScore(score);
+  }
+}
+function mpOnRemoteGameOver(){
+  if(gState==='over')return;
+  gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  document.getElementById('minimap').style.display='none';
+  showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
+  menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
+  updateStats();checkAchievements();sfxVictory();
+  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -2247,7 +2268,7 @@ function mpJoinRoom(){
   MP.roomRef.once('value').then(snap=>{
     const room=snap.val();
     if(!room){alert('Room not found');return;}
-    if(room.status!=='waiting'){alert('Room already in progress or closed');return;}
+    if(room.status!=='waiting'&&room.status!=='playing'){alert('Room is not available');return;}
     const slots=[0,1,2,3];
     const taken=new Set(Object.values(room.players||{}).map(p=>p.slot));
     const mySlot=slots.find(s=>!taken.has(s));
@@ -2265,6 +2286,13 @@ function mpJoinRoom(){
     document.getElementById('mp-room-code').textContent=code;
     mpBuildCharGrid();
     mpListenRoom();
+    if(room.status==='playing'&&room.wave){
+      mpStartGame();
+      wave=room.wave||1;
+      showWaveAnnounce(wave);
+      document.getElementById('hwave').textContent=toRoman(wave);
+      bgTransition(wave);
+    }
   }).catch(e=>{console.error('join room error',e);alert('Failed to join room');});
 }
 function mpListenRoom(){
@@ -2297,6 +2325,7 @@ function mpListenRoom(){
       }
     }
     if(room.status==='playing'){mpStartGame();}
+    if(room.status==='ended'&&gState==='play'){mpOnRemoteGameOver();}
     if(room.wave&&room.wave!==wave&&gState==='play'){
       wave=room.wave;
       showWaveAnnounce(wave);
@@ -2381,6 +2410,7 @@ function mpStartGame(){
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   mpListenStates();
+  if(MP.host&&MP.roomRef){MP.roomRef.child('status').set('playing');MP.roomRef.child('wave').set(1);}
 }
 function mpLeaveRoom(){
   if(MP.roomRef&&MP.playerId){
