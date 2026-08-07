@@ -687,6 +687,21 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <button class="btn-ghost" id="btn-menu">MAIN GATE</button>
   </div>
 </div>
+<div class="scr off" id="s-mp-over">
+  <div class="over-inner">
+    <div class="over-eyebrow">MULTIPLAYER · FALLEN</div>
+    <div class="over-divline"><div class="over-diamond"></div></div>
+    <div class="final-score-lbl">You Have Fallen</div>
+    <div class="final-rank" id="mp-f-rank" style="color:var(--red);">DEFEATED</div>
+    <div class="final-stats">
+      <div class="fstat"><span class="fstat-num" id="mp-fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
+      <div class="fstat"><span class="fstat-num" id="mp-fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>
+      <div class="fstat"><span class="fstat-num" id="mp-fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
+    </div>
+    <div class="over-divline"><div class="over-diamond"></div></div>
+    <button class="btn-enter" id="btn-mp-continue" style="margin-top:1rem;">CONTINUE</button>
+  </div>
+</div>
 
 <script>
 /* ═══ HELPERS ═══ */
@@ -1303,7 +1318,7 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;}else{endGame();}}
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';showScr('s-mp-over');}}else{endGame();}}
 }
 
 function showWaveAnnounce(n){
@@ -1529,6 +1544,7 @@ document.getElementById('btn-copy-code').addEventListener('click',()=>{
 });
 document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
 document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();});
+document.getElementById('btn-mp-continue').addEventListener('click',()=>{bgStop();gState='menu';menuAnimActive=true;showScr('s-start');mpLeaveRoom();document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('htimer').classList.remove('warn');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.querySelectorAll('.mp-diff-card').forEach(card=>{
   card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
 });
@@ -2213,7 +2229,8 @@ const MP={
   mpPosSyncTimer:0,
   mpLocalDead:false,
   mpAliveCount:0,
-  mpAllDeadTriggered:false
+  mpAllDeadTriggered:false,
+  mpDeathScreenShown:false
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2417,7 +2434,7 @@ function mpLeaveRoom(){
     }
   }
   if(MP.roomRef){MP.roomRef.child('states').off();}
-  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;
+  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;
   showScr('s-mp-lobby');
 }
 function mpGetEnemyTarget(){
