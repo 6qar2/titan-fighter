@@ -1180,10 +1180,13 @@ cv.style.cursor='none';
 if('ontouchstart' in window)document.getElementById('xhair').style.display='none';
 
 const jz=document.getElementById('joystick-zone'),jk=document.getElementById('joystick-knob'),JR=50;
+let joyTouchId=null;
 function jMove(cx2,cy2){const r=jz.getBoundingClientRect();const ox=cx2-r.left-r.width/2,oy=cy2-r.top-r.height/2;const dist=Math.hypot(ox,oy),cap=Math.min(dist,JR);const nx=dist>0?ox/dist:0,ny=dist>0?oy/dist:0;jk.style.left=(50+nx*cap/r.width*100)+'%';jk.style.top=(50+ny*cap/r.height*100)+'%';joystick.dx=nx*(cap/JR);joystick.dy=ny*(cap/JR);}
-jz.addEventListener('touchstart',e=>{e.preventDefault();wake();joystick.active=true;jMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
-jz.addEventListener('touchmove',e=>{e.preventDefault();jMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
-jz.addEventListener('touchend',e=>{e.preventDefault();joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';},{passive:false});
+function jReset(){joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';joyTouchId=null;}
+jz.addEventListener('touchstart',e=>{e.preventDefault();wake();if(joyTouchId!==null)return;joystick.active=true;joyTouchId=e.touches[0].identifier;jMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+document.addEventListener('touchmove',e=>{if(!joystick.active||joyTouchId===null)return;for(let i=0;i<e.touches.length;i++){if(e.touches[i].identifier===joyTouchId){jMove(e.touches[i].clientX,e.touches[i].clientY);break;}}},{passive:false});
+document.addEventListener('touchend',e=>{if(joyTouchId===null)return;for(let i=0;i<e.touches.length;i++){if(e.touches[i].identifier===joyTouchId)return;}jReset();},{passive:false});
+document.addEventListener('touchcancel',e=>{jReset();},{passive:false});
 jz.addEventListener('mousedown',e=>{joystick.active=true;jMove(e.clientX,e.clientY);});
 document.addEventListener('mousemove',e=>{if(joystick.active)jMove(e.clientX,e.clientY);});
 document.addEventListener('mouseup',()=>{if(joystick.active){joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';}});
