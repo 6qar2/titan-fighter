@@ -1490,8 +1490,9 @@ function drawMinimap(){
 }
 
 /* ═══ INPUT ═══ */
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}if(e.code==='KeyE'){e.preventDefault();activatePower();}});
-document.addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='Space')shooting=false;});
+function isInputFocused(){const t=document.activeElement;return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
+document.addEventListener('keydown',e=>{if(isInputFocused())return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}if(e.code==='KeyE'){e.preventDefault();activatePower();}});
+document.addEventListener('keyup',e=>{if(isInputFocused())return;keys[e.code]=false;if(e.code==='Space')shooting=false;});
 cv.addEventListener('mousemove',e=>{mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
 cv.addEventListener('mousedown',e=>{if(e.button===0){shooting=true;wake();}});
 cv.addEventListener('mouseup',e=>{if(e.button===0)shooting=false;});
@@ -1520,7 +1521,7 @@ pb2.addEventListener('mousedown',()=>{activatePower();wake();});
 const wb=document.getElementById('weapon-btn');
 wb.addEventListener('touchstart',e=>{e.preventDefault();switchWeapon();wake();},{passive:false});
 wb.addEventListener('mousedown',()=>{switchWeapon();wake();});
-document.addEventListener('keydown',e=>{if(e.code==='KeyQ'||e.code==='KeyR'){e.preventDefault();switchWeapon();}});
+document.addEventListener('keydown',e=>{if(isInputFocused())return;if(e.code==='KeyQ'||e.code==='KeyR'){e.preventDefault();switchWeapon();}});
 
 /* ═══ BUTTON WIRING ═══ */
 document.getElementById('btn-start').addEventListener('click',()=>{console.log('btn-start clicked');wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
@@ -1597,6 +1598,7 @@ function togglePause(){
   else{pauseOverlay.classList.remove('visible');bgStart(wave);}
 }
 document.addEventListener('keydown',e=>{
+  if(isInputFocused())return;
   if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();togglePause();}
 });
 document.getElementById('btn-resume').addEventListener('click',()=>{isPaused=false;pauseOverlay.classList.remove('visible');bgStart(wave);});
