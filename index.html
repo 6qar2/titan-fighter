@@ -1306,7 +1306,7 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0)endGame();
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;}else{endGame();}}
 }
 
 function fireBullet(){
@@ -1928,6 +1928,10 @@ function initGame(){
 /* ═══ ENHANCED UPDATE LOOP ═══ */
 function update(dt){
   const ch=CHARS[selChar];
+  if(MP.mpLocalDead&&MP.roomCode&&MP.playerId){
+    keys['Space']=false;keys['KeyE']=false;keys['KeyQ']=false;keys['KeyR']=false;
+    joystick.active=false;joystick.dx=0;joystick.dy=0;shooting=false;
+  }
   if(slowMoTimer>0){slowMoTimer-=dt;if(slowMoTimer<=0){slowMo=1;}else{dt*=slowMo;}}
   if(powerCooldownTimer>0){powerCooldownTimer-=dt;if(powerCooldownTimer<0)powerCooldownTimer=0;}
   if(powerCharge<1){powerCharge=Math.min(1,powerCharge+dt*(1/30));updatePowerHUD();}
@@ -2220,7 +2224,9 @@ const MP={
   lbRef:null,
   lbMode:'sp',
   remotePlayers:{},
-  mpPosSyncTimer:0
+  mpPosSyncTimer:0,
+  mpLocalDead:false,
+  mpAliveCount:0
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2435,6 +2441,7 @@ function mpSyncState(dt){
     name:pName,
     score:score,
     wave:wave,
+    alive:!MP.mpLocalDead,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
 }
@@ -2443,25 +2450,55 @@ function mpListenStates(){
   MP.roomRef.child('states').on('value',snap=>{
     const states=snap.val()||{};
     MP.remotePlayers={};
+    let aliveCount=0;
+    let totalCount=0;
     Object.keys(states).forEach(pid=>{
       if(pid===MP.playerId)return;
       const s=states[pid];
       if(s&&Date.now()-(s.ts||0)<3000){
         MP.remotePlayers[pid]=s;
+        totalCount++;
+        if(s.alive!==false)aliveCount++;
       }
     });
+    if(MP.host&&gState==='play'){
+      const myAlive=!MP.mpLocalDead;
+      const totalPlayers=Object.keys(MP.players).length;
+      const allRemoteDead=totalCount>0&&Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
+      const allDead=myAlive?false:allRemoteDead;
+      if(totalPlayers>=2&&allDead){
+        mpAllDead();
+      }
+    }
   });
+}
+function mpAllDead(){
+  if(MP.roomRef){
+    MP.roomRef.child('status').set('ended');
+    MP.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
+  }
+  setTimeout(()=>{
+    mpLeaveRoom();
+    showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
+  },3000);
 }
 function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
     const rc=CHARS[rp.char]||CHARS[0];
-    cx.save();cx.globalAlpha=0.85;
-    cx.shadowColor=rc.color;cx.shadowBlur=8;
+    const dead=rp.alive===false;
+    cx.save();
+    cx.globalAlpha=dead?0.35:0.85;
+    if(dead){
+      cx.globalCompositeOperation='source-over';
+      cx.fillStyle='rgba(80,80,80,0.5)';
+      cx.beginPath();cx.arc(rp.x,rp.y,rc.stats?.power||20,0,Math.PI*2);cx.fill();
+    }
+    cx.shadowColor=dead?'rgba(100,100,100,0.5)':rc.color;cx.shadowBlur=dead?4:8;
     const ang=Math.atan2(myP-rp.y,mxP-rp.x)+Math.PI/2;
     rc.draw(rp.x,rp.y,ang,cx);
-    cx.globalAlpha=1;
+    cx.globalAlpha=dead?0.6:1;
     cx.fillStyle='rgba(0,0,0,0.6)';cx.font="bold 10px 'Cinzel',serif";cx.textAlign='center';
-    cx.fillText(rp.name||'???',rp.x,rp.y-20);
+    cx.fillText((dead?'💀 ':'')+(rp.name||'???'),rp.x,rp.y-20);
     cx.restore();
   });
 }
