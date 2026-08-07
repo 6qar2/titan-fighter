@@ -1543,8 +1543,8 @@ document.getElementById('btn-copy-code').addEventListener('click',()=>{
   if(navigator.clipboard){navigator.clipboard.writeText(code).then(()=>{alert('Room code copied: '+code);});}else{alert('Room code: '+code);}
 });
 document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
-document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();});
-document.getElementById('btn-mp-continue').addEventListener('click',()=>{bgStop();gState='menu';menuAnimActive=true;showScr('s-start');mpLeaveRoom();document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('htimer').classList.remove('warn');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
+document.getElementById('btn-mp-continue').addEventListener('click',()=>{bgStop();gState='menu';menuAnimActive=true;showScr('s-start');mpLeaveRoom();clearInterval(timerID);cancelAnimationFrame(animID);document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('htimer').classList.remove('warn');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.querySelectorAll('.mp-diff-card').forEach(card=>{
   card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
 });
@@ -2435,7 +2435,6 @@ function mpLeaveRoom(){
   }
   if(MP.roomRef){MP.roomRef.child('states').off();}
   MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;
-  showScr('s-mp-lobby');
 }
 function mpGetEnemyTarget(){
   if(!MP.roomCode||!MP.playerId)return P;
