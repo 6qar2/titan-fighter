@@ -12,22 +12,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <script>
   const FIREBASE_CONFIG = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyCbOtApsAEDpgI-zHZ5ZQntIi4iXeWsdCg",
+    authDomain: "titan-strike-b1931.firebaseapp.com",
+    databaseURL: "https://titan-strike-b1931-default-rtdb.firebaseio.com",
+    projectId: "titan-strike-b1931",
+    storageBucket: "titan-strike-b1931.firebasestorage.app",
+    messagingSenderId: "5461509647",
+    appId: "1:5461509647:web:9e465c0bb473c58ad3c57a"
   };
   let db = null;
-  try {
-    if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
-      firebase.initializeApp(FIREBASE_CONFIG);
-      db = firebase.database();
+  function initFirebase(){
+    try {
+      if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.database();
+        console.log("Firebase initialized");
+      }
+    } catch (e) {
+      console.warn("Firebase init failed:", e);
     }
-  } catch (e) {
-    console.warn("Firebase init failed:", e);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFirebase);
+  } else {
+    initFirebase();
   }
 </script>
 <style>
@@ -1852,7 +1860,7 @@ const MP={
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
-  if(!db){alert('Multiplayer requires Firebase config. Please set up Firebase Realtime Database and update the config in index.html.');return;}
+  if(!db){alert('Firebase is not initialized yet. Please wait a moment and try again, or check your Firebase config and Realtime Database setup.');return;}
   MP.playerId='p_'+Math.random().toString(36).slice(2,9);
   const code=mpGenerateCode();
   MP.roomCode=code;
@@ -1874,7 +1882,7 @@ function mpCreateRoom(){
   }).catch(e=>{console.error('create room error',e);alert('Failed to create room');});
 }
 function mpJoinRoom(){
-  if(!db){alert('Multiplayer requires Firebase config. Please set up Firebase Realtime Database and update the config in index.html.');return;}
+  if(!db){alert('Firebase is not initialized yet. Please wait a moment and try again, or check your Firebase config and Realtime Database setup.');return;}
   const code=document.getElementById('room-code-input').value.trim().toUpperCase();
   if(code.length!==4){alert('Please enter a valid 4-character room code');return;}
   MP.playerId='p_'+Math.random().toString(36).slice(2,9);
@@ -1964,7 +1972,7 @@ function mpSubmitScore(score){
   });
 }
 function mpLoadLeaderboard(){
-  if(!db){document.getElementById('lb-list').innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Firebase not configured</div>';return;}
+  if(!db){document.getElementById('lb-list').innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Firebase not initialized. Check your config and Realtime Database setup.</div>';return;}
   const list=document.getElementById('lb-list');
   list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Loading...</div>';
   db.ref('leaderboard').orderByChild('score').limitToLast(50).once('value').then(snap=>{
