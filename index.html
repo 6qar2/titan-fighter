@@ -295,6 +295,17 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   .crest-icon{width:46px;height:46px;}
   .titan-title{font-size:clamp(1.9rem,11vw,3.1rem);}
   .titan-tagline{font-size:.72rem;letter-spacing:2px;}
+  .mp-room-inner{gap:.45rem;padding:clamp(.8rem,3vw,1.2rem);}
+  .mp-code-value{font-size:clamp(1.4rem,5vw,2rem);letter-spacing:3px;}
+  .mp-players{width:min(260px,82vw);gap:.35rem;}
+  .mp-player{min-height:40px;padding:.45rem .6rem;}
+  .mp-player span{font-size:.62rem;letter-spacing:1px;}
+  .mp-diff-wrap,.mp-char-wrap{width:min(280px,84vw);margin:.3rem 0;}
+  .mp-diff-card{font-size:.5rem;padding:.38rem .2rem;}
+  .mp-char-grid{gap:.25rem;}
+  .mp-char-card{width:clamp(44px,14vw,56px);height:clamp(56px,17vw,70px);}
+  #mp-room-code{word-break:break-all;text-align:center;line-height:1.2;}
+  .btn-enter,.btn-ghost{min-height:46px;font-size:.68rem;}
 }
 @media (min-width: 481px) and (max-width: 768px) {
   #hud{flex-wrap:wrap;gap:.32rem;}
@@ -305,6 +316,11 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   #joystick-knob{width:36px;height:36px;}
   #fire-btn{width:70px;height:70px;}
   #power-btn{width:56px;height:56px;}
+  .mp-room-inner{gap:.5rem;padding:clamp(1rem,3.5vw,1.6rem);}
+  .mp-code-value{font-size:clamp(1.5rem,5.5vw,2.2rem);letter-spacing:4px;}
+  .mp-players{width:min(280px,86vw);}
+  .mp-diff-wrap,.mp-char-wrap{width:min(320px,90vw);}
+  .mp-char-card{width:clamp(48px,15vw,60px);height:clamp(60px,18vw,76px);}
 }
 
 /* ═══ MULTIPLAYER UI ═══ */
@@ -445,7 +461,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <span class="start-badge red">♛ ELITE WARRIOR</span>
     </div>
     <div class="input-label">Enter Your Name, Warrior</div>
-    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" spellcheck="false">
+    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" inputmode="text" autocomplete="name" spellcheck="false" autocapitalize="words" lang="en">
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
     <button class="btn-cta" id="btn-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ LEADERBOARD</button>
     <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
@@ -583,7 +599,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="div-line"><div class="div-gem"></div></div>
     <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
     <div class="mp-or">— OR JOIN —</div>
-    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" spellcheck="false" style="width:min(200px,60vw);text-transform:uppercase;">
+    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" inputmode="text" autocomplete="off" spellcheck="false" lang="en" style="width:min(200px,60vw);text-transform:uppercase;">
     <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
     <button class="btn-ghost" id="btn-mp-back">← BACK</button>
   </div>
@@ -1567,7 +1583,7 @@ document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Ente
 const pnameInput=document.getElementById('pname');
 if(pnameInput){
   pnameInput.addEventListener('input',e=>{
-    pnameInput.value=pnameInput.value.replace(/[<>]/g,'');
+    e.target.value=e.target.value.replace(/[<>]/g,'');
   });
 }
 
