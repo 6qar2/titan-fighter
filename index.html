@@ -2464,17 +2464,17 @@ function mpListenStates(){
         if(s.alive!==false)aliveCount++;
       }
     });
-    if(gState==='play'){
-      const myAlive=!MP.mpLocalDead;
-      const totalPlayers=Object.keys(MP.players).length;
-      const allRemoteDead=totalCount>=0&&Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
-      const allDead=totalPlayers>=2&&totalCount>=0&&!Object.values(MP.remotePlayers).some(rp=>rp.alive!==false)&&!myAlive;
-      if(allDead&&!MP.mpAllDeadTriggered){
-        MP.mpAllDeadTriggered=true;
-        mpAllDead();
-      }
-    }
   });
+  setInterval(()=>{
+    if(gState!=='play'||MP.mpAllDeadTriggered)return;
+    const myAlive=!MP.mpLocalDead;
+    const totalPlayers=Object.keys(MP.players).length;
+    const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
+    if(totalPlayers>=2&&!myAlive&&remoteAlive===0){
+      MP.mpAllDeadTriggered=true;
+      mpAllDead();
+    }
+  },1000);
 }
 function mpAllDead(){
   if(MP.mpAllDeadTriggered)return;
