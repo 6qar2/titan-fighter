@@ -1519,7 +1519,7 @@ document.getElementById('btn-enter-arena').addEventListener('click',()=>{
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
 });
 document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
-document.getElementById('btn-mp-lobby').addEventListener('click',()=>{showScr('s-mp-lobby');});
+document.getElementById('btn-mp-lobby').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();showScr('s-mp-lobby');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
 document.getElementById('btn-create-room').addEventListener('click',()=>{mpCreateRoom();});
 document.getElementById('btn-join-room').addEventListener('click',()=>{mpJoinRoom();});
 document.getElementById('btn-mp-back').addEventListener('click',()=>{showScr('s-chars');});
