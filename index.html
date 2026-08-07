@@ -1480,7 +1480,7 @@ wb.addEventListener('mousedown',()=>{switchWeapon();wake();});
 document.addEventListener('keydown',e=>{if(e.code==='KeyQ'||e.code==='KeyR'){e.preventDefault();switchWeapon();}});
 
 /* ═══ BUTTON WIRING ═══ */
-document.getElementById('btn-start').addEventListener('click',()=>{console.log('btn-start clicked');wake();const v=document.getElementById('pname').value.trim();pName=v?v.toUpperCase():'TITAN';showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
+document.getElementById('btn-start').addEventListener('click',()=>{console.log('btn-start clicked');wake();const v=document.getElementById('pname').value.trim();if(!v){alert('Enter your name, Warrior');return;}pName=v.toUpperCase();showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
 document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-chars');});
 document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-enter-arena').addEventListener('click',()=>{
@@ -1512,7 +1512,7 @@ document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveR
 document.querySelectorAll('.mp-diff-card').forEach(card=>{
   card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
 });
-document.getElementById('btn-lb-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-lb-back').addEventListener('click',()=>{mpStopLeaderboard();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-replay').addEventListener('click',()=>{
   wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
   document.getElementById('hud').classList.remove('off');
@@ -1527,10 +1527,10 @@ document.getElementById('btn-menu').addEventListener('click',()=>{
   document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   document.getElementById('htimer').classList.remove('warn');
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
-  document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
+  document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);mpStopLeaderboard();
 });
-document.getElementById('btn-lb-over').addEventListener('click',()=>{mpLoadLeaderboard();showScr('s-leaderboard');});
-document.getElementById('btn-lobby').addEventListener('click',()=>{mpLoadLeaderboard();showScr('s-leaderboard');});
+document.getElementById('btn-lb-over').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
+document.getElementById('btn-lobby').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
 
 /* ═══ BOOT ═══ */
@@ -2143,11 +2143,13 @@ const MP={
   host:false,
   started:false,
   mySlot:null,
-  roomDiff:'normal'
+  roomDiff:'normal',
+  lbRef:null
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
   if(!db){alert('Firebase is not initialized yet. Please wait a moment and try again, or check your Firebase config and Realtime Database setup.');return;}
+  const v=document.getElementById('pname').value.trim();if(!v){alert('Enter your name before creating a room');return;}pName=v.toUpperCase();
   MP.playerId='p_'+Math.random().toString(36).slice(2,9);
   const code=mpGenerateCode();
   MP.roomCode=code;
@@ -2160,7 +2162,7 @@ function mpCreateRoom(){
     status:'waiting',
     diff:selDiff,
     players:{
-      [MP.playerId]:{name:pName||'TITAN',slot:0,ready:true,char:selChar,diff:selDiff,score:0}
+      [MP.playerId]:{name:pName,slot:0,ready:true,char:selChar,diff:selDiff,score:0}
     },
     createdAt:firebase.database.ServerValue.TIMESTAMP
   }).then(()=>{
@@ -2173,6 +2175,7 @@ function mpJoinRoom(){
   if(!db){alert('Firebase is not initialized yet. Please wait a moment and try again, or check your Firebase config and Realtime Database setup.');return;}
   const code=document.getElementById('room-code-input').value.trim().toUpperCase();
   if(code.length!==4){alert('Please enter a valid 4-character room code');return;}
+  const v=document.getElementById('pname').value.trim();if(!v){alert('Enter your name before joining a room');return;}pName=v.toUpperCase();
   MP.playerId='p_'+Math.random().toString(36).slice(2,9);
   MP.roomCode=code;
   MP.host=false;
@@ -2187,7 +2190,7 @@ function mpJoinRoom(){
     if(mySlot===undefined){alert('Room is full (4/4)');return;}
     MP.mySlot=mySlot;
     MP.roomRef.child('players/'+MP.playerId).set({
-      name:pName||'TITAN',
+      name:pName,
       slot:mySlot,
       ready:false,
       char:selChar,
@@ -2300,7 +2303,9 @@ function mpLoadLeaderboard(){
   if(!db){document.getElementById('lb-list').innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Firebase not initialized. Check your config and Realtime Database setup.</div>';return;}
   const list=document.getElementById('lb-list');
   list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Loading...</div>';
-  db.ref('leaderboard').orderByChild('score').limitToLast(50).once('value').then(snap=>{
+  if(MP.lbRef){MP.lbRef.off();}
+  MP.lbRef=db.ref('leaderboard').orderByChild('score').limitToLast(50);
+  MP.lbRef.on('value',snap=>{
     const items=[];
     snap.forEach(child=>{items.push({id:child.key,...child.val()});});
     items.sort((a,b)=>b.score-a.score);
@@ -2315,6 +2320,9 @@ function mpLoadLeaderboard(){
       list.appendChild(row);
     });
   }).catch(e=>{list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Error loading leaderboard</div>';});
+}
+function mpStopLeaderboard(){
+  if(MP.lbRef){MP.lbRef.off();MP.lbRef=null;}
 }
 
 /* ═══ INITIALIZATION ═══ */
