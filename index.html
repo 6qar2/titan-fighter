@@ -75,7 +75,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .div-line::before,.div-line::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(184,152,64,0.35),transparent);}
 .div-gem{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
 .input-label{font-family:'Cinzel',serif;font-size:clamp(.48rem,1.6vw,.6rem);letter-spacing:clamp(2px,1vw,4px);color:var(--ash);margin-bottom:clamp(.3rem,1.5vw,.5rem);text-transform:uppercase;}
-.name-input{background:rgba(184,152,64,0.04);border:none;border-bottom:1px solid rgba(184,152,64,0.28);color:var(--gold-lit);padding:clamp(.6rem,2.2vw,.9rem) .2rem;font-family:'Cinzel',serif;font-size:clamp(.85rem,3.2vw,1.05rem);letter-spacing:clamp(2px,1vw,4px);text-align:center;width:min(260px,78vw);text-transform:uppercase;outline:none;transition:border-color .25s;caret-color:var(--gold);border-radius:0;}
+.name-input{background:rgba(184,152,64,0.04);border:none;border-bottom:1px solid rgba(184,152,64,0.28);color:var(--gold-lit);padding:clamp(.6rem,2.2vw,.9rem) .2rem;font-family:'Cinzel',serif;font-size:clamp(.85rem,3.2vw,1.05rem);letter-spacing:clamp(2px,1vw,4px);text-align:center;width:min(260px,78vw);outline:none;transition:border-color .25s;caret-color:var(--gold);border-radius:0;}
 .name-input:focus{border-bottom-color:var(--gold);}
 .name-input::placeholder{color:var(--ash2);font-size:clamp(.65rem,2.2vw,.8rem);}
 .btn-cta{margin-top:clamp(.9rem,3.2vw,1.8rem);font-family:'Cinzel',serif;font-size:clamp(.72rem,2.6vw,.9rem);letter-spacing:clamp(3px,1.6vw,6px);padding:clamp(.75rem,2.8vw,1.1rem) clamp(1.6rem,5.5vw,3rem);cursor:pointer;text-transform:uppercase;background:linear-gradient(135deg,var(--crimson) 0%,var(--red) 50%,#7A0010 100%);color:var(--gold-pale);border:1px solid rgba(184,152,64,0.35);position:relative;overflow:hidden;box-shadow:0 10px 48px rgba(140,0,26,0.35);transition:all .3s;border-radius:6px;min-height:56px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
@@ -445,9 +445,9 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <span class="start-badge red">♛ ELITE WARRIOR</span>
     </div>
     <div class="input-label">Enter Your Name, Warrior</div>
-    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
+    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" spellcheck="false">
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
-    <button class="btn-ghost" id="btn-lobby" style="margin-top:.6rem;">♛ LEADERBOARD</button>
+    <button class="btn-cta" id="btn-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ LEADERBOARD</button>
     <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
   </div>
 </div>
@@ -583,7 +583,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="div-line"><div class="div-gem"></div></div>
     <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
     <div class="mp-or">— OR JOIN —</div>
-    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" style="width:min(200px,60vw);">
+    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" spellcheck="false" style="width:min(200px,60vw);text-transform:uppercase;">
     <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
     <button class="btn-ghost" id="btn-mp-back">← BACK</button>
   </div>
@@ -1548,7 +1548,13 @@ document.getElementById('btn-menu').addEventListener('click',()=>{
   document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);mpStopLeaderboard();
 });
 document.getElementById('btn-lb-over').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
-document.getElementById('btn-lobby').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
+document.getElementById('btn-lobby').addEventListener('click',()=>{
+  console.log('Leaderboard button clicked');
+  mpStopLeaderboard();
+  if(!db){alert('Firebase is not configured yet. Please set up Firebase Realtime Database to use the leaderboard.');return;}
+  mpLoadLeaderboard();
+  showScr('s-leaderboard');
+});
 document.querySelectorAll('.lb-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('selected'));
@@ -1558,6 +1564,12 @@ document.querySelectorAll('.lb-tab').forEach(tab=>{
   });
 });
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
+const pnameInput=document.getElementById('pname');
+if(pnameInput){
+  pnameInput.addEventListener('input',e=>{
+    pnameInput.value=pnameInput.value.replace(/[<>]/g,'');
+  });
+}
 
 /* ═══ BOOT ═══ */
 initStartCanvas();menuAnimActive=true;menuRAF=requestAnimationFrame(drawStartBG);
