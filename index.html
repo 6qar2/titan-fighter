@@ -1394,6 +1394,7 @@ function enterGate(){
   bgColTarget={...WAVE_BGS[Math.min(wave-1,WAVE_BGS.length-1)]};showWaveAnnounce(wave);sfxCombo();
   document.getElementById('hwave').textContent=toRoman(wave);spawnParts(cv.width/2,cv.height/2,WAVE_GATE_COLS[Math.min(wave-2,WAVE_GATE_COLS.length-1)],22);
   bgTransition(wave);waveKills=0;setTimeout(()=>{waveAdvancing=false;spawnT=1.8;},1400);
+  if(MP.host&&MP.roomRef){MP.roomRef.child('wave').set(wave);}
 }
 
 function drawGate(ctx,g){
@@ -1979,6 +1980,7 @@ function update(dt){
   if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){const spawnCount=waveModifier==='hordes'?3:1;for(let s=0;s<spawnCount;s++){if(enemies.length<Math.min(4+wave,14)){spawnEnemy();spawnEnemyVariant();}}spawnT=sr;}
   if(!waveAdvancing&&!gateOpen&&gate===null&&waveKills>=waveQuota&&enemies.length===0){if(wave>=10){endGame();return;}gateOpen=true;openGate();}
   if(gate&&!waveAdvancing&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5)enterGate();
+  if(MP.host&&MP.roomRef)mpSyncRoomWave();
   bgCol.r+=(bgColTarget.r-bgCol.r)*.018;bgCol.g+=(bgColTarget.g-bgCol.g)*.018;bgCol.b+=(bgColTarget.b-bgCol.b)*.018;
   if(gate){gate.spin+=dt*1.4;gate.pulse+=dt*2.2;if(gate.pulse>1)gate.pulse=0;}
   poisonTrails=poisonTrails.filter(t=>{t.life-=dt*.4;return t.life>0;});
@@ -2168,6 +2170,7 @@ function draw(){
   activeTurrets.forEach(t=>{cx.fillStyle='#4AFFFF';cx.beginPath();cx.arc(t.x,t.y,6,0,Math.PI*2);cx.fill();cx.strokeStyle='rgba(74,255,255,.6)';cx.lineWidth=2;cx.beginPath();cx.arc(t.x,t.y,10+Math.sin(Date.now()*.01)*3,0,Math.PI*2);cx.stroke();});
   enemies.forEach(drawEnemy);
   if(gate)drawGate(cx,gate);
+  drawRemotePlayers();
   const ch=CHARS[selChar];
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='smoke'){cx.globalAlpha=.5+Math.sin(Date.now()*.015)*.3;cx.fillStyle='rgba(74,74,106,.3)';cx.beginPath();cx.arc(P.x,P.y,P.w+30,0,Math.PI*2);cx.fill();cx.globalAlpha=1;}
   if(!(P.invinc>0&&Math.floor(P.invinc*10)%2===0)){cx.save();cx.shadowColor=ch.color;cx.shadowBlur=10;const ang=Math.atan2(myP-P.y,mxP-P.x)+Math.PI/2;ch.draw(P.x,P.y,ang,cx);cx.restore();}
@@ -2178,7 +2181,7 @@ function draw(){
 }
 
 /* ═══ ENHANCED LOOP ═══ */
-function loop(ts){if(gState!=='play'||isPaused)return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);draw();animID=requestAnimationFrame(loop);}
+function loop(ts){if(gState!=='play'||isPaused)return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);mpSyncState(dt);draw();animID=requestAnimationFrame(loop);}
 
 /* ═══ SCREEN MANAGEMENT ═══ */
 function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
@@ -2195,7 +2198,9 @@ const MP={
   roomDiff:'normal',
   mpChar:selChar,
   lbRef:null,
-  lbMode:'sp'
+  lbMode:'sp',
+  remotePlayers:{},
+  mpPosSyncTimer:0
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2215,6 +2220,7 @@ function mpCreateRoom(){
     host:MP.playerId,
     status:'waiting',
     diff:selDiff,
+    wave:1,
     players:{
       [MP.playerId]:{name:pName,slot:0,ready:true,char:MP.mpChar,diff:selDiff,score:0}
     },
@@ -2292,6 +2298,12 @@ function mpListenRoom(){
       }
     }
     if(room.status==='playing'){mpStartGame();}
+    if(room.wave&&room.wave!==wave&&gState==='play'){
+      wave=room.wave;
+      showWaveAnnounce(wave);
+      document.getElementById('hwave').textContent=toRoman(wave);
+      bgTransition(wave);
+    }
     if(MP.mySlot!==null&&MP.players[MP.playerId]&&MP.players[MP.playerId].char!==undefined){
       MP.mpChar=MP.players[MP.playerId].char;
       document.querySelectorAll('#mp-char-grid .mp-char-card').forEach(c=>{
@@ -2299,6 +2311,10 @@ function mpListenRoom(){
       });
     }
   });
+}
+function mpSyncRoomWave(){
+  if(!MP.host||!MP.roomRef||gState!=='play')return;
+  MP.roomRef.child('wave').set(wave);
 }
 function mpDiffChange(diff){
   if(!MP.host||!MP.roomRef)return;
@@ -2365,16 +2381,60 @@ function mpStartGame(){
   document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
+  mpListenStates();
 }
 function mpLeaveRoom(){
   if(MP.roomRef&&MP.playerId){
     MP.roomRef.child('players/'+MP.playerId).remove();
+    MP.roomRef.child('states/'+MP.playerId).remove();
     if(MP.host){
       MP.roomRef.remove();
     }
   }
-  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;
+  if(MP.roomRef){MP.roomRef.child('states').off();}
+  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;
   showScr('s-mp-lobby');
+}
+function mpSyncState(dt){
+  if(!MP.roomRef||!MP.playerId||gState!=='play')return;
+  MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
+  if(MP.mpPosSyncTimer<0.1)return;
+  MP.mpPosSyncTimer=0;
+  MP.roomRef.child('states/'+MP.playerId).set({
+    x:P.x,y:P.y,
+    char:MP.mpChar,
+    name:pName,
+    score:score,
+    wave:wave,
+    ts:firebase.database.ServerValue.TIMESTAMP
+  });
+}
+function mpListenStates(){
+  if(!MP.roomRef)return;
+  MP.roomRef.child('states').on('value',snap=>{
+    const states=snap.val()||{};
+    MP.remotePlayers={};
+    Object.keys(states).forEach(pid=>{
+      if(pid===MP.playerId)return;
+      const s=states[pid];
+      if(s&&Date.now()-(s.ts||0)<3000){
+        MP.remotePlayers[pid]=s;
+      }
+    });
+  });
+}
+function drawRemotePlayers(){
+  Object.values(MP.remotePlayers).forEach(rp=>{
+    const rc=CHARS[rp.char]||CHARS[0];
+    cx.save();cx.globalAlpha=0.85;
+    cx.shadowColor=rc.color;cx.shadowBlur=8;
+    const ang=Math.atan2(myP-rp.y,mxP-rp.x)+Math.PI/2;
+    rc.draw(rp.x,rp.y,ang,cx);
+    cx.globalAlpha=1;
+    cx.fillStyle='rgba(0,0,0,0.6)';cx.font="bold 10px 'Cinzel',serif";cx.textAlign='center';
+    cx.fillText(rp.name||'???',rp.x,rp.y-20);
+    cx.restore();
+  });
 }
 function mpSubmitScore(score){
   if(!db||!MP.roomCode||!MP.playerId)return;
