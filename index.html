@@ -7,7 +7,29 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#04040A">
 <title>TITANS STRIKE · GALALA</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<script>
+  const FIREBASE_CONFIG = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  let db = null;
+  try {
+    if (typeof firebase !== 'undefined' && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY") {
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db = firebase.database();
+    }
+  } catch (e) {
+    console.warn("Firebase init failed:", e);
+  }
+</script>
 <style>
 :root{
   --ink:#06060E;--ink2:#0D0C14;
@@ -274,6 +296,27 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   #fire-btn{width:70px;height:70px;}
   #power-btn{width:56px;height:56px;}
 }
+
+/* ═══ MULTIPLAYER UI ═══ */
+.mp-inner,.mp-room-inner{display:flex;flex-direction:column;align-items:center;padding:clamp(1rem,4vw,2rem) clamp(.8rem,3vw,1.2rem);min-height:100vh;justify-content:center;gap:.6rem;}
+.mp-sub{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-style:italic;font-size:clamp(.6rem,1.8vw,.78rem);letter-spacing:clamp(2px,1vw,4px);color:var(--ash);text-align:center;}
+.mp-or{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:3px;color:var(--ash);margin:.2rem 0;}
+.mp-code-box{display:flex;flex-direction:column;align-items:center;gap:.3rem;margin:.5rem 0;}
+.mp-code-label{font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;}
+.mp-code-value{font-family:'Cinzel Decorative',serif;font-size:clamp(1.8rem,6vw,2.6rem);letter-spacing:6px;color:var(--gold-lit);text-shadow:0 0 24px rgba(212,175,55,0.45);}
+.mp-players{display:flex;flex-direction:column;gap:.5rem;width:min(300px,88vw);margin:.5rem 0;}
+.mp-player{display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;border:1px solid rgba(184,152,64,0.15);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;min-height:48px;}
+.mp-player-dot{width:8px;height:8px;border-radius:50%;background:#1A1A1A;box-shadow:0 0 6px rgba(0,0,0,0.6);flex-shrink:0;}
+.mp-player.ready .mp-player-dot{background:#4CAF50;box-shadow:0 0 8px rgba(76,175,80,0.7);}
+.mp-player span{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2px;color:var(--parchment);}
+.mp-status{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:2px;color:var(--ash);text-align:center;min-height:1.2rem;}
+#btn-start-mp:disabled{opacity:.4;cursor:not-allowed;}
+.lb-list{display:flex;flex-direction:column;gap:.4rem;width:min(360px,94vw);margin:.6rem 0;max-height:60vh;overflow-y:auto;}
+.lb-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border:1px solid rgba(184,152,64,0.12);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;}
+.lb-rank{font-family:'Cinzel',serif;font-size:.7rem;color:var(--gold-dim);width:28px;text-align:center;}
+.lb-name{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);flex:1;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-score{font-family:'Cinzel',serif;font-size:.78rem;color:var(--parchment);}
+.lb-you{color:#4CAF50 !important;}
 </style>
 </head>
 <body>
@@ -370,6 +413,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="input-label">Enter Your Name, Warrior</div>
     <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false">
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
+    <button class="btn-ghost" id="btn-lobby" style="margin-top:.6rem;">♛ LEADERBOARD</button>
     <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
   </div>
 </div>
@@ -492,7 +536,55 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
   <div class="char-grid" id="char-grid"></div>
   <button class="btn-enter" id="btn-enter-arena">ENTER THE ARENA</button>
+  <button class="btn-ghost" id="btn-mp-lobby">♛ MULTIPLAYER</button>
   <button class="btn-ghost" id="btn-back-diff">← DIFFICULTY</button>
+</div>
+
+<!-- MULTIPLAYER LOBBY -->
+<div class="scr off" id="s-mp-lobby">
+  <div class="mp-inner">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">MULTIPLAYER</div>
+    <div class="mp-sub">3-player rooms · Real-time battle</div>
+    <div class="div-line"><div class="div-gem"></div></div>
+    <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
+    <div class="mp-or">— OR JOIN —</div>
+    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" style="text-transform:uppercase;width:min(200px,60vw);">
+    <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
+    <button class="btn-ghost" id="btn-mp-back">← BACK</button>
+  </div>
+</div>
+
+<!-- MULTIPLAYER ROOM / WAITING -->
+<div class="scr off" id="s-mp-room">
+  <div class="mp-room-inner">
+    <div class="screen-eyebrow">TITANS CLUB · ROOM</div>
+    <div class="screen-title">LOBBY</div>
+    <div class="mp-code-box">
+      <div class="mp-code-label">ROOM CODE</div>
+      <div class="mp-code-value" id="mp-room-code">----</div>
+      <button class="btn-ghost" id="btn-copy-code" style="margin-top:.4rem;font-size:.6rem;padding:.3rem .8rem;">COPY CODE</button>
+    </div>
+    <div class="mp-players">
+      <div class="mp-player" id="mp-p0"><div class="mp-player-dot"></div><span>Player 1</span></div>
+      <div class="mp-player" id="mp-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
+      <div class="mp-player" id="mp-p2"><div class="mp-player-dot"></div><span>Waiting...</span></div>
+    </div>
+    <div class="mp-status" id="mp-status">Waiting for players...</div>
+    <button class="btn-enter" id="btn-start-mp" disabled>START BATTLE</button>
+    <button class="btn-ghost" id="btn-leave-room">LEAVE ROOM</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="scr off overlay" id="s-leaderboard">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">LEADERBOARD</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div class="lb-list" id="lb-list"></div>
+  <button class="btn-ghost" id="btn-lb-back">← RETURN</button>
 </div>
 
 <!-- GAME OVER -->
@@ -516,6 +608,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-replay" style="margin-top:1rem;">FIGHT AGAIN</button>
+    <button class="btn-ghost" id="btn-lb-over">♛ LEADERBOARD</button>
     <button class="btn-ghost" id="btn-menu">MAIN GATE</button>
   </div>
 </div>
@@ -1209,6 +1302,17 @@ document.getElementById('btn-enter-arena').addEventListener('click',()=>{
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
 });
 document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
+document.getElementById('btn-mp-lobby').addEventListener('click',()=>{showScr('s-mp-lobby');});
+document.getElementById('btn-create-room').addEventListener('click',()=>{mpCreateRoom();});
+document.getElementById('btn-join-room').addEventListener('click',()=>{mpJoinRoom();});
+document.getElementById('btn-mp-back').addEventListener('click',()=>{showScr('s-chars');});
+document.getElementById('btn-copy-code').addEventListener('click',()=>{
+  const code=document.getElementById('mp-room-code').textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(code).then(()=>{alert('Room code copied: '+code);});}else{alert('Room code: '+code);}
+});
+document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
+document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();});
+document.getElementById('btn-lb-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-replay').addEventListener('click',()=>{
   wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
   document.getElementById('hud').classList.remove('off');
@@ -1225,6 +1329,8 @@ document.getElementById('btn-menu').addEventListener('click',()=>{
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
 });
+document.getElementById('btn-lb-over').addEventListener('click',()=>{mpLoadLeaderboard();showScr('s-leaderboard');});
+document.getElementById('btn-lobby').addEventListener('click',()=>{mpLoadLeaderboard();showScr('s-leaderboard');});
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
 
 /* ═══ BOOT ═══ */
@@ -1695,6 +1801,7 @@ function endGame(){
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();
+  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -1732,6 +1839,150 @@ function loop(ts){if(gState!=='play'||isPaused)return;const dt=Math.min((ts-last
 
 /* ═══ SCREEN MANAGEMENT ═══ */
 function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
+
+/* ═══ MULTIPLAYER SYSTEM ═══ */
+const MP={
+  roomRef:null,
+  roomCode:null,
+  playerId:null,
+  players:{},
+  host:false,
+  started:false,
+  mySlot:null
+};
+function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
+function mpCreateRoom(){
+  if(!db){alert('Multiplayer requires Firebase config. Please set up Firebase Realtime Database and update the config in index.html.');return;}
+  MP.playerId='p_'+Math.random().toString(36).slice(2,9);
+  const code=mpGenerateCode();
+  MP.roomCode=code;
+  MP.host=true;
+  MP.mySlot=0;
+  MP.roomRef=db.ref('rooms/'+code);
+  MP.roomRef.set({
+    code:code,
+    host:MP.playerId,
+    status:'waiting',
+    players:{
+      [MP.playerId]:{name:pName||'TITAN',slot:0,ready:true,char:selChar,diff:selDiff,score:0}
+    },
+    createdAt:firebase.database.ServerValue.TIMESTAMP
+  }).then(()=>{
+    showScr('s-mp-room');
+    document.getElementById('mp-room-code').textContent=code;
+    mpListenRoom();
+  }).catch(e=>{console.error('create room error',e);alert('Failed to create room');});
+}
+function mpJoinRoom(){
+  if(!db){alert('Multiplayer requires Firebase config. Please set up Firebase Realtime Database and update the config in index.html.');return;}
+  const code=document.getElementById('room-code-input').value.trim().toUpperCase();
+  if(code.length!==4){alert('Please enter a valid 4-character room code');return;}
+  MP.playerId='p_'+Math.random().toString(36).slice(2,9);
+  MP.roomCode=code;
+  MP.host=false;
+  MP.roomRef=db.ref('rooms/'+code);
+  MP.roomRef.once('value').then(snap=>{
+    const room=snap.val();
+    if(!room){alert('Room not found');return;}
+    if(room.status!=='waiting'){alert('Room already in progress or closed');return;}
+    const slots=[0,1,2];
+    const taken=new Set(Object.values(room.players||{}).map(p=>p.slot));
+    const mySlot=slots.find(s=>!taken.has(s));
+    if(mySlot===undefined){alert('Room is full (3/3)');return;}
+    MP.mySlot=mySlot;
+    MP.roomRef.child('players/'+MP.playerId).set({
+      name:pName||'TITAN',
+      slot:mySlot,
+      ready:false,
+      char:selChar,
+      diff:selDiff,
+      score:0
+    });
+    showScr('s-mp-room');
+    document.getElementById('mp-room-code').textContent=code;
+    mpListenRoom();
+  }).catch(e=>{console.error('join room error',e);alert('Failed to join room');});
+}
+function mpListenRoom(){
+  if(!MP.roomRef)return;
+  MP.roomRef.on('value',snap=>{
+    const room=snap.val();
+    if(!room){showScr('s-mp-lobby');return;}
+    MP.players=room.players||{};
+    mpRenderPlayers();
+    const count=Object.keys(MP.players).length;
+    const allReady=count>=2&&Object.values(MP.players).every(p=>p.ready);
+    document.getElementById('mp-status').textContent=count>=2?(allReady?'Ready to start!':'Waiting for ready...'):'Waiting for players...';
+    const startBtn=document.getElementById('btn-start-mp');
+    startBtn.disabled=!(count>=2&&allReady);
+    if(room.status==='playing'){mpStartGame();}
+  });
+}
+function mpRenderPlayers(){
+  for(let i=0;i<3;i++){
+    const el=document.getElementById('mp-p'+i);
+    const entry=Object.values(MP.players).find(p=>p.slot===i);
+    if(entry){
+      el.classList.add('ready');
+      el.querySelector('span').textContent=entry.name+(i===0?' (Host)':'');
+    }else{
+      el.classList.remove('ready');
+      el.querySelector('span').textContent='Waiting...';
+    }
+  }
+}
+function mpSetReady(){
+  if(!MP.roomRef||!MP.playerId)return;
+  MP.roomRef.child('players/'+MP.playerId+'/ready').set(true);
+}
+function mpStartGame(){
+  if(MP.started)return;
+  MP.started=true;
+  showScr(null);
+  document.getElementById('hud').classList.remove('off');
+  if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
+  gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
+}
+function mpLeaveRoom(){
+  if(MP.roomRef&&MP.playerId){
+    MP.roomRef.child('players/'+MP.playerId).remove();
+    if(MP.host){
+      MP.roomRef.remove();
+    }
+  }
+  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;
+  showScr('s-mp-lobby');
+}
+function mpSubmitScore(score){
+  if(!db||!MP.roomCode||!MP.playerId)return;
+  db.ref('leaderboard').push({
+    name:pName||'TITAN',
+    score:score,
+    wave:wave,
+    room:MP.roomCode,
+    timestamp:firebase.database.ServerValue.TIMESTAMP
+  });
+}
+function mpLoadLeaderboard(){
+  if(!db){document.getElementById('lb-list').innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Firebase not configured</div>';return;}
+  const list=document.getElementById('lb-list');
+  list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Loading...</div>';
+  db.ref('leaderboard').orderByChild('score').limitToLast(50).once('value').then(snap=>{
+    const items=[];
+    snap.forEach(child=>{items.push({id:child.key,...child.val()});});
+    items.sort((a,b)=>b.score-a.score);
+    list.innerHTML='';
+    if(items.length===0){list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">No scores yet</div>';return;}
+    items.slice(0,50).forEach((it,i)=>{
+      const row=document.createElement('div');row.className='lb-row';
+      const rank=document.createElement('div');rank.className='lb-rank';rank.textContent='#'+(i+1);
+      const name=document.createElement('div');name.className='lb-name'+(it.name===pName?' lb-you':'');name.textContent=it.name;
+      const score=document.createElement('div');score.className='lb-score';score.textContent=it.score.toLocaleString();
+      row.appendChild(rank);row.appendChild(name);row.appendChild(score);
+      list.appendChild(row);
+    });
+  }).catch(e=>{list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Error loading leaderboard</div>';});
+}
 
 /* ═══ INITIALIZATION ═══ */
 loadSettings();loadStats();loadAchievements();loadUpgrades();
