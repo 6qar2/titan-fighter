@@ -2480,9 +2480,9 @@ function mpListenStates(){
     if(gState==='play'){
       const myAlive=!MP.mpLocalDead;
       const totalPlayers=Object.keys(MP.players).length;
-      const allRemoteDead=totalCount>0&&Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
-      const allDead=myAlive?false:allRemoteDead;
-      if(totalPlayers>=2&&allDead&&!MP.mpAllDeadTriggered){
+      const allRemoteDead=totalCount>=0&&Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
+      const allDead=totalPlayers>=2&&totalCount>=0&&!Object.values(MP.remotePlayers).some(rp=>rp.alive!==false)&&!myAlive;
+      if(allDead&&!MP.mpAllDeadTriggered){
         MP.mpAllDeadTriggered=true;
         mpAllDead();
       }
@@ -2492,6 +2492,9 @@ function mpListenStates(){
 function mpAllDead(){
   if(MP.mpAllDeadTriggered)return;
   MP.mpAllDeadTriggered=true;
+  if(gState==='play'){
+    endGame();
+  }
   if(MP.roomRef){
     MP.roomRef.child('status').set('ended');
     MP.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
