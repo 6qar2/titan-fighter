@@ -555,7 +555,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div class="mp-inner">
     <div class="screen-eyebrow">TITANS CLUB</div>
     <div class="screen-title">MULTIPLAYER</div>
-    <div class="mp-sub">3-player rooms · Real-time battle</div>
+    <div class="mp-sub">2-4 player rooms · Real-time battle</div>
     <div class="div-line"><div class="div-gem"></div></div>
     <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
     <div class="mp-or">— OR JOIN —</div>
@@ -579,6 +579,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <div class="mp-player" id="mp-p0"><div class="mp-player-dot"></div><span>Player 1</span></div>
       <div class="mp-player" id="mp-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
       <div class="mp-player" id="mp-p2"><div class="mp-player-dot"></div><span>Waiting...</span></div>
+      <div class="mp-player" id="mp-p3"><div class="mp-player-dot"></div><span>Waiting...</span></div>
     </div>
     <div class="mp-status" id="mp-status">Waiting for players...</div>
     <button class="btn-enter" id="btn-start-mp" disabled>START BATTLE</button>
@@ -1905,10 +1906,9 @@ function mpJoinRoom(){
     const room=snap.val();
     if(!room){alert('Room not found');return;}
     if(room.status!=='waiting'){alert('Room already in progress or closed');return;}
-    const slots=[0,1,2];
-    const taken=new Set(Object.values(room.players||{}).map(p=>p.slot));
-    const mySlot=slots.find(s=>!taken.has(s));
-    if(mySlot===undefined){alert('Room is full (3/3)');return;}
+  const slots=[0,1,2,3];
+  const mySlot=slots.find(s=>!taken.has(s));
+  if(mySlot===undefined){alert('Room is full (4/4)');return;}
     MP.mySlot=mySlot;
     MP.roomRef.child('players/'+MP.playerId).set({
       name:pName||'TITAN',
@@ -1939,7 +1939,7 @@ function mpListenRoom(){
   });
 }
 function mpRenderPlayers(){
-  for(let i=0;i<3;i++){
+  for(let i=0;i<4;i++){
     const el=document.getElementById('mp-p'+i);
     const entry=Object.values(MP.players).find(p=>p.slot===i);
     if(entry){
