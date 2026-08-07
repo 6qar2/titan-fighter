@@ -321,6 +321,12 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .mp-player span{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2px;color:var(--parchment);}
 .mp-status{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:2px;color:var(--ash);text-align:center;min-height:1.2rem;}
 #btn-start-mp:disabled{opacity:.4;cursor:not-allowed;}
+.mp-diff-wrap{width:min(340px,92vw);margin:.4rem 0;}
+.mp-diff-label{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:2px;color:var(--gold-dim);text-align:center;margin-bottom:.35rem;text-transform:uppercase;}
+.mp-diff-cards{display:flex;gap:.4rem;justify-content:center;}
+.mp-diff-card{flex:1;padding:.45rem .3rem;border:1px solid rgba(184,152,64,0.18);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:1px;color:var(--ash);}
+.mp-diff-card.selected{border-color:rgba(212,175,55,0.55);color:var(--gold-lit);box-shadow:0 0 12px rgba(184,152,64,0.18);}
+.mp-diff-card:active{transform:scale(.96);}
 .lb-list{display:flex;flex-direction:column;gap:.4rem;width:min(360px,94vw);margin:.6rem 0;max-height:60vh;overflow-y:auto;}
 .lb-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border:1px solid rgba(184,152,64,0.12);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;}
 .lb-rank{font-family:'Cinzel',serif;font-size:.7rem;color:var(--gold-dim);width:28px;text-align:center;}
@@ -580,6 +586,14 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <div class="mp-player" id="mp-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
       <div class="mp-player" id="mp-p2"><div class="mp-player-dot"></div><span>Waiting...</span></div>
       <div class="mp-player" id="mp-p3"><div class="mp-player-dot"></div><span>Waiting...</span></div>
+    </div>
+    <div class="mp-diff-wrap" id="mp-diff-wrap" style="display:none;">
+      <div class="mp-diff-label">HOST DIFFICULTY</div>
+      <div class="mp-diff-cards">
+        <div class="mp-diff-card" data-diff="easy">🛡️ RECRUIT</div>
+        <div class="mp-diff-card selected" data-diff="normal">⚔️ LEGIONARY</div>
+        <div class="mp-diff-card" data-diff="hard">💀 TITAN</div>
+      </div>
     </div>
     <div class="mp-status" id="mp-status">Waiting for players...</div>
     <button class="btn-enter" id="btn-start-mp" disabled>START BATTLE</button>
@@ -1333,6 +1347,9 @@ document.getElementById('btn-copy-code').addEventListener('click',()=>{
 });
 document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
 document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();});
+document.querySelectorAll('.mp-diff-card').forEach(card=>{
+  card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
+});
 document.getElementById('btn-lb-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-replay').addEventListener('click',()=>{
   wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
@@ -1869,7 +1886,8 @@ const MP={
   players:{},
   host:false,
   started:false,
-  mySlot:null
+  mySlot:null,
+  roomDiff:'normal'
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -1884,6 +1902,7 @@ function mpCreateRoom(){
     code:code,
     host:MP.playerId,
     status:'waiting',
+    diff:selDiff,
     players:{
       [MP.playerId]:{name:pName||'TITAN',slot:0,ready:true,char:selChar,diff:selDiff,score:0}
     },
@@ -1906,9 +1925,10 @@ function mpJoinRoom(){
     const room=snap.val();
     if(!room){alert('Room not found');return;}
     if(room.status!=='waiting'){alert('Room already in progress or closed');return;}
-  const slots=[0,1,2,3];
-  const mySlot=slots.find(s=>!taken.has(s));
-  if(mySlot===undefined){alert('Room is full (4/4)');return;}
+    const slots=[0,1,2,3];
+    const taken=new Set(Object.values(room.players||{}).map(p=>p.slot));
+    const mySlot=slots.find(s=>!taken.has(s));
+    if(mySlot===undefined){alert('Room is full (4/4)');return;}
     MP.mySlot=mySlot;
     MP.roomRef.child('players/'+MP.playerId).set({
       name:pName||'TITAN',
@@ -1929,13 +1949,31 @@ function mpListenRoom(){
     const room=snap.val();
     if(!room){showScr('s-mp-lobby');return;}
     MP.players=room.players||{};
+    MP.roomDiff=room.diff||'normal';
     mpRenderPlayers();
     const count=Object.keys(MP.players).length;
     const allReady=count>=2&&Object.values(MP.players).every(p=>p.ready);
     document.getElementById('mp-status').textContent=count>=2?(allReady?'Ready to start!':'Waiting for ready...'):'Waiting for players...';
     const startBtn=document.getElementById('btn-start-mp');
     startBtn.disabled=!(count>=2&&allReady);
+    const diffWrap=document.getElementById('mp-diff-wrap');
+    if(diffWrap){
+      diffWrap.style.display=MP.host?'block':'none';
+      if(MP.host){
+        diffWrap.querySelectorAll('.mp-diff-card').forEach(card=>{
+          card.classList.toggle('selected',card.dataset.diff===MP.roomDiff);
+        });
+      }
+    }
     if(room.status==='playing'){mpStartGame();}
+  });
+}
+function mpDiffChange(diff){
+  if(!MP.host||!MP.roomRef)return;
+  MP.roomDiff=diff;
+  MP.roomRef.child('diff').set(diff);
+  document.querySelectorAll('.mp-diff-card').forEach(card=>{
+    card.classList.toggle('selected',card.dataset.diff===diff);
   });
 }
 function mpRenderPlayers(){
@@ -1958,6 +1996,7 @@ function mpSetReady(){
 function mpStartGame(){
   if(MP.started)return;
   MP.started=true;
+  selDiff=MP.roomDiff||'normal';
   showScr(null);
   document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
