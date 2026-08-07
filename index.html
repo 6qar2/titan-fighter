@@ -2402,6 +2402,8 @@ function mpSetReady(){
       const allReady=count>=2&&Object.values(all).every(p=>p.ready);
       if(allReady){
         MP.roomRef.child('status').set('playing');
+        MP.roomRef.child('wave').set(1);
+        MP.roomRef.child('startedAt').set(firebase.database.ServerValue.TIMESTAMP);
       }
     });
   }
@@ -2416,7 +2418,6 @@ function mpStartGame(){
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   mpListenStates();
-  if(MP.host&&MP.roomRef){MP.roomRef.child('status').set('playing');MP.roomRef.child('wave').set(1);}
 }
 function mpLeaveRoom(){
   if(MP.roomRef&&MP.playerId){
