@@ -327,6 +327,16 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .mp-diff-card{flex:1;padding:.45rem .3rem;border:1px solid rgba(184,152,64,0.18);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:1px;color:var(--ash);}
 .mp-diff-card.selected{border-color:rgba(212,175,55,0.55);color:var(--gold-lit);box-shadow:0 0 12px rgba(184,152,64,0.18);}
 .mp-diff-card:active{transform:scale(.96);}
+.mp-char-wrap{width:min(340px,92vw);margin:.4rem 0;}
+.mp-char-label{font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:2px;color:var(--gold-dim);text-align:center;margin-bottom:.35rem;text-transform:uppercase;}
+.mp-char-grid{display:flex;gap:.35rem;justify-content:center;flex-wrap:wrap;}
+.mp-char-card{width:clamp(52px,16vw,66px);height:clamp(66px,20vw,84px);border:1px solid rgba(184,152,64,0.18);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;padding:.2rem;}
+.mp-char-card.selected{border-color:rgba(212,175,55,0.55);box-shadow:0 0 12px rgba(184,152,64,0.18);}
+.mp-char-card:active{transform:scale(.94);}
+.mp-char-card canvas{width:100%;height:100%;}
+.lb-tabs{display:flex;gap:.4rem;justify-content:center;margin-bottom:.4rem;}
+.lb-tab{font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;padding:.4rem .8rem;border:1px solid rgba(184,152,64,0.18);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:6px;cursor:pointer;transition:all .2s;color:var(--ash);}
+.lb-tab.selected{border-color:rgba(212,175,55,0.55);color:var(--gold-lit);box-shadow:0 0 10px rgba(184,152,64,0.15);}
 .lb-list{display:flex;flex-direction:column;gap:.4rem;width:min(360px,94vw);margin:.6rem 0;max-height:60vh;overflow-y:auto;}
 .lb-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border:1px solid rgba(184,152,64,0.12);background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));border-radius:8px;}
 .lb-rank{font-family:'Cinzel',serif;font-size:.7rem;color:var(--gold-dim);width:28px;text-align:center;}
@@ -603,6 +613,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="mp-diff-card" data-diff="hard">💀 TITAN</div>
       </div>
     </div>
+    <div class="mp-char-wrap" id="mp-char-wrap">
+      <div class="mp-char-label">YOUR CHAMPION</div>
+      <div class="mp-char-grid" id="mp-char-grid"></div>
+    </div>
     <div class="mp-status" id="mp-status">Waiting for players...</div>
     <button class="btn-enter" id="btn-start-mp" disabled>START BATTLE</button>
     <button class="btn-ghost" id="btn-leave-room">LEAVE ROOM</button>
@@ -615,6 +629,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="screen-eyebrow">TITANS CLUB</div>
     <div class="screen-title">LEADERBOARD</div>
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div class="lb-tabs" id="lb-tabs">
+    <div class="lb-tab selected" data-lb="sp">SINGLE PLAYER</div>
+    <div class="lb-tab" data-lb="mp">MULTIPLAYER</div>
   </div>
   <div class="lb-list" id="lb-list"></div>
   <button class="btn-ghost" id="btn-lb-back">← RETURN</button>
@@ -1531,6 +1549,14 @@ document.getElementById('btn-menu').addEventListener('click',()=>{
 });
 document.getElementById('btn-lb-over').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
 document.getElementById('btn-lobby').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
+document.querySelectorAll('.lb-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('selected'));
+    tab.classList.add('selected');
+    MP.lbMode=tab.dataset.lb;
+    mpLoadLeaderboard();
+  });
+});
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
 
 /* ═══ BOOT ═══ */
@@ -2086,7 +2112,7 @@ function endGame(){
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();sfxVictory();
-  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
+  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}else{spSubmitScore(score);}
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -2144,7 +2170,9 @@ const MP={
   started:false,
   mySlot:null,
   roomDiff:'normal',
-  lbRef:null
+  mpChar:selChar,
+  lbRef:null,
+  lbMode:'sp'
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2162,12 +2190,13 @@ function mpCreateRoom(){
     status:'waiting',
     diff:selDiff,
     players:{
-      [MP.playerId]:{name:pName,slot:0,ready:true,char:selChar,diff:selDiff,score:0}
+      [MP.playerId]:{name:pName,slot:0,ready:true,char:MP.mpChar,diff:selDiff,score:0}
     },
     createdAt:firebase.database.ServerValue.TIMESTAMP
   }).then(()=>{
     showScr('s-mp-room');
     document.getElementById('mp-room-code').textContent=code;
+    mpBuildCharGrid();
     mpListenRoom();
   }).catch(e=>{console.error('create room error',e);alert('Failed to create room');});
 }
@@ -2193,12 +2222,13 @@ function mpJoinRoom(){
       name:pName,
       slot:mySlot,
       ready:false,
-      char:selChar,
+      char:MP.mpChar,
       diff:selDiff,
       score:0
     });
     showScr('s-mp-room');
     document.getElementById('mp-room-code').textContent=code;
+    mpBuildCharGrid();
     mpListenRoom();
   }).catch(e=>{console.error('join room error',e);alert('Failed to join room');});
 }
@@ -2232,6 +2262,12 @@ function mpListenRoom(){
       }
     }
     if(room.status==='playing'){mpStartGame();}
+    if(MP.mySlot!==null&&MP.players[MP.playerId]&&MP.players[MP.playerId].char!==undefined){
+      MP.mpChar=MP.players[MP.playerId].char;
+      document.querySelectorAll('#mp-char-grid .mp-char-card').forEach(c=>{
+        c.classList.toggle('selected',parseInt(c.dataset.idx)===MP.mpChar);
+      });
+    }
   });
 }
 function mpDiffChange(diff){
@@ -2241,6 +2277,26 @@ function mpDiffChange(diff){
   document.querySelectorAll('.mp-diff-card').forEach(card=>{
     card.classList.toggle('selected',card.dataset.diff===diff);
   });
+}
+function mpBuildCharGrid(){
+  const grid=document.getElementById('mp-char-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  CHARS.forEach((c,i)=>{
+    const card=document.createElement('div');card.className='mp-char-card'+(i===MP.mpChar?' selected':'');card.dataset.idx=i;
+    const mc=document.createElement('canvas');mc.width=64;mc.height=80;
+    const mctx=mc.getContext('2d');mctx.clearRect(0,0,64,80);
+    c.draw(32,40,-Math.PI/2,mctx);
+    card.appendChild(mc);
+    card.addEventListener('click',()=>{mpSelectChar(i);});
+    grid.appendChild(card);
+  });
+}
+function mpSelectChar(idx){
+  if(!MP.roomRef||!MP.playerId)return;
+  MP.mpChar=idx;
+  document.querySelectorAll('#mp-char-grid .mp-char-card').forEach(c=>c.classList.toggle('selected',parseInt(c.dataset.idx)===idx));
+  MP.roomRef.child('players/'+MP.playerId+'/char').set(idx);
 }
 function mpRenderPlayers(){
   for(let i=0;i<4;i++){
@@ -2273,6 +2329,7 @@ function mpSetReady(){
 function mpStartGame(){
   if(MP.started)return;
   MP.started=true;
+  selChar=MP.mpChar;
   selDiff=MP.roomDiff||'normal';
   showScr(null);
   document.getElementById('hud').classList.remove('off');
@@ -2291,11 +2348,22 @@ function mpLeaveRoom(){
 }
 function mpSubmitScore(score){
   if(!db||!MP.roomCode||!MP.playerId)return;
-  db.ref('leaderboard').push({
-    name:pName||'TITAN',
+  db.ref('leaderboard_mp').push({
+    name:pName,
     score:score,
     wave:wave,
     room:MP.roomCode,
+    mode:'mp',
+    timestamp:firebase.database.ServerValue.TIMESTAMP
+  });
+}
+function spSubmitScore(score){
+  if(!db)return;
+  db.ref('leaderboard_sp').push({
+    name:pName,
+    score:score,
+    wave:wave,
+    mode:'sp',
     timestamp:firebase.database.ServerValue.TIMESTAMP
   });
 }
@@ -2304,7 +2372,8 @@ function mpLoadLeaderboard(){
   const list=document.getElementById('lb-list');
   list.innerHTML='<div style="text-align:center;color:var(--ash);padding:1rem;">Loading...</div>';
   if(MP.lbRef){MP.lbRef.off();}
-  MP.lbRef=db.ref('leaderboard').orderByChild('score').limitToLast(50);
+  const node=MP.lbMode==='mp'?'leaderboard_mp':'leaderboard_sp';
+  MP.lbRef=db.ref(node).orderByChild('score').limitToLast(50);
   MP.lbRef.on('value',snap=>{
     const items=[];
     snap.forEach(child=>{items.push({id:child.key,...child.val()});});
