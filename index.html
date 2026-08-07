@@ -125,6 +125,8 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .btn-enter:active{transform:scale(.97);}
 .btn-ghost{font-family:'Cinzel',serif;font-size:clamp(.58rem,1.9vw,.72rem);letter-spacing:clamp(1px,.8vw,3px);padding:clamp(.45rem,1.6vw,.65rem) clamp(.9rem,3.2vw,1.8rem);cursor:pointer;text-transform:uppercase;background:transparent;color:var(--ash);border:1px solid rgba(94,86,77,0.3);margin-top:clamp(.25rem,.8vw,.45rem);transition:all .2s;border-radius:6px;min-height:46px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
 .btn-ghost:active{color:var(--parchment);border-color:rgba(184,152,64,0.35);}
+.btn-mp{background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);}
+.btn-mp:active{transform:scale(.97);box-shadow:0 4px 20px rgba(90,40,220,0.4);}
 #hud{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:clamp(.35rem,1.1vw,.55rem) clamp(.6rem,2.2vw,1rem);padding-top:max(.45rem,env(safe-area-inset-top));background:linear-gradient(180deg,rgba(6,6,14,0.94) 0%,rgba(6,6,14,0.82) 100%);backdrop-filter:blur(14px);border-bottom:1px solid rgba(184,152,64,0.08);flex-wrap:wrap;gap:clamp(.25rem,1vw,.45rem);}
 #hud.off{display:none;}
 .hud-block{display:flex;flex-direction:column;align-items:center;gap:1px;}
@@ -544,7 +546,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
   <div class="char-grid" id="char-grid"></div>
   <button class="btn-enter" id="btn-enter-arena">ENTER THE ARENA</button>
-  <button class="btn-ghost" id="btn-mp-lobby">♛ MULTIPLAYER</button>
+  <button class="btn-enter btn-mp" id="btn-mp-lobby">♛ MULTIPLAYER</button>
   <button class="btn-ghost" id="btn-back-diff">← DIFFICULTY</button>
 </div>
 
@@ -557,7 +559,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="div-line"><div class="div-gem"></div></div>
     <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
     <div class="mp-or">— OR JOIN —</div>
-    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" style="text-transform:uppercase;width:min(200px,60vw);">
+    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" autocorrect="off" spellcheck="false" style="width:min(200px,60vw);">
     <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
     <button class="btn-ghost" id="btn-mp-back">← BACK</button>
   </div>
@@ -1313,6 +1315,16 @@ document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('
 document.getElementById('btn-mp-lobby').addEventListener('click',()=>{showScr('s-mp-lobby');});
 document.getElementById('btn-create-room').addEventListener('click',()=>{mpCreateRoom();});
 document.getElementById('btn-join-room').addEventListener('click',()=>{mpJoinRoom();});
+const roomCodeInput=document.getElementById('room-code-input');
+if(roomCodeInput){
+  roomCodeInput.addEventListener('input',e=>{
+    let v=e.target.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase();
+    e.target.value=v;
+  });
+  roomCodeInput.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();mpJoinRoom();}
+  });
+}
 document.getElementById('btn-mp-back').addEventListener('click',()=>{showScr('s-chars');});
 document.getElementById('btn-copy-code').addEventListener('click',()=>{
   const code=document.getElementById('mp-room-code').textContent;
