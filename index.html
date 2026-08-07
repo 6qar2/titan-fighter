@@ -1955,7 +1955,14 @@ function mpListenRoom(){
     const allReady=count>=2&&Object.values(MP.players).every(p=>p.ready);
     document.getElementById('mp-status').textContent=count>=2?(allReady?'Ready to start!':'Waiting for ready...'):'Waiting for players...';
     const startBtn=document.getElementById('btn-start-mp');
-    startBtn.disabled=!(count>=2&&allReady);
+    const myEntry=MP.players[MP.playerId];
+    if(myEntry){
+      startBtn.textContent=MP.host?(allReady?'START BATTLE':'Waiting...'):(myEntry.ready?'READY ✓':'READY');
+      startBtn.disabled=MP.host?!allReady:false;
+    }else{
+      startBtn.textContent='START BATTLE';
+      startBtn.disabled=true;
+    }
     const diffWrap=document.getElementById('mp-diff-wrap');
     if(diffWrap){
       diffWrap.style.display=MP.host?'block':'none';
@@ -1992,6 +1999,17 @@ function mpRenderPlayers(){
 function mpSetReady(){
   if(!MP.roomRef||!MP.playerId)return;
   MP.roomRef.child('players/'+MP.playerId+'/ready').set(true);
+  if(MP.host){
+    const players=MP.roomRef.child('players');
+    players.once('value').then(snap=>{
+      const all=snap.val()||{};
+      const count=Object.keys(all).length;
+      const allReady=count>=2&&Object.values(all).every(p=>p.ready);
+      if(allReady){
+        MP.roomRef.child('status').set('playing');
+      }
+    });
+  }
 }
 function mpStartGame(){
   if(MP.started)return;
