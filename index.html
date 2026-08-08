@@ -624,8 +624,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="mp-players">
       <div class="mp-player" id="mp-p0"><div class="mp-player-dot"></div><span>Player 1</span></div>
       <div class="mp-player" id="mp-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-      <div class="mp-player" id="mp-p2"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-      <div class="mp-player" id="mp-p3"><div class="mp-player-dot"></div><span>Waiting...</span></div>
     </div>
     <div class="mp-diff-wrap" id="mp-diff-wrap" style="display:none;">
       <div class="mp-diff-label">HOST DIFFICULTY</div>
@@ -1977,9 +1975,9 @@ function update(dt){
   shootCD-=dt;if(shooting&&shootCD<=0){fireBullet();shootCD=fireInterval;}
   if(ammo<maxAmmo){ammoRegenAccum+=dt*diffCfg.ammoRegenRate;if(ammoRegenAccum>=1){const g=Math.floor(ammoRegenAccum);ammo=Math.min(maxAmmo,ammo+g);ammoRegenAccum-=g;updateAmmoHUD();}}
   if(comboT>0){comboT-=dt;if(comboT<=0){combo=0;document.getElementById('combo').style.opacity='0';}}
-  const spawnBase=diffCfg.spawnRateBase;const sr=Math.max(.25,spawnBase-wave*.12);
+  const spawnBase=diffCfg.spawnRateBase;const mpSpdMult=MP.roomCode?.5:1;const sr=Math.max(.25,(spawnBase-wave*.12)*mpSpdMult);
   const waveQuota=6+wave*3;spawnT-=dt;
-  if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){const spawnCount=waveModifier==='hordes'?3:1;for(let s=0;s<spawnCount;s++){if(enemies.length<Math.min(4+wave,14)){spawnEnemy();spawnEnemyVariant();}}spawnT=sr;}
+  if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){const spawnCount=waveModifier==='hordes'?3:1;for(let s=0;s<spawnCount;s++){if(enemies.length<Math.min(4+wave,MP.roomCode?10:14)){spawnEnemy();spawnEnemyVariant();}}spawnT=sr;}
   if(!waveAdvancing&&!gateOpen&&gate===null&&waveKills>=waveQuota&&enemies.length===0){if(wave>=10){endGame();return;}gateOpen=true;openGate();}
   if(gate&&!waveAdvancing&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5)enterGate();
   if(MP.host&&MP.roomRef)mpSyncRoomWave();
@@ -2233,7 +2231,12 @@ const MP={
   mpAliveCount:0,
   mpAllDeadTriggered:false,
   mpDeathScreenShown:false,
-  mpStateInterval:null
+  mpStateInterval:null,
+  _lastSyncX:0,
+  _lastSyncY:0,
+  _lastSyncScore:0,
+  _lastSyncWave:0,
+  _lastSyncedWave:0
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2283,10 +2286,10 @@ function mpJoinRoom(){
     const room=snap.val();
     if(!room){alert('Room not found');return;}
     if(room.status!=='waiting'&&room.status!=='playing'){alert('Room is not available');return;}
-    const slots=[0,1,2,3];
+    const slots=[0,1];
     const taken=new Set(Object.values(room.players||{}).map(p=>p.slot));
     const mySlot=slots.find(s=>!taken.has(s));
-    if(mySlot===undefined){alert('Room is full (4/4)');return;}
+    if(mySlot===undefined){alert('Room is full (2/2)');return;}
     MP.playerId=playerId;
     MP.roomCode=code;
     MP.host=false;
@@ -2360,7 +2363,10 @@ function mpListenRoom(){
 }
 function mpSyncRoomWave(){
   if(!MP.host||!MP.roomRef||gState!=='play')return;
-  MP.roomRef.child('wave').set(wave);
+  if(MP._lastSyncedWave!==wave){
+    MP._lastSyncedWave=wave;
+    MP.roomRef.child('wave').set(wave);
+  }
 }
 function mpDiffChange(diff){
   if(!MP.host||!MP.roomRef)return;
@@ -2391,7 +2397,7 @@ function mpSelectChar(idx){
   MP.roomRef.child('players/'+MP.playerId+'/char').set(idx);
 }
 function mpRenderPlayers(){
-  for(let i=0;i<4;i++){
+  for(let i=0;i<2;i++){
     const el=document.getElementById('mp-p'+i);
     const entry=Object.values(MP.players).find(p=>p.slot===i);
     if(entry){
@@ -2441,7 +2447,7 @@ function mpLeaveRoom(){
   }
   if(MP.roomRef){MP.roomRef.child('states').off();}
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
-  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;
+  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;
 }
 function mpGetEnemyTarget(){
   if(!MP.roomCode||!MP.playerId)return P;
@@ -2459,8 +2465,11 @@ function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
-  if(MP.mpPosSyncTimer<0.1)return;
+  if(MP.mpPosSyncTimer<0.25)return;
   MP.mpPosSyncTimer=0;
+  const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
+  if(Math.hypot(P.x-lastX,P.y-lastY)<8&&score===MP._lastSyncScore&&wave===MP._lastSyncWave)return;
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
     char:MP.mpChar,
