@@ -158,6 +158,24 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 #combo{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);font-family:'Cinzel Decorative',serif;font-size:1.35rem;letter-spacing:2px;color:var(--gold-lit);text-shadow:0 0 22px rgba(212,175,55,0.5);z-index:90;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 #combo.milestone{animation:comboMilestone .5s ease-out;color:#FFD700;text-shadow:0 0 32px rgba(255,215,0,0.8);}
 @keyframes comboMilestone{0%{transform:translateX(-50%) scale(1.5)}100%{transform:translateX(-50%) scale(1)}}
+#combo.decay{animation:comboDecay .6s ease-in-out infinite;color:var(--red-hot);text-shadow:0 0 22px rgba(217,0,31,0.6);}
+@keyframes comboDecay{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.5;transform:translateX(-50%) scale(1.05)}}
+#vignette.near-death{background:radial-gradient(ellipse at center,transparent 40%,rgba(120,0,0,0.45) 100%);animation:heartbeat 1s ease-in-out infinite;}
+@keyframes heartbeat{0%,100%{opacity:.7}15%{opacity:1}30%{opacity:.6}45%{opacity:.9}}
+#quit-confirm{position:fixed;inset:0;z-index:260;background:rgba(6,6,14,0.95);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+#quit-confirm.visible{display:flex;}
+.quit-title{font-family:'Cinzel Decorative',serif;font-size:1.5rem;letter-spacing:4px;color:var(--red-hot);text-shadow:0 0 22px rgba(217,0,31,0.5);}
+.quit-msg{font-family:'Barlow Condensed',sans-serif;font-size:.85rem;letter-spacing:2px;color:var(--ash);text-align:center;max-width:280px;}
+.quit-btns{display:flex;gap:.8rem;margin-top:.5rem;}
+.quit-btns button{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;padding:.6rem 1.4rem;cursor:pointer;text-transform:uppercase;border-radius:6px;min-height:46px;transition:all .2s;}
+.quit-yes{background:linear-gradient(135deg,var(--crimson),var(--red));color:var(--gold-pale);border:1px solid rgba(184,152,64,0.35);}
+.quit-no{background:transparent;color:var(--parchment);border:1px solid rgba(184,152,64,0.3);}
+.quit-yes:active{transform:scale(.95);}
+.quit-no:active{transform:scale(.95);}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+  #combo,#wave-announce,#power-announce,#low-ammo-warn,#enemy-warn,#gate-prompt,#vignette{animation:none !important;transition:none !important;}
+}
 #wave-announce{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,7.5vw,2.6rem);letter-spacing:3px;color:var(--gold-lit);text-shadow:0 0 44px rgba(212,175,55,0.45);z-index:95;pointer-events:none;text-align:center;opacity:0;transition:opacity .4s;}
 #low-ammo-warn{position:fixed;bottom:170px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.64rem;letter-spacing:4px;color:var(--red-hot);z-index:90;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;text-transform:uppercase;}
 #enemy-warn{position:fixed;top:85px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:4px;color:#FF8C00;z-index:90;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 14px rgba(255,140,0,0.6);}
@@ -471,6 +489,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
     <button class="btn-cta" id="btn-mp-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ MULTIPLAYER</button>
     <button class="btn-cta" id="btn-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ LEADERBOARD</button>
+    <button class="btn-ghost" id="btn-start-settings" style="margin-top:.5rem;">⚙ SETTINGS</button>
+    <button class="btn-ghost" id="btn-start-stats" style="margin-top:.4rem;">📊 STATISTICS</button>
+    <button class="btn-ghost" id="btn-start-upgrades" style="margin-top:.4rem;">⬆ UPGRADES</button>
+    <button class="btn-ghost" id="btn-start-achievements" style="margin-top:.4rem;">🏆 ACHIEVEMENTS</button>
     <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
   </div>
 </div>
@@ -510,7 +532,18 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
   <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
   <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
+  <button class="pause-btn" id="btn-pause-achievements">🏆 ACHIEVEMENTS</button>
   <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
+</div>
+
+<!-- QUIT CONFIRMATION -->
+<div id="quit-confirm">
+  <div class="quit-title">LEAVE BATTLE?</div>
+  <div class="quit-msg">Your progress will be lost and you will return to the main gate.</div>
+  <div class="quit-btns">
+    <button class="quit-no" id="btn-quit-no">STAY</button>
+    <button class="quit-yes" id="btn-quit-yes">LEAVE</button>
+  </div>
 </div>
 
 <!-- SETTINGS SCREEN -->
@@ -1574,6 +1607,10 @@ document.getElementById('btn-lobby').addEventListener('click',()=>{
   mpLoadLeaderboard();
   showScr('s-leaderboard');
 });
+document.getElementById('btn-start-settings').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr('s-settings');});
+document.getElementById('btn-start-stats').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderStats();showScr('s-stats');});
+document.getElementById('btn-start-upgrades').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderUpgrades();showScr('s-upgrades');});
+document.getElementById('btn-start-achievements').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderAchievements();showScr('s-achievements');});
 document.querySelectorAll('.lb-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('selected'));
@@ -1605,13 +1642,29 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape'||e.code==='KeyP'){e.preventDefault();togglePause();}
 });
 document.getElementById('btn-resume').addEventListener('click',()=>{isPaused=false;pauseOverlay.classList.remove('visible');bgStart(wave);lastTS=performance.now();animID=requestAnimationFrame(loop);});
-document.getElementById('btn-quit').addEventListener('click',()=>{isPaused=false;pauseOverlay.classList.remove('visible');endGame();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-quit').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.add('visible');});
+document.getElementById('btn-quit-no').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.remove('visible');});
+document.getElementById('btn-quit-yes').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.remove('visible');isPaused=false;pauseOverlay.classList.remove('visible');endGame();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
 document.getElementById('btn-pause-settings').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-settings');});
 document.getElementById('btn-pause-stats').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-stats');renderStats();});
 document.getElementById('btn-pause-upgrades').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-upgrades');renderUpgrades();});
-document.getElementById('btn-settings-back').addEventListener('click',()=>{isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);});
-document.getElementById('btn-stats-back').addEventListener('click',()=>{isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);});
-document.getElementById('btn-upgrades-back').addEventListener('click',()=>{isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);});
+document.getElementById('btn-settings-back').addEventListener('click',()=>{
+  if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+});
+document.getElementById('btn-stats-back').addEventListener('click',()=>{
+  if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+});
+document.getElementById('btn-upgrades-back').addEventListener('click',()=>{
+  if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+});
+document.getElementById('btn-achievements-back').addEventListener('click',()=>{
+  if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+});
+document.getElementById('btn-pause-achievements').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-achievements');renderAchievements();});
 
 /* ═══ SETTINGS ═══ */
 let settings={musicVol:0.8,sfxVol:1.0,particleDensity:3};
@@ -1961,6 +2014,8 @@ function update(dt){
   const pad=P.w/2+2,hudH=48;
   P.x=Math.max(pad,Math.min(cv.width-pad,P.x));P.y=Math.max(hudH+pad,Math.min(cv.height-pad,P.y));
   if(P.invinc>0)P.invinc=Math.max(0,P.invinc-dt);
+  const vig=document.getElementById('vignette');
+  if(lives<=1&&gState==='play')vig.classList.add('near-death');else vig.classList.remove('near-death');
   if(gameState2.shockwave){gameState2.shockwave.r+=dt*480;gameState2.shockwave.alpha-=dt*1.1;if(gameState2.shockwave.alpha<=0)gameState2.shockwave=null;}
   if(shakeIntensity>0){shakeIntensity*=0.92;if(shakeIntensity<0.3)shakeIntensity=0;}
   shakeX=(Math.random()-.5)*shakeIntensity*2;shakeY=(Math.random()-.5)*shakeIntensity*2;
@@ -1980,7 +2035,12 @@ function update(dt){
   const fireInterval=ch.fire/(window.fireRateBuff||1);
   shootCD-=dt;if(shooting&&shootCD<=0){fireBullet();shootCD=fireInterval;}
   if(ammo<maxAmmo){ammoRegenAccum+=dt*diffCfg.ammoRegenRate;if(ammoRegenAccum>=1){const g=Math.floor(ammoRegenAccum);ammo=Math.min(maxAmmo,ammo+g);ammoRegenAccum-=g;updateAmmoHUD();}}
-  if(comboT>0){comboT-=dt;if(comboT<=0){combo=0;document.getElementById('combo').style.opacity='0';}}
+  if(comboT>0){
+    comboT-=dt;
+    const comboEl=document.getElementById('combo');
+    if(comboT<=0){combo=0;comboEl.classList.remove('decay');comboEl.style.opacity='0';}
+    else if(comboT<1&&combo>=3){comboEl.classList.add('decay');}
+  }
   const spawnBase=diffCfg.spawnRateBase;const mpSpdMult=MP.roomCode?.5:1;const sr=Math.max(.25,(spawnBase-wave*.12)*mpSpdMult);
   const waveQuota=6+wave*3;spawnT-=dt;
   if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){const spawnCount=waveModifier==='hordes'?3:1;for(let s=0;s<spawnCount;s++){if(enemies.length<Math.min(4+wave,MP.roomCode?10:14)){spawnEnemy();spawnEnemyVariant();}}spawnT=sr;}
