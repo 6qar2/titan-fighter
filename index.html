@@ -433,6 +433,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <span class="hud-lbl">Lives</span>
     <div class="lives-row" id="ldots"></div>
   </div>
+  <div class="hud-block" id="opponent-lives-hud" style="display:none;">
+    <span class="hud-lbl" style="color:rgba(76,175,80,0.9);">Opponent</span>
+    <div class="lives-row" id="opponent-lives"></div>
+  </div>
   <div class="hud-block">
     <span class="hud-lbl">Wave</span>
     <span class="hud-val" id="hwave">I</span>
@@ -730,6 +734,41 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-mp-return-lobby" style="margin-top:1rem;">♛ RETURN TO LOBBY</button>
+  </div>
+</div>
+
+<!-- MP MATCH END -->
+<div class="scr off" id="s-mp-end">
+  <div class="over-inner">
+    <div class="over-eyebrow">MULTIPLAYER · BATTLE REPORT</div>
+    <div class="over-divline"><div class="over-diamond"></div></div>
+    <div class="final-score-lbl" id="mp-end-result">BATTLE ENDED</div>
+    <div class="final-rank" id="mp-end-rank" style="color:var(--gold-lit);">DRAW</div>
+    <div style="display:flex;gap:1.5rem;margin:1rem 0;flex-wrap:wrap;justify-content:center;">
+      <div style="flex:1;min-width:120px;text-align:center;padding:.8rem;border:1px solid rgba(184,152,64,0.2);border-radius:10px;background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));">
+        <div style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--ash);text-transform:uppercase;margin-bottom:.4rem;">YOU</div>
+        <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);" id="mp-end-p0-name">PLAYER 1</div>
+        <div class="final-stats" style="margin-top:.6rem;">
+          <div class="fstat"><span class="fstat-num" id="mp-end-p0-wave">I</span><span class="fstat-lbl">Wave</span></div>
+          <div class="fstat"><span class="fstat-num" id="mp-end-p0-kills">0</span><span class="fstat-lbl">Kills</span></div>
+          <div class="fstat"><span class="fstat-num" id="mp-end-p0-score">0</span><span class="fstat-lbl">Score</span></div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:120px;text-align:center;padding:.8rem;border:1px solid rgba(184,152,64,0.2);border-radius:10px;background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));">
+        <div style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--ash);text-transform:uppercase;margin-bottom:.4rem;">OPPONENT</div>
+        <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);" id="mp-end-p1-name">PLAYER 2</div>
+        <div class="final-stats" style="margin-top:.6rem;">
+          <div class="fstat"><span class="fstat-num" id="mp-end-p1-wave">I</span><span class="fstat-lbl">Wave</span></div>
+          <div class="fstat"><span class="fstat-num" id="mp-end-p1-kills">0</span><span class="fstat-lbl">Kills</span></div>
+          <div class="fstat"><span class="fstat-num" id="mp-end-p1-score">0</span><span class="fstat-lbl">Score</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="over-divline"><div class="over-diamond"></div></div>
+    <div style="display:flex;gap:.8rem;margin-top:.8rem;flex-wrap:wrap;justify-content:center;">
+      <button class="btn-enter" id="btn-mp-rematch" style="margin-top:0;">♛ REMATCH</button>
+      <button class="btn-ghost" id="btn-mp-end-leave">LEAVE ROOM</button>
+    </div>
   </div>
 </div>
 
@@ -1181,11 +1220,26 @@ function initStars(){stars=[];for(let i=0;i<80;i++)stars.push({x:Math.random()*c
 
 function buildDots(){const el=document.getElementById('ldots');el.innerHTML='';for(let i=0;i<lives;i++){const d=document.createElement('div');d.className='ldot';d.id='d'+i;el.appendChild(d);}}
 function refreshDots(){document.querySelectorAll('.ldot').forEach((d,i)=>{d.className='ldot'+(i>=lives?' dead':'');});}
+function updateOpponentLivesHUD(){
+  const el=document.getElementById('opponent-lives-hud');
+  if(!el)return;
+  if(!MP.roomCode||!MP.playerId||Object.keys(MP.players).length<2){el.style.display='none';return;}
+  el.style.display='flex';
+  const container=document.getElementById('opponent-lives');
+  container.innerHTML='';
+  const remoteLives=Object.values(MP.remotePlayers).length>0?Math.max(...Object.values(MP.remotePlayers).map(rp=>rp.lives||0)):0;
+  const maxLives=diffCfg.lives;
+  for(let i=0;i<maxLives;i++){
+    const dot=document.createElement('span');
+    dot.className='ldot'+(i>=remoteLives?' dead':'');
+    container.appendChild(dot);
+  }
+}
 
 function startTimer(){
   clearInterval(timerID);
   timerID=setInterval(()=>{
-    if(gState!=='play')return;timeLeft--;updateHUD();
+    if(gState!=='play')return;timeLeft--;updateHUD();updateOpponentLivesHUD();
     const t=document.getElementById('htimer');
     if(timeLeft<=30)t.classList.add('warn');else t.classList.remove('warn');
     if(timeLeft<=0){endGame();return;}
@@ -1589,6 +1643,23 @@ document.getElementById('btn-copy-code').addEventListener('click',()=>{
 document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
 document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
 document.getElementById('btn-mp-return-lobby').addEventListener('click',()=>{mpResetToLobby();});
+document.getElementById('btn-mp-rematch').addEventListener('click',()=>{
+  if(MP.mpEndTimer)clearTimeout(MP.mpEndTimer);
+  MP.mpMatchResult=null;
+  if(MP.roomRef){
+    MP.roomRef.child('status').set('waiting');
+    MP.roomRef.child('wave').set(1);
+    MP.roomRef.child('startedAt').remove();
+    Object.keys(MP.players).forEach(pid=>{
+      MP.roomRef.child('players/'+pid).update({ready:false,score:0});
+    });
+  }
+  MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
+  showScr('s-mp-room');
+  mpListenRoom();
+  mpRenderPlayers();
+});
+document.getElementById('btn-mp-end-leave').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
 document.querySelectorAll('.mp-diff-card').forEach(card=>{
   card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
 });
@@ -2241,16 +2312,8 @@ function mpOnRemoteGameOver(){
   document.getElementById('kills-left').style.display='none';
   updateStats();checkAchievements();sfxVictory();
   if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
-  setTimeout(()=>{
-    showScr('s-mp-room');
-    MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;
-    if(MP.roomRef){
-      MP.roomRef.child('status').set('waiting');
-      MP.roomRef.child('wave').set(1);
-    }
-    mpListenRoom();
-    mpRenderPlayers();
-  },2500);
+  const result=!MP.mpLocalDead?'win':'lose';
+  mpShowMatchEnd(result);
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -2324,7 +2387,9 @@ const MP={
   _lastSyncScore:0,
   _lastSyncWave:0,
   _lastSyncKills:0,
-  _lastSyncedWave:0
+  _lastSyncedWave:0,
+  mpMatchResult:null,
+  mpEndTimer:null
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
 function mpCreateRoom(){
@@ -2549,6 +2614,7 @@ function mpLeaveRoom(){
   if(MP.roomRef){MP.roomRef.child('states').off();}
   mpStopLeaderboard();
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
+  if(MP.mpEndTimer){clearTimeout(MP.mpEndTimer);MP.mpEndTimer=null;}
   gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   document.getElementById('gc').classList.add('off');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
@@ -2594,6 +2660,7 @@ function mpSyncState(dt){
     vx:Math.abs(vx)<600?vx:0,
     vy:Math.abs(vy)<600?vy:0,
     alive:!MP.mpLocalDead,
+    lives:lives,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
 }
@@ -2651,6 +2718,8 @@ function mpListenStates(){
 }
 function mpResetToLobby(){
   MP.mpAllDeadTriggered=true;
+  if(MP.mpEndTimer){clearTimeout(MP.mpEndTimer);MP.mpEndTimer=null;}
+  MP.mpMatchResult=null;
   gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
@@ -2675,12 +2744,53 @@ function mpAllDead(){
   if(MP.mpAllDeadTriggered)return;
   MP.mpAllDeadTriggered=true;
   document.getElementById('spectator-indicator').style.display='none';
-  if(gState==='play'){
-    endGame();
+  const localWon=!MP.mpLocalDead;
+  const remoteAlive=Object.values(MP.remotePlayers).some(rp=>rp.alive!==false);
+  let result='draw';
+  if(localWon&&!remoteAlive)result='win';
+  else if(!localWon&&remoteAlive)result='lose';
+  mpShowMatchEnd(result);
+}
+function mpShowMatchEnd(result){
+  if(MP.mpEndTimer)clearTimeout(MP.mpEndTimer);
+  MP.mpMatchResult=result;
+  gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  if(MP.roomRef){MP.roomRef.child('states').off();}
+  if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
+  document.getElementById('gc').classList.add('off');
+  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
+  document.getElementById('minimap').style.display='none';
+  document.getElementById('spectator-indicator').style.display='none';
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
+  updateStats();checkAchievements();
+  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
+  const resultEl=document.getElementById('mp-end-result');
+  const rankEl=document.getElementById('mp-end-rank');
+  if(result==='win'){resultEl.textContent='VICTORY';resultEl.style.color='var(--gold-lit)';rankEl.textContent='♛ TITANS CLUB · TRIUMPH';rankEl.style.color='var(--gold-lit)';}
+  else if(result==='lose'){resultEl.textContent='DEFEATED';resultEl.style.color='var(--red-hot)';rankEl.textContent='♛ TITANS CLUB · FALLEN';rankEl.style.color='var(--red-hot)';}
+  else{resultEl.textContent='BATTLE ENDED';resultEl.style.color='var(--ash)';rankEl.textContent='DRAW';rankEl.style.color='var(--ash)';}
+  document.getElementById('mp-end-p0-name').textContent=pName||'YOU';
+  document.getElementById('mp-end-p0-wave').textContent=toRoman(wave);
+  document.getElementById('mp-end-p0-kills').textContent=totalKills;
+  document.getElementById('mp-end-p0-score').textContent=score.toLocaleString();
+  const remote=Object.values(MP.remotePlayers)[0];
+  if(remote){
+    document.getElementById('mp-end-p1-name').textContent=(remote.name||'OPPONENT')+(MP.host?' (Host)':'');
+    document.getElementById('mp-end-p1-wave').textContent=toRoman(remote.wave||wave);
+    document.getElementById('mp-end-p1-kills').textContent=remote.score||0;
+    document.getElementById('mp-end-p1-score').textContent=remote.score||0;
+  }else{
+    document.getElementById('mp-end-p1-name').textContent='OPPONENT';
+    document.getElementById('mp-end-p1-wave').textContent=toRoman(wave);
+    document.getElementById('mp-end-p1-kills').textContent='0';
+    document.getElementById('mp-end-p1-score').textContent='0';
   }
-  setTimeout(()=>{
+  showScr('s-mp-end');
+  MP.mpEndTimer=setTimeout(()=>{
     mpResetToLobby();
-  },2000);
+  },8000);
 }
 function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
