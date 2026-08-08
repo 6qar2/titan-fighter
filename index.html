@@ -2574,6 +2574,14 @@ function mpGetEnemyTarget(enemy){
 function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
+  if(MP.mpLocalDead){
+    const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
+    if(remoteAlive===0&&Object.keys(MP.players).length>=2){
+      MP.mpAllDeadTriggered=true;
+      mpAllDead();
+      return;
+    }
+  }
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
   if(MP.mpPosSyncTimer<0.2)return;
   MP.mpPosSyncTimer=0;
@@ -2588,13 +2596,6 @@ function mpSyncState(dt){
     alive:!MP.mpLocalDead,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
-  if(MP.mpLocalDead){
-    const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
-    if(remoteAlive===0&&Object.keys(MP.players).length>=2){
-      MP.mpAllDeadTriggered=true;
-      mpAllDead();
-    }
-  }
 }
 function mpListenStates(){
   if(!MP.roomRef)return;
@@ -2702,26 +2703,26 @@ function drawRemotePlayers(){
     cx.save();
     cx.globalAlpha=dead?0.5:1;
     if(!dead){
-      cx.shadowColor='rgba(76,175,80,0.9)';cx.shadowBlur=24;
-      cx.strokeStyle='rgba(76,175,80,1)';cx.lineWidth=4;
-      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+8,0,Math.PI*2);cx.stroke();
+      cx.shadowColor='rgba(76,175,80,0.9)';cx.shadowBlur=18;
+      cx.strokeStyle='rgba(76,175,80,1)';cx.lineWidth=3;
+      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+4,0,Math.PI*2);cx.stroke();
       cx.shadowBlur=0;
-      cx.strokeStyle='rgba(200,230,201,0.7)';cx.lineWidth=2;
-      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+14,0,Math.PI*2);cx.stroke();
-      cx.shadowColor='rgba(76,175,80,0.7)';cx.shadowBlur=14;
+      cx.strokeStyle='rgba(200,230,201,0.7)';cx.lineWidth=1.5;
+      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+8,0,Math.PI*2);cx.stroke();
+      cx.shadowColor='rgba(76,175,80,0.7)';cx.shadowBlur=10;
     }else{
       cx.shadowColor='rgba(120,120,120,0.4)';cx.shadowBlur=6;
       cx.fillStyle='rgba(80,80,80,0.5)';
-      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+6,0,Math.PI*2);cx.fill();
+      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+4,0,Math.PI*2);cx.fill();
     }
     const ang=Math.atan2((enemies[0]?.y||rp._ry+10)-rp._ry,(enemies[0]?.x||rp._rx+10)-rp._rx)+Math.PI/2;
     rc.draw(rp._rx,rp._ry,ang,cx);
     cx.globalAlpha=1;cx.shadowBlur=0;
-    cx.fillStyle='rgba(0,0,0,0.85)';cx.font="bold 13px 'Cinzel',serif";cx.textAlign='center';
-    cx.fillText((dead?'💀 ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-30);
+    cx.fillStyle='rgba(0,0,0,0.85)';cx.font="bold 12px 'Cinzel',serif";cx.textAlign='center';
+    cx.fillText((dead?'💀 ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-26);
     if(!dead){
-      cx.fillStyle='rgba(76,175,80,1)';cx.font="bold 10px 'Cinzel',serif";
-      cx.fillText('ALLY',rp._rx,rp._ry+32);
+      cx.fillStyle='rgba(76,175,80,1)';cx.font="bold 9px 'Cinzel',serif";
+      cx.fillText('ALLY',rp._rx,rp._ry+26);
     }
     cx.restore();
   });
