@@ -1532,7 +1532,13 @@ document.getElementById('btn-enter-arena').addEventListener('click',()=>{
 document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
 document.getElementById('btn-mp-lobby').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();showScr('s-mp-lobby');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
 document.getElementById('btn-create-room').addEventListener('click',()=>{mpCreateRoom();});
-document.getElementById('btn-join-room').addEventListener('click',()=>{mpJoinRoom();});
+document.getElementById('btn-join-room').addEventListener('click',()=>{
+  const btn=document.getElementById('btn-join-room');
+  if(btn.disabled)return;
+  btn.disabled=true;
+  mpJoinRoom();
+  setTimeout(()=>{btn.disabled=false;},2000);
+});
 document.getElementById('btn-mp-back').addEventListener('click',()=>{showScr('s-chars');});
 document.getElementById('btn-copy-code').addEventListener('click',()=>{
   const code=document.getElementById('mp-room-code').textContent;
@@ -1856,7 +1862,7 @@ function fireBullet(){
 /* ═══ ENHANCED ENEMY SPAWN ═══ */
 let spawnVariantTimer=0;
 function spawnEnemyVariant(){
-  if(Math.random()>0.08||enemies.length>=Math.min(4+wave,14))return;
+  if(Math.random()>0.08||enemies.length>=Math.min(4+wave,MP.roomCode?10:14))return;
   const variants=['elite','berserker','skirmisher'];
   const def=EDEFS.find(d=>d.type===variants[Math.floor(Math.random()*variants.length)]);
   if(def)spawnEnemy(def);
@@ -2248,27 +2254,31 @@ function mpCreateRoom(){
   const playerId='p_'+Math.random().toString(36).slice(2,9);
   const code=mpGenerateCode();
   const roomRef=db.ref('rooms/'+code);
-  const roomData={
-    code:code,
-    host:playerId,
-    status:'waiting',
-    diff:selDiff,
-    wave:1,
-    players:{
-      [playerId]:{name:pName,slot:0,ready:true,char:MP.mpChar,diff:selDiff,score:0}
-    },
-    createdAt:firebase.database.ServerValue.TIMESTAMP
-  };
-  roomRef.set(roomData).then(()=>{
-    MP.playerId=playerId;
-    MP.roomCode=code;
-    MP.host=true;
-    MP.mySlot=0;
-    MP.roomRef=roomRef;
-    showScr('s-mp-room');
-    document.getElementById('mp-room-code').textContent=code;
-    mpBuildCharGrid();
-    mpListenRoom();
+  roomRef.once('value').then(snap=>{
+    const existing=snap.val();
+    if(existing&&existing.status!=='ended'){alert('Room code collision. Please try again.');return;}
+    const roomData={
+      code:code,
+      host:playerId,
+      status:'waiting',
+      diff:selDiff,
+      wave:1,
+      players:{
+        [playerId]:{name:pName,slot:0,ready:true,char:MP.mpChar,diff:selDiff,score:0}
+      },
+      createdAt:firebase.database.ServerValue.TIMESTAMP
+    };
+    return roomRef.set(roomData).then(()=>{
+      MP.playerId=playerId;
+      MP.roomCode=code;
+      MP.host=true;
+      MP.mySlot=0;
+      MP.roomRef=roomRef;
+      showScr('s-mp-room');
+      document.getElementById('mp-room-code').textContent=code;
+      mpBuildCharGrid();
+      mpListenRoom();
+    });
   }).catch(e=>{console.error('create room error',e);alert('Failed to create room');});
 }
 function mpJoinRoom(){
@@ -2295,7 +2305,7 @@ function mpJoinRoom(){
     MP.host=false;
     MP.roomRef=roomRef;
     MP.mySlot=mySlot;
-    MP.roomRef.child('players/'+MP.playerId).set({
+    return MP.roomRef.child('players/'+MP.playerId).set({
       name:pName,
       slot:mySlot,
       ready:false,
@@ -2303,21 +2313,28 @@ function mpJoinRoom(){
       diff:selDiff,
       score:0
     });
+  }).then(()=>{
     showScr('s-mp-room');
     document.getElementById('mp-room-code').textContent=code;
     mpBuildCharGrid();
     mpListenRoom();
-    if(room.status==='playing'&&room.wave){
-      mpStartGame();
-      wave=room.wave||1;
-      showWaveAnnounce(wave);
-      document.getElementById('hwave').textContent=toRoman(wave);
-      bgTransition(wave);
+    if(MP.roomRef){
+      MP.roomRef.once('value').then(snap=>{
+        const room=snap.val();
+        if(room&&room.status==='playing'&&room.wave){
+          mpStartGame();
+          wave=room.wave||1;
+          showWaveAnnounce(wave);
+          document.getElementById('hwave').textContent=toRoman(wave);
+          bgTransition(wave);
+        }
+      });
     }
   }).catch(e=>{console.error('join room error',e);alert('Failed to join room');});
 }
 function mpListenRoom(){
   if(!MP.roomRef)return;
+  MP.roomRef.off();
   MP.roomRef.on('value',snap=>{
     const room=snap.val();
     if(!room){showScr('s-mp-lobby');return;}
@@ -2411,20 +2428,21 @@ function mpRenderPlayers(){
 }
 function mpSetReady(){
   if(!MP.roomRef||!MP.playerId)return;
-  MP.roomRef.child('players/'+MP.playerId+'/ready').set(true);
-  if(MP.host){
-    const players=MP.roomRef.child('players');
-    players.once('value').then(snap=>{
-      const all=snap.val()||{};
-      const count=Object.keys(all).length;
-      const allReady=count>=2&&Object.values(all).every(p=>p.ready);
-      if(allReady){
-        MP.roomRef.child('status').set('playing');
-        MP.roomRef.child('wave').set(1);
-        MP.roomRef.child('startedAt').set(firebase.database.ServerValue.TIMESTAMP);
-      }
-    });
-  }
+  MP.roomRef.child('players/'+MP.playerId+'/ready').set(true).then(()=>{
+    if(MP.host){
+      const players=MP.roomRef.child('players');
+      players.once('value').then(snap=>{
+        const all=snap.val()||{};
+        const count=Object.keys(all).length;
+        const allReady=count>=2&&Object.values(all).every(p=>p.ready);
+        if(allReady){
+          MP.roomRef.child('status').set('playing');
+          MP.roomRef.child('wave').set(1);
+          MP.roomRef.child('startedAt').set(firebase.database.ServerValue.TIMESTAMP);
+        }
+      });
+    }
+  });
 }
 function mpStartGame(){
   if(MP.started)return;
@@ -2446,6 +2464,7 @@ function mpLeaveRoom(){
     }
   }
   if(MP.roomRef){MP.roomRef.child('states').off();}
+  mpStopLeaderboard();
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
   MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;
 }
@@ -2456,7 +2475,7 @@ function mpGetEnemyTarget(){
   Object.values(MP.remotePlayers).forEach(rp=>{
     if(rp.alive!==false)candidates.push({x:rp.x,y:rp.y,name:rp.name,alive:true});
   });
-  if(candidates.length===0)return P;
+  if(candidates.length===0)return{x:cv.width/2,y:cv.height/2,name:'center',alive:false};
   let best=candidates[0],bestD=Infinity;
   enemies.forEach(e=>{candidates.forEach(c=>{const d=Math.hypot(e.x-c.x,e.y-c.y);if(d<bestD){bestD=d;best=c;}});});
   return best;
@@ -2482,6 +2501,7 @@ function mpSyncState(dt){
 }
 function mpListenStates(){
   if(!MP.roomRef)return;
+  MP.roomRef.child('states').off();
   MP.roomRef.child('states').on('value',snap=>{
     const states=snap.val()||{};
     MP.remotePlayers={};
@@ -2520,7 +2540,7 @@ function mpAllDead(){
   }
   setTimeout(()=>{
     mpLeaveRoom();
-    showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
+    showScr('s-start');menuAnimActive=true;initStartCanvas();
   },3000);
 }
 function drawRemotePlayers(){
@@ -2535,7 +2555,8 @@ function drawRemotePlayers(){
       cx.beginPath();cx.arc(rp.x,rp.y,rc.stats?.power||20,0,Math.PI*2);cx.fill();
     }
     cx.shadowColor=dead?'rgba(100,100,100,0.5)':rc.color;cx.shadowBlur=dead?4:8;
-    const ang=Math.atan2(P.y-rp.y,P.x-rp.x)+Math.PI/2;
+    const target=mpGetEnemyTarget();
+    const ang=Math.atan2(target.y-rp.y,target.x-rp.x)+Math.PI/2;
     rc.draw(rp.x,rp.y,ang,cx);
     cx.globalAlpha=dead?0.6:1;
     cx.fillStyle='rgba(0,0,0,0.6)';cx.font="bold 10px 'Cinzel',serif";cx.textAlign='center';
