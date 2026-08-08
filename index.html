@@ -2547,18 +2547,16 @@ function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
-  if(MP.mpPosSyncTimer<0.15)return;
+  if(MP.mpPosSyncTimer<0.1)return;
   MP.mpPosSyncTimer=0;
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
-  if(Math.hypot(P.x-lastX,P.y-lastY)<5&&score===MP._lastSyncScore&&wave===MP._lastSyncWave&&waveKills===MP._lastSyncKills)return;
+  if(Math.hypot(P.x-lastX,P.y-lastY)<4&&score===MP._lastSyncScore&&wave===MP._lastSyncWave&&waveKills===MP._lastSyncKills)return;
   MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncKills=waveKills;
+  const vx=(P.x-lastX)/0.1,vy=(P.y-lastY)/0.1;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
-    char:MP.mpChar,
-    name:pName,
-    score:score,
-    wave:wave,
-    waveKills:waveKills,
+    vx:Math.abs(vx)<800?vx:0,
+    vy:Math.abs(vy)<800?vy:0,
     alive:!MP.mpLocalDead,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
@@ -2566,24 +2564,38 @@ function mpSyncState(dt){
 function mpListenStates(){
   if(!MP.roomRef)return;
   MP.roomRef.child('states').off();
-  MP.roomRef.child('states').on('value',snap=>{
-    const states=snap.val()||{};
-    MP.remotePlayers={};
-    let aliveCount=0;
-    let totalCount=0;
-    Object.keys(states).forEach(pid=>{
-      if(pid===MP.playerId)return;
-      const s=states[pid];
-      if(s&&Date.now()-(s.ts||0)<3000){
-        MP.remotePlayers[pid]=s;
-        totalCount++;
-        if(s.alive!==false)aliveCount++;
-        if(!MP.host&&s.waveKills!==undefined&&waveKills<s.waveKills){waveKills=s.waveKills;}
-      }
-    });
+  const statesRef=MP.roomRef.child('states');
+  statesRef.on('child_added',snap=>{
+    const pid=snap.key;if(pid===MP.playerId)return;
+    const s=snap.val();
+    if(!s||!s.ts||Date.now()-s.ts>4000)return;
+    MP.remotePlayers[pid]=s;
+    if(!s._vx)s._vx=0;if(!s._vy)s._vy=0;
+  });
+  statesRef.on('child_changed',snap=>{
+    const pid=snap.key;if(pid===MP.playerId)return;
+    const s=snap.val();
+    if(!s||!s.ts||Date.now()-s.ts>4000){delete MP.remotePlayers[pid];return;}
+    const prev=MP.remotePlayers[pid];
+    if(prev&&s.x!==undefined){
+      const dt=Math.max(0.016,(s.ts||Date.now())-(prev.ts||Date.now()))/1000;
+      s._vx=((s.x-prev.x)/dt)*.5;
+      s._vy=((s.y-prev.y)/dt)*.5;
+    }
+    MP.remotePlayers[pid]=s;
+    if(!MP.host&&s.waveKills!==undefined&&waveKills<s.waveKills){waveKills=s.waveKills;}
+  });
+  statesRef.on('child_removed',snap=>{
+    const pid=snap.key;if(pid===MP.playerId)return;
+    delete MP.remotePlayers[pid];
   });
   MP.mpStateInterval=setInterval(()=>{
     if(gState!=='play'||MP.mpAllDeadTriggered)return;
+    const now=Date.now();
+    Object.keys(MP.remotePlayers).forEach(pid=>{
+      const s=MP.remotePlayers[pid];
+      if(now-(s.ts||0)>4000){delete MP.remotePlayers[pid];}
+    });
     const myAlive=!MP.mpLocalDead;
     const totalPlayers=Object.keys(MP.players).length;
     const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
@@ -2612,8 +2624,18 @@ function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
     const rc=CHARS[rp.char]||CHARS[0];
     const dead=rp.alive===false;
-    if(!rp._rx)rp._rx=rp.x;if(!rp._ry)rp._ry=rp.y;
-    rp._rx+=(rp.x-rp._rx)*.35;rp._ry+=(rp.y-rp._ry)*.35;
+    if(rp._rx===undefined){rp._rx=rp.x;rp._ry=rp.y;rp._vx=0;rp._vy=0;}
+    if(!dead&&rp._vx!==undefined){
+      rp._rx+=rp._vx*(1/60);
+      rp._ry+=rp._vy*(1/60);
+      rp._vx+=(rp.x-rp._rx)*.25;
+      rp._vy+=(rp.y-rp._ry)*.25;
+      rp._vx*=.4;rp._vy*=.4;
+    }else{
+      rp._vx=0;rp._vy=0;
+      rp._rx+=(rp.x-rp._rx)*.2;
+      rp._ry+=(rp.y-rp._ry)*.2;
+    }
     cx.save();
     cx.globalAlpha=dead?0.35:0.85;
     if(dead){
