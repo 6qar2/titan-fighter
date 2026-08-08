@@ -1444,11 +1444,13 @@ function drawGate(ctx,g){
 
 /* ═══ DRAW ENEMIES ═══ */
 function drawEnemy(e){
-  if(e.ability==='phase'&&!e.visible&&Math.floor(Date.now()/150)%3===0)return; // flicker when phased
+  if(e.ability==='phase'&&!e.visible&&Math.floor(Date.now()/150)%3===0)return;
   cx.save();cx.translate(e.x,e.y);
   if(e.ability==='phase')cx.globalAlpha=e.visible?1:0.25;
   cx.shadowColor=e.col;cx.shadowBlur=e.type==='titangod'||e.type==='caesar'||e.type==='chaoslord'?30:14;
-  if(e.isElite){cx.shadowColor='#FFD700';cx.shadowBlur=20;cx.strokeStyle='rgba(255,215,0,.6)';cx.lineWidth=2;cx.beginPath();cx.arc(0,0,e.sz+4,0,Math.PI*2);cx.stroke();}
+  cx.strokeStyle='rgba(255,60,60,0.7)';cx.lineWidth=2.5;
+  cx.beginPath();cx.arc(0,0,e.sz+4,0,Math.PI*2);cx.stroke();
+  if(e.isElite){cx.shadowColor='#FFD700';cx.shadowBlur=20;cx.strokeStyle='rgba(255,215,0,.9)';cx.lineWidth=2.5;cx.beginPath();cx.arc(0,0,e.sz+7,0,Math.PI*2);cx.stroke();}
 
   const s=e.sz;
   switch(e.type){
@@ -2573,16 +2575,16 @@ function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
-  if(MP.mpPosSyncTimer<0.1)return;
+  if(MP.mpPosSyncTimer<0.2)return;
   MP.mpPosSyncTimer=0;
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
-  if(Math.hypot(P.x-lastX,P.y-lastY)<4&&score===MP._lastSyncScore&&wave===MP._lastSyncWave&&waveKills===MP._lastSyncKills)return;
-  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncKills=waveKills;
-  const vx=(P.x-lastX)/0.1,vy=(P.y-lastY)/0.1;
+  if(Math.hypot(P.x-lastX,P.y-lastY)<6&&score===MP._lastSyncScore&&wave===MP._lastSyncWave)return;
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;
+  const vx=(P.x-lastX)/0.2,vy=(P.y-lastY)/0.2;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
-    vx:Math.abs(vx)<800?vx:0,
-    vy:Math.abs(vy)<800?vy:0,
+    vx:Math.abs(vx)<600?vx:0,
+    vy:Math.abs(vy)<600?vy:0,
     alive:!MP.mpLocalDead,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
@@ -2594,22 +2596,23 @@ function mpListenStates(){
   statesRef.on('child_added',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
-    if(!s||!s.ts||Date.now()-s.ts>4000)return;
+    if(!s||!s.ts||Date.now()-s.ts>3000)return;
     MP.remotePlayers[pid]=s;
     if(!s._vx)s._vx=0;if(!s._vy)s._vy=0;
+    if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
   });
   statesRef.on('child_changed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
-    if(!s||!s.ts||Date.now()-s.ts>4000){delete MP.remotePlayers[pid];return;}
+    if(!s||!s.ts||Date.now()-s.ts>3000){delete MP.remotePlayers[pid];return;}
     const prev=MP.remotePlayers[pid];
-    if(prev&&s.x!==undefined){
-      const dt=Math.max(0.016,(s.ts||Date.now())-(prev.ts||Date.now()))/1000;
-      s._vx=((s.x-prev.x)/dt)*.5;
-      s._vy=((s.y-prev.y)/dt)*.5;
+    if(prev&&s.x!==undefined&&prev.x!==undefined){
+      const rawDt=Math.max(0.016,(s.ts||Date.now())-(prev.ts||Date.now()))/1000;
+      const dx=s.x-prev.x,dy=s.y-prev.y;
+      s._vx=Math.max(-400,Math.min(400,(dx/rawDt)*.4));
+      s._vy=Math.max(-400,Math.min(400,(dy/rawDt)*.4));
     }
     MP.remotePlayers[pid]=s;
-    if(!MP.host&&s.waveKills!==undefined&&waveKills<s.waveKills){waveKills=s.waveKills;}
   });
   statesRef.on('child_removed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
@@ -2620,7 +2623,7 @@ function mpListenStates(){
     const now=Date.now();
     Object.keys(MP.remotePlayers).forEach(pid=>{
       const s=MP.remotePlayers[pid];
-      if(now-(s.ts||0)>4000){delete MP.remotePlayers[pid];}
+      if(now-(s.ts||0)>3000){delete MP.remotePlayers[pid];}
     });
     const myAlive=!MP.mpLocalDead;
     const totalPlayers=Object.keys(MP.players).length;
@@ -2632,7 +2635,6 @@ function mpListenStates(){
   },1000);
 }
 function mpResetToLobby(){
-  if(MP.mpAllDeadTriggered)return;
   MP.mpAllDeadTriggered=true;
   gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
@@ -2670,32 +2672,46 @@ function drawRemotePlayers(){
     const dead=rp.alive===false;
     if(rp._rx===undefined){rp._rx=rp.x;rp._ry=rp.y;rp._vx=0;rp._vy=0;}
     if(!dead&&rp._vx!==undefined){
+      const ex=rp._rx+rp._vx*(1/60);
+      const ey=rp._ry+rp._vy*(1/60);
+      rp._vx+=(rp.x-ex)*.2;
+      rp._vy+=(rp.y-ey)*.2;
+      rp._vx*=.35;rp._vy*=.35;
       rp._rx+=rp._vx*(1/60);
       rp._ry+=rp._vy*(1/60);
-      rp._vx+=(rp.x-rp._rx)*.25;
-      rp._vy+=(rp.y-rp._ry)*.25;
-      rp._vx*=.4;rp._vy*=.4;
     }else{
       rp._vx=0;rp._vy=0;
-      rp._rx+=(rp.x-rp._rx)*.2;
-      rp._ry+=(rp.y-rp._ry)*.2;
+      rp._rx+=(rp.x-rp._rx)*.15;
+      rp._ry+=(rp.y-rp._ry)*.15;
     }
     cx.save();
-    cx.globalAlpha=dead?0.35:0.85;
-    if(dead){
-      cx.globalCompositeOperation='source-over';
+    cx.globalAlpha=dead?0.4:0.9;
+    if(!dead){
+      cx.shadowColor='rgba(76,175,80,0.8)';cx.shadowBlur=18;
+      cx.strokeStyle='rgba(76,175,80,0.9)';cx.lineWidth=3;
+      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+6,0,Math.PI*2);cx.stroke();
+      cx.shadowBlur=0;
+      cx.strokeStyle='rgba(200,230,201,0.5)';cx.lineWidth=1.5;
+      cx.beginPath();cx.arc(rp._rx,rp._ry,(rc.stats?.power||20)+10,0,Math.PI*2);cx.stroke();
+    }else{
+      cx.shadowColor='rgba(100,100,100,0.5)';cx.shadowBlur=4;
       cx.fillStyle='rgba(80,80,80,0.5)';
       cx.beginPath();cx.arc(rp._rx,rp._ry,rc.stats?.power||20,0,Math.PI*2);cx.fill();
     }
-    cx.shadowColor=dead?'rgba(100,100,100,0.5)':rc.color;cx.shadowBlur=dead?4:8;
+    cx.shadowColor=dead?'rgba(100,100,100,0.5)':'rgba(76,175,80,0.6)';cx.shadowBlur=dead?4:10;
     let nearestEnemy=null,bestD=Infinity;
     enemies.forEach(e=>{const d=Math.hypot(e.x-rp._rx,e.y-rp._ry);if(d<bestD){bestD=d;nearestEnemy=e;}});
     const target=nearestEnemy||{x:rp._rx+10,y:rp._ry};
     const ang=Math.atan2(target.y-rp._ry,target.x-rp._rx)+Math.PI/2;
     rc.draw(rp._rx,rp._ry,ang,cx);
-    cx.globalAlpha=dead?0.6:1;
-    cx.fillStyle='rgba(0,0,0,0.6)';cx.font="bold 10px 'Cinzel',serif";cx.textAlign='center';
-    cx.fillText((dead?'💀 ':'')+(rp.name||'???'),rp._rx,rp._ry-20);
+    cx.globalAlpha=dead?0.5:1;
+    cx.shadowBlur=0;
+    cx.fillStyle='rgba(0,0,0,0.7)';cx.font="bold 11px 'Cinzel',serif";cx.textAlign='center';
+    cx.fillText((dead?'💀 ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-24);
+    if(!dead){
+      cx.fillStyle='rgba(76,175,80,0.9)';cx.font="bold 9px 'Cinzel',serif";
+      cx.fillText('ALLY',rp._rx,rp._ry+28);
+    }
     cx.restore();
   });
 }
