@@ -1521,7 +1521,7 @@ function drawMinimap(){
 
 /* ═══ INPUT ═══ */
 function isInputFocused(){const t=document.activeElement;return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
-document.addEventListener('keydown',e=>{if(isInputFocused())return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
+document.addEventListener('keydown',e=>{if(isInputFocused()||(MP.mpLocalDead&&MP.roomCode&&MP.playerId))return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
 document.addEventListener('keyup',e=>{if(isInputFocused())return;keys[e.code]=false;if(e.code==='Space')shooting=false;});
 cv.addEventListener('mousemove',e=>{mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
 cv.addEventListener('mousedown',e=>{if(e.button===0){shooting=true;wake();}});
@@ -2004,13 +2004,15 @@ function update(dt){
     }
   }
   let mvx=0,mvy=0;
-  if(keys['ArrowUp']||keys['KeyW'])mvy-=1;if(keys['ArrowDown']||keys['KeyS'])mvy+=1;
-  if(keys['ArrowLeft']||keys['KeyA'])mvx-=1;if(keys['ArrowRight']||keys['KeyD'])mvx+=1;
-  if(joystick.active){mvx+=joystick.dx;mvy+=joystick.dy;}
-  const ml=Math.hypot(mvx,mvy);if(ml>0){mvx/=ml;mvy/=ml;}
-  if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable'){mvx=0;mvy=0;}
-  let pspd=ch.spd*(P.spdBuff||1);
-  P.x+=mvx*pspd*dt;P.y+=mvy*pspd*dt;
+  if(!(MP.mpLocalDead&&MP.roomCode&&MP.playerId)){
+    if(keys['ArrowUp']||keys['KeyW'])mvy-=1;if(keys['ArrowDown']||keys['KeyS'])mvy+=1;
+    if(keys['ArrowLeft']||keys['KeyA'])mvx-=1;if(keys['ArrowRight']||keys['KeyD'])mvx+=1;
+    if(joystick.active){mvx+=joystick.dx;mvy+=joystick.dy;}
+    const ml=Math.hypot(mvx,mvy);if(ml>0){mvx/=ml;mvy/=ml;}
+    if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable'){mvx=0;mvy=0;}
+    let pspd=ch.spd*(P.spdBuff||1);
+    P.x+=mvx*pspd*dt;P.y+=mvy*pspd*dt;
+  }
   const pad=P.w/2+2,hudH=48;
   P.x=Math.max(pad,Math.min(cv.width-pad,P.x));P.y=Math.max(hudH+pad,Math.min(cv.height-pad,P.y));
   if(P.invinc>0)P.invinc=Math.max(0,P.invinc-dt);
@@ -2077,7 +2079,7 @@ function update(dt){
   enemies.forEach(e=>{
     e.wob+=dt*2.2;
     if(e.stunT>0){e.stunT-=dt;return;}
-    const target=mpGetEnemyTarget();
+    const target=mpGetEnemyTarget(e)||P;
     const dx=target.x-e.x,dy=target.y-e.y,dist=Math.hypot(dx,dy)||1;
     let spdMult=(e.spdMod||1);
     if(waveModifier==='fast')spdMult*=1.6;
@@ -2302,6 +2304,7 @@ const MP={
   _lastSyncY:0,
   _lastSyncScore:0,
   _lastSyncWave:0,
+  _lastSyncKills:0,
   _lastSyncedWave:0
 };
 function mpGenerateCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let code='';for(let i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];return code;}
@@ -2526,9 +2529,9 @@ function mpLeaveRoom(){
   if(MP.roomRef){MP.roomRef.child('states').off();}
   mpStopLeaderboard();
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
-  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;
+  MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
 }
-function mpGetEnemyTarget(){
+function mpGetEnemyTarget(enemy){
   if(!MP.roomCode||!MP.playerId)return P;
   const candidates=[];
   if(!MP.mpLocalDead)candidates.push({x:P.x,y:P.y,name:pName,alive:true});
@@ -2537,24 +2540,25 @@ function mpGetEnemyTarget(){
   });
   if(candidates.length===0)return{x:cv.width/2,y:cv.height/2,name:'center',alive:false};
   let best=candidates[0],bestD=Infinity;
-  enemies.forEach(e=>{candidates.forEach(c=>{const d=Math.hypot(e.x-c.x,e.y-c.y);if(d<bestD){bestD=d;best=c;}});});
+  candidates.forEach(c=>{const d=Math.hypot(enemy.x-c.x,enemy.y-c.y);if(d<bestD){bestD=d;best=c;}});
   return best;
 }
 function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
-  if(MP.mpPosSyncTimer<0.25)return;
+  if(MP.mpPosSyncTimer<0.15)return;
   MP.mpPosSyncTimer=0;
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
-  if(Math.hypot(P.x-lastX,P.y-lastY)<8&&score===MP._lastSyncScore&&wave===MP._lastSyncWave)return;
-  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;
+  if(Math.hypot(P.x-lastX,P.y-lastY)<5&&score===MP._lastSyncScore&&wave===MP._lastSyncWave&&waveKills===MP._lastSyncKills)return;
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncKills=waveKills;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
     char:MP.mpChar,
     name:pName,
     score:score,
     wave:wave,
+    waveKills:waveKills,
     alive:!MP.mpLocalDead,
     ts:firebase.database.ServerValue.TIMESTAMP
   });
@@ -2574,6 +2578,7 @@ function mpListenStates(){
         MP.remotePlayers[pid]=s;
         totalCount++;
         if(s.alive!==false)aliveCount++;
+        if(!MP.host&&s.waveKills!==undefined&&waveKills<s.waveKills){waveKills=s.waveKills;}
       }
     });
   });
@@ -2607,20 +2612,24 @@ function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
     const rc=CHARS[rp.char]||CHARS[0];
     const dead=rp.alive===false;
+    if(!rp._rx)rp._rx=rp.x;if(!rp._ry)rp._ry=rp.y;
+    rp._rx+=(rp.x-rp._rx)*.35;rp._ry+=(rp.y-rp._ry)*.35;
     cx.save();
     cx.globalAlpha=dead?0.35:0.85;
     if(dead){
       cx.globalCompositeOperation='source-over';
       cx.fillStyle='rgba(80,80,80,0.5)';
-      cx.beginPath();cx.arc(rp.x,rp.y,rc.stats?.power||20,0,Math.PI*2);cx.fill();
+      cx.beginPath();cx.arc(rp._rx,rp._ry,rc.stats?.power||20,0,Math.PI*2);cx.fill();
     }
     cx.shadowColor=dead?'rgba(100,100,100,0.5)':rc.color;cx.shadowBlur=dead?4:8;
-    const target=mpGetEnemyTarget();
-    const ang=Math.atan2(target.y-rp.y,target.x-rp.x)+Math.PI/2;
-    rc.draw(rp.x,rp.y,ang,cx);
+    let nearestEnemy=null,bestD=Infinity;
+    enemies.forEach(e=>{const d=Math.hypot(e.x-rp._rx,e.y-rp._ry);if(d<bestD){bestD=d;nearestEnemy=e;}});
+    const target=nearestEnemy||{x:rp._rx+10,y:rp._ry};
+    const ang=Math.atan2(target.y-rp._ry,target.x-rp._rx)+Math.PI/2;
+    rc.draw(rp._rx,rp._ry,ang,cx);
     cx.globalAlpha=dead?0.6:1;
     cx.fillStyle='rgba(0,0,0,0.6)';cx.font="bold 10px 'Cinzel',serif";cx.textAlign='center';
-    cx.fillText((dead?'💀 ':'')+(rp.name||'???'),rp.x,rp.y-20);
+    cx.fillText((dead?'💀 ':'')+(rp.name||'???'),rp._rx,rp._ry-20);
     cx.restore();
   });
 }
