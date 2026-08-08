@@ -50,6 +50,7 @@
 html,body{width:100%;height:100%;overflow:hidden;background:var(--ink);touch-action:none;}
 body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-select:none;-webkit-user-select:none;}
 #gc{display:block;position:fixed;inset:0;}
+#gc.off{display:none;}
 #flash{position:fixed;inset:0;z-index:180;pointer-events:none;background:rgba(180,0,26,0.3);opacity:0;transition:opacity .08s;}
 #ammo-flash{position:fixed;inset:0;z-index:179;pointer-events:none;background:rgba(0,200,168,0.15);opacity:0;transition:opacity .12s;}
 #power-flash{position:fixed;inset:0;z-index:178;pointer-events:none;background:rgba(90,40,220,0.2);opacity:0;transition:opacity .15s;}
@@ -720,16 +721,22 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div class="over-inner">
     <div class="over-eyebrow">MULTIPLAYER · FALLEN</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
-    <div class="final-score-lbl">You Have Fallen</div>
-    <div class="final-rank" id="mp-f-rank" style="color:var(--red);">DEFEATED</div>
+    <div class="final-score-lbl">All Titans Have Fallen</div>
+    <div class="final-rank" id="mp-f-rank" style="color:var(--red);">BATTLE ENDED</div>
     <div class="final-stats">
       <div class="fstat"><span class="fstat-num" id="mp-fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
       <div class="fstat"><span class="fstat-num" id="mp-fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>
       <div class="fstat"><span class="fstat-num" id="mp-fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
-    <button class="btn-enter" id="btn-mp-continue" style="margin-top:1rem;">CONTINUE</button>
+    <button class="btn-enter" id="btn-mp-return-lobby" style="margin-top:1rem;">♛ RETURN TO LOBBY</button>
   </div>
+</div>
+
+<!-- SPECTATOR INDICATOR -->
+<div id="spectator-indicator" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;pointer-events:none;text-align:center;">
+  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,1.8rem);letter-spacing:4px;color:var(--gold-dim);text-shadow:0 0 20px rgba(212,175,55,0.3);">SPECTATING</div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--ash);margin-top:.3rem;">Waiting for the battle to end...</div>
 </div>
 
 <script>
@@ -1347,7 +1354,7 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';showScr('s-mp-over');}}else{endGame();}}
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';document.getElementById('spectator-indicator').style.display='block';}}else{endGame();}}
 }
 
 function showWaveAnnounce(n){
@@ -1579,7 +1586,7 @@ document.getElementById('btn-copy-code').addEventListener('click',()=>{
 });
 document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
 document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
-document.getElementById('btn-mp-continue').addEventListener('click',()=>{bgStop();gState='menu';menuAnimActive=true;showScr('s-start');mpLeaveRoom();clearInterval(timerID);cancelAnimationFrame(animID);document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('htimer').classList.remove('warn');['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+document.getElementById('btn-mp-return-lobby').addEventListener('click',()=>{mpResetToLobby();});
 document.querySelectorAll('.mp-diff-card').forEach(card=>{
   card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
 });
@@ -2224,14 +2231,24 @@ function mpOnRemoteGameOver(){
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
+  document.getElementById('gc').classList.add('off');
   document.getElementById('minimap').style.display='none';
-  showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
   document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
-  menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();sfxVictory();
   if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
+  setTimeout(()=>{
+    showScr('s-mp-room');
+    MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;
+    if(MP.roomRef){
+      MP.roomRef.child('status').set('waiting');
+      MP.roomRef.child('wave').set(1);
+    }
+    mpListenRoom();
+    mpRenderPlayers();
+  },2500);
 }
 
 /* ═══ ENHANCED DRAW ═══ */
@@ -2426,7 +2443,7 @@ function mpListenRoom(){
       }
     }
     if(room.status==='playing'){mpStartGame();}
-    if(room.status==='ended'&&gState==='play'){mpOnRemoteGameOver();}
+    if(room.status==='ended'){if(gState==='play'){mpResetToLobby();}else if(!MP.mpAllDeadTriggered){showScr('s-mp-room');mpRenderPlayers();}}
     if(room.wave&&room.wave!==wave&&gState==='play'){
       wave=room.wave;
       showWaveAnnounce(wave);
@@ -2513,6 +2530,7 @@ function mpStartGame(){
   selChar=MP.mpChar;
   selDiff=MP.roomDiff||'normal';
   showScr(null);
+  document.getElementById('gc').classList.remove('off');
   document.getElementById('hud').classList.remove('off');
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
@@ -2529,6 +2547,14 @@ function mpLeaveRoom(){
   if(MP.roomRef){MP.roomRef.child('states').off();}
   mpStopLeaderboard();
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
+  gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  document.getElementById('gc').classList.add('off');
+  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
+  document.getElementById('minimap').style.display='none';
+  document.getElementById('spectator-indicator').style.display='none';
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
   MP.roomRef=null;MP.roomCode=null;MP.players={};MP.host=false;MP.started=false;MP.mySlot=null;MP.remotePlayers={};MP.mpPosSyncTimer=0;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
 }
 function mpGetEnemyTarget(enemy){
@@ -2605,20 +2631,38 @@ function mpListenStates(){
     }
   },1000);
 }
+function mpResetToLobby(){
+  if(MP.mpAllDeadTriggered)return;
+  MP.mpAllDeadTriggered=true;
+  gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
+  if(MP.roomRef){MP.roomRef.child('states').off();}
+  if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
+  document.getElementById('gc').classList.add('off');
+  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
+  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
+  document.getElementById('minimap').style.display='none';
+  document.getElementById('spectator-indicator').style.display='none';
+  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
+  document.getElementById('kills-left').style.display='none';
+  if(MP.roomRef){
+    MP.roomRef.child('status').set('waiting');
+    MP.roomRef.child('wave').set(1);
+    MP.roomRef.child('startedAt').remove();
+  }
+  MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
+  showScr('s-mp-room');
+  mpListenRoom();
+  mpRenderPlayers();
+}
 function mpAllDead(){
   if(MP.mpAllDeadTriggered)return;
   MP.mpAllDeadTriggered=true;
   if(gState==='play'){
     endGame();
   }
-  if(MP.roomRef){
-    MP.roomRef.child('status').set('ended');
-    MP.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
-  }
   setTimeout(()=>{
-    mpLeaveRoom();
-    showScr('s-start');menuAnimActive=true;initStartCanvas();
-  },3000);
+    mpResetToLobby();
+  },2000);
 }
 function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
