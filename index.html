@@ -627,12 +627,10 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     </div>
     <div class="start-wordmark">TITANS <span>STRIKE</span></div>
     <div class="start-tagline">FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS</div>
-
     <div class="name-field">
       <label class="input-label" for="pname">WARRIOR NAME</label>
       <input id="pname" class="name-input" type="text" placeholder="ENTER YOUR NAME" maxlength="14" autocomplete="off" style="text-transform:uppercase;">
     </div>
-
     <div class="cta-row">
       <button class="btn-arena" id="btn-start">
         <span class="btn-shine"></span>
@@ -644,7 +642,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <span class="btn-sub">2-4 PLAYERS · REAL-TIME</span>
       </button>
     </div>
-
     <div class="club-row">
       <button class="club-btn" id="btn-start-settings" title="Settings"><span>&#9881;</span></button>
       <button class="club-btn" id="btn-start-stats" title="Statistics"><span>&#9620;</span></button>
@@ -652,10 +649,127 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <button class="club-btn" id="btn-start-achievements" title="Achievements"><span>&#9733;</span></button>
       <button class="club-btn" id="btn-lobby" title="Leaderboard"><span>&#9776;</span></button>
     </div>
-
     <div class="version-stamp">TITANS STRIKE · ARENA EDITION</div>
   </div>
 </div>
+
+
+<!-- DIFFICULTY SELECT -->
+<div class="scr off" id="s-diff">
+  <div class="diff-inner">
+    <div class="screen-eyebrow" style="margin-bottom:.3rem;">Select Your Trial</div>
+    <div class="diff-title">DIFFICULTY</div>
+    <div class="diff-sub">Choose how hard the Legion pushes back</div>
+    <div class="diff-cards">
+      <div class="diff-card selected" id="dc-easy" data-diff="easy">
+        <div class="diff-icon">🛡️</div>
+        <div class="diff-info"><div class="diff-name">RECRUIT</div><div class="diff-desc">Slower enemies · More ammo drops · Forgiving</div></div>
+        <div class="diff-badge easy">EASY</div>
+      </div>
+      <div class="diff-card" id="dc-normal" data-diff="normal">
+        <div class="diff-icon">⚔️</div>
+        <div class="diff-info"><div class="diff-name">LEGIONARY</div><div class="diff-desc">Balanced challenge · Standard ammo flow</div></div>
+        <div class="diff-badge normal">NORMAL</div>
+      </div>
+      <div class="diff-card" id="dc-hard" data-diff="hard">
+        <div class="diff-icon">💀</div>
+        <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies · Scarce ammo · No mercy</div></div>
+        <div class="diff-badge hard">HARD</div>
+      </div>
+    </div>
+    <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR →</button>
+    <button class="btn-ghost" id="btn-diff-back">← RETURN</button>
+  </div>
+</div>
+
+<!-- PAUSE OVERLAY -->
+<div id="pause-overlay">
+  <div class="pause-title">PAUSED</div>
+  <button class="pause-btn primary" id="btn-resume">RESUME</button>
+  <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
+  <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
+  <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
+  <button class="pause-btn" id="btn-pause-achievements">🏆 ACHIEVEMENTS</button>
+  <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
+</div>
+
+<!-- QUIT CONFIRMATION -->
+<div id="quit-confirm">
+  <div class="quit-title">LEAVE BATTLE?</div>
+  <div class="quit-msg">Your progress will be lost and you will return to the main gate.</div>
+  <div class="quit-btns">
+    <button class="quit-no" id="btn-quit-no">STAY</button>
+    <button class="quit-yes" id="btn-quit-yes">LEAVE</button>
+  </div>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div class="scr off overlay" id="s-settings">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">SETTINGS</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:.8rem;width:min(340px,92vw);margin:.5rem 0;">
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">MUSIC VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="music-vol-lbl">80%</span></div>
+      <input type="range" id="music-vol" min="0" max="100" value="80" style="width:100%;accent-color:var(--gold);">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">SFX VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="sfx-vol-lbl">100%</span></div>
+      <input type="range" id="sfx-vol" min="0" max="100" value="100" style="width:100%;accent-color:var(--gold);">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:.3rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">PARTICLE DENSITY</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="particle-lbl">HIGH</span></div>
+      <input type="range" id="particle-density" min="1" max="3" value="3" style="width:100%;accent-color:var(--gold);">
+    </div>
+    <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
+  </div>
+</div>
+
+<!-- STATISTICS SCREEN -->
+<div class="scr off overlay" id="s-stats">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">WARRIOR STATISTICS</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div class="stat-grid" id="stats-grid">
+    <div class="stat-card"><span class="sv" id="st-total-kills">0</span><span class="sl">Total Kills</span></div>
+    <div class="stat-card"><span class="sv" id="st-games">0</span><span class="sl">Games Played</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-score">0</span><span class="sl">Best Score</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-wave">I</span><span class="sl">Best Wave</span></div>
+    <div class="stat-card"><span class="sv" id="st-best-combo">0</span><span class="sl">Best Combo</span></div>
+    <div class="stat-card"><span class="sv" id="st-accuracy">0%</span><span class="sl">Accuracy</span></div>
+    <div class="stat-card"><span class="sv" id="st-headshots">0</span><span class="sl">Titan Club Kills</span></div>
+    <div class="stat-card"><span class="sv" id="st-time">0h</span><span class="sl">Play Time</span></div>
+  </div>
+  <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
+<!-- UPGRADES SCREEN -->
+<div class="scr off overlay" id="s-upgrades">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB · ARMORY</div>
+    <div class="screen-title">PERMANENT UPGRADES</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div style="font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);margin:.3rem 0;">♛ TITANS CLUB CREDITS: <span id="credits-count" style="color:var(--red-hot);">0</span></div>
+  <div id="upgrades-list" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;max-height:50vh;overflow-y:auto;width:min(360px,95vw);"></div>
+  <button class="btn-ghost" id="btn-upgrades-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
+<!-- ACHIEVEMENTS SCREEN -->
+<div class="scr off overlay" id="s-achievements">
+  <div class="screen-header">
+    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-title">HALL OF FAME</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div id="achievements-list" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;max-height:55vh;overflow-y:auto;width:min(380px,95vw);"></div>
+  <button class="btn-ghost" id="btn-achievements-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
 <!-- CHARACTER SELECT -->
 <div class="scr off" id="s-chars">
   <div class="screen-header">
