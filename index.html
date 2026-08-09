@@ -2687,22 +2687,26 @@ function mpGetEnemyTarget(enemy){
   return P;
 }
 function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
+function mpCheckAllDead(){
+  if(gState!=='play'||MP.mpAllDeadTriggered)return;
+  if(!MP.mpLocalDead)return;
+  if(Object.keys(MP.players).length<2)return;
+  const allRemoteDead=Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
+  if(allRemoteDead){
+    MP.mpAllDeadTriggered=true;
+    mpAllDead();
+  }
+}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
-  if(MP.mpLocalDead){
-    const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
-    if(remoteAlive===0&&Object.keys(MP.players).length>=2){
-      MP.mpAllDeadTriggered=true;
-      mpAllDead();
-      return;
-    }
-  }
+  mpCheckAllDead();
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
-  if(MP.mpPosSyncTimer<0.2)return;
-  MP.mpPosSyncTimer=0;
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
   const aliveNow=!MP.mpLocalDead;
-  if(Math.hypot(P.x-lastX,P.y-lastY)<6&&score===MP._lastSyncScore&&wave===MP._lastSyncWave&&aliveNow===MP._lastSyncAlive&&lives===MP._lastSyncLives)return;
+  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives;
+  const sendInterval=changed?0.2:1;
+  if(MP.mpPosSyncTimer<sendInterval)return;
+  MP.mpPosSyncTimer=0;
   MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
@@ -2711,7 +2715,7 @@ function mpSyncState(dt){
     score:score,
     wave:wave,
     kills:totalKills,
-    ts:firebase.database.ServerValue.TIMESTAMP
+    ts:Date.now()
   });
 }
 function mpListenStates(){
@@ -2721,22 +2725,20 @@ function mpListenStates(){
   statesRef.on('child_added',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
-    if(!s||!s.ts||Date.now()-s.ts>3000)return;
-    MP.remotePlayers[pid]=s;
+    if(!s)return;
+    s._seen=Date.now();
     if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
+    MP.remotePlayers[pid]=s;
+    mpCheckAllDead();
   });
   statesRef.on('child_changed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
-    if(!s||!s.ts||Date.now()-s.ts>3000){delete MP.remotePlayers[pid];return;}
+    if(!s)return;
+    s._seen=Date.now();
+    if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
     MP.remotePlayers[pid]=s;
-    if(MP.mpLocalDead&&s.alive===false&&Object.keys(MP.players).length>=2){
-      const allRemoteDead=Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
-      if(allRemoteDead){
-        MP.mpAllDeadTriggered=true;
-        mpAllDead();
-      }
-    }
+    mpCheckAllDead();
   });
   statesRef.on('child_removed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
@@ -2747,15 +2749,9 @@ function mpListenStates(){
     const now=Date.now();
     Object.keys(MP.remotePlayers).forEach(pid=>{
       const s=MP.remotePlayers[pid];
-      if(now-(s.ts||0)>3000){delete MP.remotePlayers[pid];}
+      if(s&&now-(s._seen||0)>4000){delete MP.remotePlayers[pid];}
     });
-    const myAlive=!MP.mpLocalDead;
-    const totalPlayers=Object.keys(MP.players).length;
-    const remoteAlive=Object.values(MP.remotePlayers).filter(rp=>rp.alive!==false).length;
-    if(totalPlayers>=2&&!myAlive&&remoteAlive===0){
-      MP.mpAllDeadTriggered=true;
-      mpAllDead();
-    }
+    mpCheckAllDead();
   },1000);
 }
 function mpResetToLobby(){
