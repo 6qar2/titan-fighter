@@ -384,6 +384,77 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .lb-name{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);flex:1;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .lb-score{font-family:'Cinzel',serif;font-size:.78rem;color:var(--parchment);}
 .lb-you{color:#4CAF50 !important;}
+/* CINEMATIC INTRO */
+.cinematic-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.7);
+}
+.intro-black {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.7;
+  z-index: 1;
+}
+.intro-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+}
+.intro-logo {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 20px;
+}
+.intro-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #E2C06A;
+}
+.intro-subtitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.intro-progress {
+  width: 200px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  margin: 0 auto 20px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.intro-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #E2C06A;
+  width: 0;
+  transition: width 0.5s ease;
+}
+.intro-prompt {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  letter-spacing: 1px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
 </style>
 </head>
 <body>
@@ -474,38 +545,172 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 </div>
 <canvas id="minimap" style="position:fixed;bottom:110px;right:10px;width:100px;height:100px;z-index:99;pointer-events:none;border:1px solid rgba(184,152,64,0.2);background:rgba(6,6,14,0.6);display:none;"></canvas>
 
-<!-- START SCREEN -->
+<!-- CINEMATIC INTRO OVERLAY -->
+<div id="cinematic-intro" class="cinematic-intro active">
+  <div class="intro-black"></div>
+  <div class="intro-content">
+    <div class="intro-logo">
+      <svg viewBox="0 0 120 120" width="120" height="120">
+        <defs>
+          <radialGradient id="intro-cg" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stop-color="#E2C06A"/>
+            <stop offset="100%" stop-color="#8A6F2A"/>
+          </radialGradient>
+        </defs>
+        <path d="M60 10 L76 36 L104 28 L88 52 L110 68 L84 70 L80 100 L60 84 L40 100 L36 70 L20 68 L16 52 L32 52 L44 36 Z" fill="url(#intro-cg)" opacity=".9"/>
+        <circle cx="60" cy="56" r="14" fill="rgba(139,0,21,0.85)"/>
+        <path d="M60 44 L64 54 L76 54 L66 62 L70 74 L60 66 L50 74 L54 62 L44 54 L56 54 Z" fill="#E2C06A" opacity=".9"/>
+      </svg>
+    </div>
+    <div class="intro-title" data-text="TITANS STRIKE"></div>
+    <div class="intro-subtitle" data-text="FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS"></div>
+    <div class="intro-progress">
+      <div class="intro-progress-fill"></div>
+    </div>
+    <div class="intro-prompt">TOUCH OR PRESS ANY KEY TO BEGIN</div>
+  </div>
+</div>
+
+<!-- START SCREEN - CINEMATIC REDESIGN -->
 <div class="scr" id="s-start">
   <canvas id="start-canvas"></canvas>
   <div id="vignette" class="active"></div>
+  <div id="start-particles"></div>
   <div class="start-inner">
-    <div class="crest-ring-wrap">
-      <div class="ring ring-1"></div><div class="ring ring-2"></div><div class="ring ring-3"></div>
-      <svg class="crest-icon" viewBox="0 0 60 60">
-        <defs><radialGradient id="cg" cx="50%" cy="40%" r="50%"><stop offset="0%" stop-color="#E2C06A"/><stop offset="100%" stop-color="#8A6F2A"/></radialGradient></defs>
-        <path d="M30 5 L38 18 L52 14 L44 26 L55 34 L42 35 L40 50 L30 42 L20 50 L18 35 L5 34 L16 26 L8 14 L22 18 Z" fill="url(#cg)" opacity=".9"/>
-        <circle cx="30" cy="28" r="7" fill="rgba(139,0,21,0.85)"/>
-        <path d="M30 22 L32 27 L38 27 L33 31 L35 37 L30 33 L25 37 L27 31 L22 27 L28 27 Z" fill="#E2C06A" opacity=".9"/>
+    <div class="start-background-layers">
+      <div class="bg-layer bg-layer-1"></div>
+      <div class="bg-layer bg-layer-2"></div>
+      <div class="bg-layer bg-layer-3"></div>
+    </div>
+    
+    <div class="start-content-wrapper">
+      <!-- Cinematic Title Sequence -->
+      <div class="title-sequence" id="title-sequence">
+        <div class="title-line title-line-1" data-text="TITANS"></div>
+        <div class="title-line title-line-2" data-text="STRIKE"></div>
+        <div class="title-underline">
+          <div class="title-underline-fill"></div>
+        </div>
+        <div class="title-tagline" data-text="Forged in Glory · Bound by Discipline · United as Titans"></div>
+      </div>
+
+      <!-- Main Menu Buttons -->
+      <div class="main-menu-buttons" id="main-menu-buttons" style="opacity:0;transform:translateY(30px);">
+        <div class="menu-section">
+          <div class="section-title">SINGLE PLAYER</div>
+          <button class="btn-menu-primary" id="btn-start">
+            <span class="btn-icon">⚔</span>
+            <span class="btn-text">
+              <span class="btn-main">ENTER THE BATTLE</span>
+              <span class="btn-sub">Single Player Campaign</span>
+            </span>
+            <span class="btn-glow"></span>
+          </button>
+        </div>
+
+        <div class="menu-section">
+          <div class="section-title">MULTIPLAYER</div>
+          <div class="button-row">
+            <button class="btn-menu-secondary" id="btn-mp-lobby">
+              <span class="btn-icon">♛</span>
+              <span class="btn-text">
+                <span class="btn-main">HOST LOBBY</span>
+                <span class="btn-sub">Create a co-op session</span>
+              </span>
+            </button>
+            <button class="btn-menu-secondary" id="btn-mp-join">
+              <span class="btn-icon">🔗</span>
+              <span class="btn-text">
+                <span class="btn-main">JOIN LOBBY</span>
+                <span class="btn-sub">Enter room code</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-section">
+          <div class="section-title">COMMUNITY</div>
+          <div class="button-row">
+            <button class="btn-menu-ghost" id="btn-lobby">
+              <span class="btn-icon">♛</span>
+              <span class="btn-text">LEADERBOARD</span>
+            </button>
+            <button class="btn-menu-ghost" id="btn-start-stats">
+              <span class="btn-icon">📊</span>
+              <span class="btn-text">STATISTICS</span>
+            </button>
+          </div>
+          <div class="button-row">
+            <button class="btn-menu-ghost" id="btn-start-upgrades">
+              <span class="btn-icon">⬆</span>
+              <span class="btn-text">UPGRADES</span>
+            </button>
+            <button class="btn-menu-ghost" id="btn-start-achievements">
+              <span class="btn-icon">🏆</span>
+              <span class="btn-text">ACHIEVEMENTS</span>
+            </button>
+            <button class="btn-menu-ghost" id="btn-start-settings">
+              <span class="btn-icon">⚙</span>
+              <span class="btn-text">SETTINGS</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-footer">
+          <div class="version-stamp">MMXXVI · TITANS CLUB · GALALA UNIVERSITY</div>
+          <div class="social-links">
+            <span class="footer-badge gold">✦ TITANS CLUB LEGEND</span>
+            <span class="footer-badge red">♛ ELITE WARRIOR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Character Preview Carousel -->
+      <div class="character-preview" id="character-preview">
+        <div class="preview-label">CHOOSE YOUR CHAMPION</div>
+        <div class="preview-track" id="preview-track"></div>
+        <div class="preview-nav">
+          <button class="preview-btn" id="preview-prev" aria-label="Previous champion">‹</button>
+          <div class="preview-dots" id="preview-dots"></div>
+          <button class="preview-btn" id="preview-next" aria-label="Next champion">›</button>
+        </div>
+        <div class="preview-info" id="preview-info">
+          <div class="preview-name" id="preview-name">LEGIONARY</div>
+          <div class="preview-role" id="preview-role">Vanguard</div>
+          <div class="preview-stats" id="preview-stats">
+            <div class="stat"><span class="stat-val" id="stat-speed">60</span><span class="stat-label">SPEED</span></div>
+            <div class="stat"><span class="stat-val" id="stat-fire">70</span><span class="stat-label">FIRE</span></div>
+            <div class="stat"><span class="stat-val" id="stat-power">80</span><span class="stat-label">POWER</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CINEMATIC INTRO OVERLAY -->
+<div id="cinematic-intro" class="cinematic-intro active">
+  <div class="intro-black"></div>
+  <div class="intro-content">
+    <div class="intro-logo">
+      <svg viewBox="0 0 120 120" width="120" height="120">
+        <defs>
+          <radialGradient id="intro-cg" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stop-color="#E2C06A"/>
+            <stop offset="100%" stop-color="#8A6F2A"/>
+          </radialGradient>
+        </defs>
+        <path d="M60 10 L76 36 L104 28 L88 52 L110 68 L84 70 L80 100 L60 84 L40 100 L36 70 L20 68 L16 52 L32 52 L44 36 Z" fill="url(#intro-cg)" opacity=".9"/>
+        <circle cx="60" cy="56" r="14" fill="rgba(139,0,21,0.85)"/>
+        <path d="M60 44 L64 54 L76 54 L66 62 L70 74 L60 66 L50 74 L54 62 L44 54 L56 54 Z" fill="#E2C06A" opacity=".9"/>
       </svg>
     </div>
-    <div class="titan-eyebrow">TITANS CLUB · GALALA UNIVERSITY</div>
-    <div class="titan-title"><span class="t1">TITANS</span><span class="t2">STRIKE</span></div>
-    <div class="start-subtitle">Forged in Glory · Bound by Discipline · United as Titans</div>
-    <div class="start-divider"><div class="start-divider-dot"></div></div>
-    <div class="start-badges">
-      <span class="start-badge gold">✦ TITANS CLUB LEGEND</span>
-      <span class="start-badge red">♛ ELITE WARRIOR</span>
+    <div class="intro-title" data-text="TITANS STRIKE"></div>
+    <div class="intro-subtitle" data-text="FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS"></div>
+    <div class="intro-progress">
+      <div class="intro-progress-fill"></div>
     </div>
-    <div class="input-label">Enter Your Name, Warrior</div>
-    <input id="pname" class="name-input" type="text" placeholder="LEGIONARY" maxlength="12" autocomplete="name">
-    <button class="btn-cta" id="btn-start">ENTER THE BATTLE</button>
-    <button class="btn-cta" id="btn-mp-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ MULTIPLAYER</button>
-    <button class="btn-cta" id="btn-lobby" style="margin-top:.6rem;background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:rgba(167,139,250,0.4);color:#DDD6FE;box-shadow:0 6px 28px rgba(90,40,220,0.25);">♛ LEADERBOARD</button>
-    <button class="btn-ghost" id="btn-start-settings" style="margin-top:.5rem;">⚙ SETTINGS</button>
-    <button class="btn-ghost" id="btn-start-stats" style="margin-top:.4rem;">📊 STATISTICS</button>
-    <button class="btn-ghost" id="btn-start-upgrades" style="margin-top:.4rem;">⬆ UPGRADES</button>
-    <button class="btn-ghost" id="btn-start-achievements" style="margin-top:.4rem;">🏆 ACHIEVEMENTS</button>
-    <div class="version-stamp">MMXXVI · GALALA UNIVERSITY</div>
+    <div class="intro-prompt">TOUCH OR PRESS ANY KEY TO BEGIN</div>
   </div>
 </div>
 
