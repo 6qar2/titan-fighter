@@ -2705,6 +2705,18 @@ function mpStartGame(){
     MP.roomRef.child('mpEndSignal').remove();
     MP.roomRef.child('states/'+MP.playerId).onDisconnect().remove();
   }
+  // Initialize MP state variables for fresh game
+  MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncAlive=0;
+  MP._lastSyncFiring=0;MP._lastSyncReviving=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
+  MP._lastSyncScore=0;MP._lastSyncKills=0;MP._lastSyncReviving=0;
+  MP._lastTitanKillSent=0;MP._lastTitanKillSeen=0;
+  MP._lastPingType=0;MP._lastPingTime=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
+  MP._remoteGoneTimer=null;MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;
+  MP.mpPosSyncTimer=0;MP.mpEndTimer=null;MP.mpStateInterval=null;MP.mpMatchResult=null;
+  MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;
+  MP._lastTitanKillSent=0;MP._lastTitanKillSeen=0;
+  MP._lastPingType=0;MP._lastPingTime=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
+  MP._lastSyncFiring=0;MP._lastSyncReviving=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
 }
 function mpLeaveRoom(){
   resetJoystick();
@@ -2737,7 +2749,9 @@ function mpIsLocalAlive(){return!(MP.mpLocalDead&&MP.roomCode&&MP.playerId);}
 function mpCheckAllDead(){
   if(gState!=='play'||MP.mpAllDeadTriggered)return;
   if(!MP.mpLocalDead)return;
-  if(Object.keys(MP.players).length<2)return;
+  const playerCount=Object.keys(MP.players).length||0;
+  const remoteCount=Object.keys(MP.remotePlayers).length||0;
+  if((playerCount+remoteCount)<2)return;
   const allRemoteDead=Object.values(MP.remotePlayers).every(rp=>rp.alive===false);
   if(allRemoteDead){
     MP.mpAllDeadTriggered=true;
@@ -2811,14 +2825,14 @@ function mpSpawnAllyBullets(dt){
   Object.values(MP.remotePlayers).forEach(rp=>{
     if(rp.alive===false||!rp.firing)return;
     rp._ghostT=(rp._ghostT||0)+dt;
-    if(rp._ghostT<0.13)return;
+    if(rp._ghostT<0.25)return;
     rp._ghostT=0;
     const rx=(rp._rx!==undefined?rp._rx:rp.x),ry=(rp._ry!==undefined?rp._ry:rp.y);
     let nearest=null,nd=1e9;
     for(const e of enemies){const d=Math.hypot(e.x-rx,e.y-ry);if(d<nd){nd=d;nearest=e;}}
     if(!nearest)return;
-    const ang=Math.atan2(nearest.y-ry,nearest.x-rx),spd=820;
-    bullets.push({x:rx,y:ry,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,r:5,dmg:6,color:'rgba(120,200,255,0.9)',pierce:false});
+    const ang=Math.atan2(nearest.y-ry,nearest.x-rx),spd=600;
+    bullets.push({x:rx,y:ry,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,r:5,dmg:5,color:'rgba(120,200,255,0.9)',pierce:false,hit:false,weaponId:'ally'});
     bulletTrails.push({x:rx,y:ry,age:0,maxAge:.1,color:'rgba(120,200,255,0.7)',vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd});
   });
 }
@@ -2831,12 +2845,13 @@ function mpSyncState(dt){
   const firingNow=(shooting&&aliveNow)?1:0;
   const revivingNow=(MP._revivingAlly&&aliveNow)?1:0;
   const pingTypeNow=MP._lastPingType||0;
-  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives||firingNow!==MP._lastSyncFiring||revivingNow!==MP._lastSyncReviving||pingTypeNow!==MP._lastSyncPing;
+  const waveModNow=waveModifier||'';
+  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives||firingNow!==MP._lastSyncFiring||revivingNow!==MP._lastSyncReviving||pingTypeNow!==MP._lastSyncPing||waveModNow!==MP._lastSyncWaveMod;
   const sendInterval=changed?0.2:1;
   if(MP.mpPosSyncTimer<sendInterval)return;
   MP.mpPosSyncTimer=0;
-  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;MP._lastSyncFiring=firingNow;MP._lastSyncReviving=revivingNow;MP._lastSyncPing=pingTypeNow;
-  MP.roomRef.child('states/'+MP.playerId).set({
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;MP._lastSyncFiring=firingNow;MP._lastSyncReviving=revivingNow;MP._lastSyncPing=pingTypeNow;MP._lastSyncWaveMod=waveModNow;
+  MP.roomRef.child('states/'+MP.playerId).update({
     x:P.x,y:P.y,
     alive:aliveNow,
     firing:firingNow,
@@ -2847,6 +2862,7 @@ function mpSyncState(dt){
     lives:lives,
     score:score,
     wave:wave,
+    waveMod:waveModNow,
     kills:totalKills,
     ts:Date.now()
   });
@@ -2859,7 +2875,7 @@ function mpListenStates(){
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
     if(!s)return;
-    s._seen=Date.now();
+    s._seen=s.ts||Date.now();
     if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
     MP.remotePlayers[pid]=s;
     if(MP._remoteGoneTimer){clearTimeout(MP._remoteGoneTimer);MP._remoteGoneTimer=null;}
@@ -2869,7 +2885,7 @@ function mpListenStates(){
     const pid=snap.key;if(pid===MP.playerId)return;
     const s=snap.val();
     if(!s)return;
-    s._seen=Date.now();
+    s._seen=s.ts||Date.now();
     if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
     MP.remotePlayers[pid]=s;
     if(MP._remoteGoneTimer){clearTimeout(MP._remoteGoneTimer);MP._remoteGoneTimer=null;}
@@ -2878,13 +2894,20 @@ function mpListenStates(){
   statesRef.on('child_removed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     delete MP.remotePlayers[pid];
-    if(gState==='play'&&!MP.mpAllDeadTriggered&&!MP._remoteGoneTimer&&!MP.mpLocalDead){
-      MP._remoteGoneTimer=setTimeout(()=>{
-        MP._remoteGoneTimer=null;
-        if(gState==='play'&&!MP.mpAllDeadTriggered){
-          mpShowMatchEnd('win');
-        }
-      },4000);
+    if(gState==='play'&&!MP.mpAllDeadTriggered){
+      if(MP._remoteGoneTimer){clearTimeout(MP._remoteGoneTimer);MP._remoteGoneTimer=null;}
+      if(!MP.mpLocalDead){
+        // Local player alive, ally disconnected -> win
+        MP._remoteGoneTimer=setTimeout(()=>{
+          MP._remoteGoneTimer=null;
+          if(gState==='play'&&!MP.mpAllDeadTriggered){
+            mpShowMatchEnd('win');
+          }
+        },4000);
+      }else{
+        // Local player dead, ally disconnected -> lose
+        mpShowMatchEnd('lose');
+      }
     }
   });
   MP.mpStateInterval=setInterval(()=>{
@@ -2896,6 +2919,7 @@ function mpResetToLobby(){
   resetJoystick();
   MP.mpAllDeadTriggered=true;
   if(MP.mpEndTimer){clearTimeout(MP.mpEndTimer);MP.mpEndTimer=null;}
+  if(MP.mpPosSyncTimer)clearTimeout(MP.mpPosSyncTimer);
   MP.mpMatchResult=null;
   gState='menu';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
@@ -2914,7 +2938,12 @@ function mpResetToLobby(){
     MP.roomRef.child('matchOver').remove();
     MP.roomRef.child('mpEndSignal').remove();
   }
-  MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
+  MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;
+  MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
+  MP._lastSyncAlive=0;MP._lastSyncFiring=0;MP._lastSyncReviving=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
+  MP._lastTitanKillSent=0;MP._lastTitanKillSeen=0;
+  MP._lastPingType=0;MP._lastPingTime=0;MP._lastSyncPing=0;MP._lastSyncWaveMod=0;
+  MP._remoteGoneTimer=null;MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;
   showScr('s-mp-room');
   mpListenRoom();
   mpRenderPlayers();
@@ -2928,12 +2957,13 @@ function mpAllDead(){
 }
 function mpShowMatchEnd(result){
   if(MP.mpEndTimer)clearTimeout(MP.mpEndTimer);
+  if(MP.mpPosSyncTimer)clearTimeout(MP.mpPosSyncTimer);
+  if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
   MP.mpMatchResult=result;
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
   if(MP.host&&MP.roomRef){MP.roomRef.child('matchOver').set({result:result,by:MP.playerId});}
   else if(MP.roomRef){MP.roomRef.child('mpEndSignal').set({result:result,by:MP.playerId});}
-  if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
   document.getElementById('gc').classList.add('off');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
   document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
