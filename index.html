@@ -2090,7 +2090,20 @@ function checkBulletCollision(b,e,i){
     let finalDmg=b.dmg*dmgMult;
     if(rollCrit()){finalDmg*=2;spawnDmgNum(e.x,e.y,finalDmg,'#FFD700');stats.headshots++;}else{spawnDmgNum(e.x,e.y,finalDmg,'#E2C06A');}
     e.hp-=finalDmg;spawnParts(b.x,b.y,e.col,5);hitSparks.push({x:b.x,y:b.y,vx:(Math.random()-.5)*80,vy:(Math.random()-.5)*80-40,r:1.5+Math.random()*2,life:1,color:'#FFD700'});
-    if(b.explosive){for(let j=enemies.length-1;j>=0;j--){const other=enemies[j];if(other===e||deadEnemies.includes(other))continue;if(Math.hypot(other.x-b.x,other.y-b.y)<(b.explR||120)){other.hp-=finalDmg*.6;spawnParts(other.x,other.y,'#FF4422',4);if(other.hp<=0)killEnemy(other,j);}}spawnParts(b.x,b.y,'#FF4422',12);triggerShake(6,200);}
+    if(b.explosive){
+      const toKill=[];
+      for(let j=enemies.length-1;j>=0;j--){
+        const other=enemies[j];
+        if(other===e||deadEnemies.includes(other))continue;
+        if(Math.hypot(other.x-b.x,other.y-b.y)<(b.explR||120)){
+          other.hp-=finalDmg*.6;
+          spawnParts(other.x,other.y,'#FF4422',4);
+          if(other.hp<=0)toKill.push({enemy:other,idx:j});
+        }
+      }
+      for(const k of toKill)killEnemy(k.enemy,k.idx);
+      spawnParts(b.x,b.y,'#FF4422',12);triggerShake(6,200);
+    }
     if(e.hp<=0){killEnemy(e,i);return false;}
     return false;
   }
@@ -2430,7 +2443,12 @@ function draw(){
 }
 
 /* ═══ ENHANCED LOOP ═══ */
-function loop(ts){if(gState!=='play'||isPaused)return;const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;update(dt);mpSyncState(dt);draw();animID=requestAnimationFrame(loop);}
+function loop(ts){
+  if(gState!=='play'||isPaused)return;
+  const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;
+  try{update(dt);mpSyncState(dt);draw();}catch(e){console.error('Game loop error:',e);}
+  animID=requestAnimationFrame(loop);
+}
 
 /* ═══ SCREEN MANAGEMENT ═══ */
 function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
@@ -2738,12 +2756,12 @@ function mpSendPing(type){
   if(!MP.roomCode||!MP.playerId||gState!=='play')return;
   MP._lastPingType=type;MP._lastPingTime=Date.now();
   spawnPop(P.x,P.y-34,MP_PING_TXT[type]||'!','power');
-  if(MP.roomRef)MP.roomRef.child('states/'+MP.playerId).set({ping:type,pingT:MP._lastPingTime,x:P.x,y:P.y,alive:!MP.mpLocalDead,firing:(shooting&&!MP.mpLocalDead)?1:0,lives:lives,score:score,wave:wave,kills:totalKills,ts:Date.now()});
+  if(MP.roomRef)MP.roomRef.child('states/'+MP.playerId).update({ping:type,pingT:MP._lastPingTime,ts:Date.now()});
 }
 function mpNotifyTitanKill(){
   if(!MP.roomRef||!MP.playerId)return;
   MP._lastTitanKillSent=Date.now();
-  MP.roomRef.child('states/'+MP.playerId).set({titanKill:MP._lastTitanKillSent,x:P.x,y:P.y,alive:!MP.mpLocalDead,firing:(shooting&&!MP.mpLocalDead)?1:0,lives:lives,score:score,wave:wave,kills:totalKills,ts:Date.now()});
+  MP.roomRef.child('states/'+MP.playerId).update({titanKill:MP._lastTitanKillSent,ts:Date.now()});
 }
 function mpUpdateRevive(dt){
   if(!MP.roomCode||!MP.playerId||gState!=='play')return;
