@@ -437,6 +437,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <span class="hud-lbl" style="color:rgba(76,175,80,0.9);">Opponent</span>
     <div class="lives-row" id="opponent-lives"></div>
     <span class="hud-lbl" id="opponent-score" style="color:rgba(76,175,80,0.7);margin-top:2px;"></span>
+    <span class="hud-lbl" id="team-score" style="color:rgba(212,175,55,0.9);margin-top:4px;font-size:.7rem;letter-spacing:1px;">TEAM 0</span>
   </div>
   <div class="hud-block">
     <span class="hud-lbl">Wave</span>
@@ -464,6 +465,11 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <button id="weapon-btn" style="width:58px;height:28px;border-radius:6px;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;"><span id="weapon-btn-icon">🔫</span> <span id="weapon-btn-name" style="margin-left:3px;">PISTOL</span></button>
     <button id="power-btn"><span class="power-icon">✦</span><span class="power-lbl">POWER</span></button>
     <button id="fire-btn"><span class="fire-icon">⚔</span><span class="fire-lbl">FIRE</span></button>
+  </div>
+  <div id="ping-bar" style="position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;">
+    <button class="ping-btn" data-ping="help" style="width:64px;height:26px;border-radius:6px;background:rgba(192,0,26,0.18);border:1px solid rgba(192,0,26,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#FFB3B3;touch-action:none;cursor:pointer;">HELP!</button>
+    <button class="ping-btn" data-ping="nice" style="width:64px;height:26px;border-radius:6px;background:rgba(76,175,80,0.18);border:1px solid rgba(76,175,80,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#A5D6A7;touch-action:none;cursor:pointer;">NICE!</button>
+    <button class="ping-btn" data-ping="here" style="width:64px;height:26px;border-radius:6px;background:rgba(184,152,64,0.18);border:1px solid rgba(184,152,64,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#E2C06A;touch-action:none;cursor:pointer;">HERE!</button>
   </div>
 </div>
 <canvas id="minimap" style="position:fixed;bottom:110px;right:10px;width:100px;height:100px;z-index:99;pointer-events:none;border:1px solid rgba(184,152,64,0.2);background:rgba(6,6,14,0.6);display:none;"></canvas>
@@ -743,6 +749,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div class="over-inner">
     <div class="over-eyebrow">MULTIPLAYER · BATTLE REPORT</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:.62rem;letter-spacing:5px;color:var(--gold-dim);margin-bottom:-.4rem;">TEAM RESULT</div>
     <div class="final-score-lbl" id="mp-end-result">BATTLE ENDED</div>
     <div class="final-rank" id="mp-end-rank" style="color:var(--gold-lit);">DRAW</div>
     <div style="display:flex;gap:1.5rem;margin:1rem 0;flex-wrap:wrap;justify-content:center;">
@@ -773,10 +780,11 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
 </div>
 
-<!-- SPECTATOR INDICATOR -->
+<!-- SPECTATOR / DOWNED INDICATOR -->
 <div id="spectator-indicator" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;pointer-events:none;text-align:center;">
-  <div style="font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,1.8rem);letter-spacing:4px;color:var(--gold-dim);text-shadow:0 0 20px rgba(212,175,55,0.3);">SPECTATING</div>
-  <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--ash);margin-top:.3rem;">Waiting for the battle to end...</div>
+  <div class="spc-text" style="font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,1.8rem);letter-spacing:4px;color:var(--gold-dim);text-shadow:0 0 20px rgba(212,175,55,0.3);">DOWNED</div>
+  <div class="spc-sub" style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--ash);margin-top:.3rem;">ALLY CAN REVIVE YOU</div>
+  <div class="spc-revive" style="width:180px;height:6px;margin:.5rem auto 0;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden;display:none;"><div class="spc-revive-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#4CAF50,#A5D6A7);transition:width .1s;"></div></div>
 </div>
 
 <script>
@@ -1246,6 +1254,8 @@ function updateOpponentLivesHUD(){
     }
   }
   if(scoreEl)scoreEl.textContent=(remote.score||0).toLocaleString();
+  const teamEl=document.getElementById('team-score');
+  if(teamEl)teamEl.textContent='TEAM '+((score||0)+(remote.score||0)).toLocaleString();
 }
 
 function startTimer(){
@@ -1412,6 +1422,15 @@ function spawnEnemy(forceDef,forceX,forceY){
   if(def.type==='colossusg')showEnemyWarn('⚔ TITAN GUARD · TITANS CLUB');
   enemies.push(e);
 }
+function spawnTitan(wave){
+  if(enemies.some(e=>e.isTitan))return;
+  const hp=Math.ceil(140*diffCfg.enemyHpMult*(1+(wave-5)*0.4));
+  const def={type:'mp_titan',label:'SHARED TITAN',hp:hp,sz:48,spd:0.42,sRate:0.7,pts:600};
+  const e={...def,maxHp:hp,hp:hp,x:cv.width/2,y:-70,vx:0,vy:0,st:0,wob:0,wm:1,ang:0,spdMod:1,stunT:0,spd:def.spd*diffCfg.enemySpdMult,sRate:def.sRate*diffCfg.enemyFireMult,isElite:false,isTitan:true,col:'#C77DFF'};
+  enemies.push(e);
+  MP._lastTitanKillSeen=0;
+  showEnemyWarn('☄ SHARED TITAN · CO-OP TARGET');
+}
 
 function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
 
@@ -1431,7 +1450,7 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';document.getElementById('spectator-indicator').style.display='block';}}else{endGame();}}
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;MP._downedKillBaseline=null;MP.mpReviveHold=0;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';}var si=document.getElementById('spectator-indicator');si.querySelector('.spc-text').textContent='DOWNED — ALLY CAN REVIVE';si.style.display='block';}else{endGame();}}
 }
 
 function showWaveAnnounce(n){
@@ -1444,6 +1463,7 @@ function showWaveAnnounce(n){
   if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
   applyWaveModifier();
   bgTransition(n);
+  if(MP.roomCode&&MP.playerId&&(n===5||n===8))spawnTitan(n);
 }
 
 function sfxStartGame(){
@@ -1746,6 +1766,13 @@ document.querySelectorAll('.lb-tab').forEach(tab=>{
   });
 });
 document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
+document.querySelectorAll('.ping-btn').forEach(btn=>{btn.addEventListener('click',()=>{mpSendPing(btn.dataset.ping);});});
+document.addEventListener('keydown',e=>{
+  if(gState!=='play')return;
+  if(e.code==='KeyZ')mpSendPing('help');
+  else if(e.code==='KeyX')mpSendPing('nice');
+  else if(e.code==='KeyC')mpSendPing('here');
+});
 
 /* ═══ BOOT ═══ */
 initStartCanvas();menuAnimActive=true;menuRAF=requestAnimationFrame(drawStartBG);
@@ -2079,6 +2106,7 @@ function updateMagnet(){
 /* ═══ GAME INITIALIZATION ENHANCEMENT ═══ */
 function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
+  if(MP.roomCode&&MP.playerId){diffCfg={...diffCfg,enemyHpMult:diffCfg.enemyHpMult*1.3,enemyFireMult:diffCfg.enemyFireMult*1.15};}
   const ch=CHARS[selChar];
   score=0;lives=diffCfg.lives;wave=1;timeLeft=DURATION;
   combo=0;comboT=0;shootCD=0;spawnT=0;waveAdvancing=false;waveKills=0;
@@ -2114,6 +2142,8 @@ function update(dt){
     keys['Space']=false;keys['KeyE']=false;keys['KeyQ']=false;keys['KeyR']=false;
     joystick.active=false;joystick.dx=0;joystick.dy=0;shooting=false;
   }
+  if(MP.roomCode&&MP.playerId)mpUpdateRevive(dt);
+  if(MP.roomCode&&MP.playerId)mpSpawnAllyBullets(dt);
   if(slowMoTimer>0){slowMoTimer-=dt;if(slowMoTimer<=0){slowMo=1;}else{dt*=slowMo;}}
   if(powerCooldownTimer>0){powerCooldownTimer-=dt;if(powerCooldownTimer<0)powerCooldownTimer=0;}
   if(powerCharge<1){powerCharge=Math.min(1,powerCharge+dt*(1/30));updatePowerHUD();}
@@ -2315,6 +2345,7 @@ function killEnemy(e,idx){
   powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
   if(e.isElite)spawnPop(e.x,e.y-20,`+${Math.round(e.pts*.5)} ELITE`,'boss');
   if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
+  if(e.isTitan)mpNotifyTitanKill();
   enemies.splice(idx,1);waveKills++;updateHUD();
 }
 
@@ -2516,6 +2547,8 @@ function mpJoinRoom(){
           mpStartGame();
           wave=room.wave||1;
           waveKills=0;enemies.length=0;
+          lives=Math.max(1,Math.ceil(diffCfg.lives/2));
+          score=(wave-1)*350;totalKills=Math.floor((wave-1)*4);
           showWaveAnnounce(wave);
           document.getElementById('hwave').textContent=toRoman(wave);
           bgTransition(wave);
@@ -2691,6 +2724,75 @@ function mpCheckAllDead(){
     mpAllDead();
   }
 }
+function mpReviveLocal(msg){
+  MP.mpLocalDead=false;MP.mpRevivedThisDeath=false;MP.mpDeathScreenShown=false;
+  lives=Math.max(1,Math.ceil(diffCfg.lives*0.5));refreshDots();
+  P.invinc=3;resetJoystick();
+  const si=document.getElementById('spectator-indicator');if(si)si.style.display='none';
+  showPowerAnnounce('✚ '+(msg||'REVIVED BY ALLY'));
+  spawnParts(P.x,P.y,'#4CAF50',24);sfxCombo();
+  updateOpponentLivesHUD();
+}
+const MP_PING_TXT={help:'⚠ HELP!',nice:'✦ NICE!',here:'📍 HERE!'};
+function mpSendPing(type){
+  if(!MP.roomCode||!MP.playerId||gState!=='play')return;
+  MP._lastPingType=type;MP._lastPingTime=Date.now();
+  spawnPop(P.x,P.y-34,MP_PING_TXT[type]||'!','power');
+  if(MP.roomRef)MP.roomRef.child('states/'+MP.playerId).set({ping:type,pingT:MP._lastPingTime,x:P.x,y:P.y,alive:!MP.mpLocalDead,firing:(shooting&&!MP.mpLocalDead)?1:0,lives:lives,score:score,wave:wave,kills:totalKills,ts:Date.now()});
+}
+function mpNotifyTitanKill(){
+  if(!MP.roomRef||!MP.playerId)return;
+  MP._lastTitanKillSent=Date.now();
+  MP.roomRef.child('states/'+MP.playerId).set({titanKill:MP._lastTitanKillSent,x:P.x,y:P.y,alive:!MP.mpLocalDead,firing:(shooting&&!MP.mpLocalDead)?1:0,lives:lives,score:score,wave:wave,kills:totalKills,ts:Date.now()});
+}
+function mpUpdateRevive(dt){
+  if(!MP.roomCode||!MP.playerId||gState!=='play')return;
+  const remote=Object.values(MP.remotePlayers)[0];
+  const REVIVE_TIME=2.0,REVIVE_KILLS=18,REVIVE_RADIUS=72;
+  if(MP.mpLocalDead){
+    const si=document.getElementById('spectator-indicator');
+    if(si)si.style.display='block';
+    const rf=document.querySelector('#spectator-indicator .spc-revive');
+    const rp=document.querySelector('#spectator-indicator .spc-revive-fill');
+    if(remote&&remote.reviving){
+      MP.mpReviveHold=(MP.mpReviveHold||0)+dt;
+      if(rf)rf.style.display='block';
+      if(rp)rp.style.width=Math.min(100,(MP.mpReviveHold/REVIVE_TIME)*100)+'%';
+      if(MP.mpReviveHold>=REVIVE_TIME){mpReviveLocal('REVIVED BY ALLY');return;}
+    }else{
+      MP.mpReviveHold=0;
+      if(rf)rf.style.display='none';
+    }
+    if(remote){
+      if(MP._downedKillBaseline===null)MP._downedKillBaseline=remote.kills||0;
+      if((remote.kills||0)-MP._downedKillBaseline>=REVIVE_KILLS){mpReviveLocal('ALLY MILESTONE');return;}
+    }
+  }else{
+    if(remote&&remote.alive===false){
+      const rx=(remote._rx!==undefined?remote._rx:remote.x),ry=(remote._ry!==undefined?remote._ry:remote.y);
+      const d=Math.hypot(P.x-rx,P.y-ry);
+      MP._revivingAlly=d<REVIVE_RADIUS;
+      MP.mpReviveHold=(MP.mpReviveHold||0)+(MP._revivingAlly?dt:0);
+      if(MP.mpReviveHold>=REVIVE_TIME){MP._revivingAlly=true;MP.mpReviveHold=REVIVE_TIME;}
+    }else{MP._revivingAlly=false;MP.mpReviveHold=0;}
+  }
+}
+function mpSpawnAllyBullets(dt){
+  if(!MP.roomCode||!MP.playerId||gState!=='play')return;
+  Object.values(MP.remotePlayers).forEach(rp=>{
+    if(rp.alive===false||!rp.firing)return;
+    rp._ghostT=(rp._ghostT||0)+dt;
+    if(rp._ghostT<0.13)return;
+    rp._ghostT=0;
+    const rx=(rp._rx!==undefined?rp._rx:rp.x),ry=(rp._ry!==undefined?rp._ry:rp.y);
+    let nearest=null,nd=1e9;
+    for(const e of enemies){const d=Math.hypot(e.x-rx,e.y-ry);if(d<nd){nd=d;nearest=e;}}
+    if(!nearest)return;
+    const ang=Math.atan2(nearest.y-ry,nearest.x-rx),spd=820;
+    bullets.push({x:rx,y:ry,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,r:5,dmg:6,color:'rgba(120,200,255,0.9)',pierce:false});
+    bulletTrails.push({x:rx,y:ry,age:0,maxAge:.1,color:'rgba(120,200,255,0.7)',vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd});
+  });
+}
 function mpSyncState(dt){
   if(!MP.roomRef||!MP.playerId||gState!=='play')return;
   mpCheckAllDead();
@@ -2698,15 +2800,21 @@ function mpSyncState(dt){
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
   const aliveNow=!MP.mpLocalDead;
   const firingNow=(shooting&&aliveNow)?1:0;
-  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives||firingNow!==MP._lastSyncFiring;
+  const revivingNow=(MP._revivingAlly&&aliveNow)?1:0;
+  const pingTypeNow=MP._lastPingType||0;
+  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives||firingNow!==MP._lastSyncFiring||revivingNow!==MP._lastSyncReviving||pingTypeNow!==MP._lastSyncPing;
   const sendInterval=changed?0.2:1;
   if(MP.mpPosSyncTimer<sendInterval)return;
   MP.mpPosSyncTimer=0;
-  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;MP._lastSyncFiring=firingNow;
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;MP._lastSyncFiring=firingNow;MP._lastSyncReviving=revivingNow;MP._lastSyncPing=pingTypeNow;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
     alive:aliveNow,
     firing:firingNow,
+    reviving:revivingNow,
+    ping:pingTypeNow,
+    pingT:MP._lastPingTime||0,
+    titanKill:MP._lastTitanKillSent||0,
     lives:lives,
     score:score,
     wave:wave,
@@ -2834,6 +2942,11 @@ function mpShowMatchEnd(result){
 }
 function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
+    if(rp.titanKill&&rp.titanKill!==MP._lastTitanKillSeen){
+      MP._lastTitanKillSeen=rp.titanKill;
+      const t=enemies.find(x=>x.isTitan);
+      if(t){enemies.splice(enemies.indexOf(t),1);spawnParts(t.x,t.y,'#C77DFF',16);addKillFeed('☄ SHARED TITAN SLAIN','#C77DFF');}
+    }
     const rc=CHARS[rp.char]||CHARS[0];
     const dead=rp.alive===false;
     if(rp._rx===undefined){rp._rx=rp.x;rp._ry=rp.y;}
@@ -2879,6 +2992,11 @@ function drawRemotePlayers(){
     if(!dead){
       cx.fillStyle='rgba(76,175,80,1)';cx.font="bold 8px 'Cinzel',serif";
       cx.fillText('ALLY',rp._rx,rp._ry+24);
+    }
+    if(rp.pingT&&Date.now()-rp.pingT<2500){
+      cx.globalAlpha=Math.max(0.15,1-(Date.now()-rp.pingT)/2500);
+      cx.fillStyle='#E2C06A';cx.font="bold 14px 'Cinzel',serif";
+      cx.fillText(MP_PING_TXT[rp.ping]||'!',rp._rx,rp._ry-40);cx.globalAlpha=1;
     }
     cx.restore();
   });
