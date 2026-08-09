@@ -2354,23 +2354,6 @@ function mpDetermineResult(){
   if(score<remoteScore)return 'lose';
   return 'draw';
 }
-function mpOnRemoteGameOver(){
-  resetJoystick();
-  if(gState==='over')return;
-  gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
-  if(MP.roomRef){MP.roomRef.child('states').off();}
-  if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
-  document.getElementById('gc').classList.add('off');
-  document.getElementById('minimap').style.display='none';
-  document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
-  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
-  ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
-  document.getElementById('kills-left').style.display='none';
-  updateStats();checkAchievements();sfxVictory();
-  if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
-  const result=!MP.mpLocalDead?'win':'lose';
-  mpShowMatchEnd(result);
-}
 
 /* ═══ ENHANCED DRAW ═══ */
 function draw(){
@@ -2435,6 +2418,7 @@ const MP={
   mpPosSyncTimer:0,
   mpLocalDead:false,
   mpRevivedThisDeath:false,
+  _remoteGoneTimer:null,
   mpAliveCount:0,
   mpAllDeadTriggered:false,
   mpDeathScreenShown:false,
@@ -2567,6 +2551,7 @@ function mpListenRoom(){
         });
       }
     }
+    if(room.matchOver&&gState==='play'){mpShowMatchEnd(room.matchOver.result||mpDetermineResult());return;}
     if(room.status==='playing'){mpStartGame();}
     if(room.status==='ended'){if(gState==='play'){mpResetToLobby();}else if(!MP.mpAllDeadTriggered){showScr('s-mp-room');mpRenderPlayers();}}
     if(room.wave&&room.wave!==wave&&gState==='play'){
@@ -2658,6 +2643,10 @@ function mpStartGame(){
   if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');
   gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   mpListenStates();
+  if(MP.roomRef&&MP.playerId){
+    MP.roomRef.child('matchOver').remove();
+    MP.roomRef.child('states/'+MP.playerId).onDisconnect().remove();
+  }
 }
 function mpLeaveRoom(){
   resetJoystick();
@@ -2703,14 +2692,16 @@ function mpSyncState(dt){
   MP.mpPosSyncTimer=(MP.mpPosSyncTimer||0)+dt;
   const lastX=MP._lastSyncX||0,lastY=MP._lastSyncY||0;
   const aliveNow=!MP.mpLocalDead;
-  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives;
+  const firingNow=(shooting&&aliveNow)?1:0;
+  const changed=Math.hypot(P.x-lastX,P.y-lastY)>=6||score!==MP._lastSyncScore||wave!==MP._lastSyncWave||aliveNow!==MP._lastSyncAlive||lives!==MP._lastSyncLives||firingNow!==MP._lastSyncFiring;
   const sendInterval=changed?0.2:1;
   if(MP.mpPosSyncTimer<sendInterval)return;
   MP.mpPosSyncTimer=0;
-  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;
+  MP._lastSyncX=P.x;MP._lastSyncY=P.y;MP._lastSyncScore=score;MP._lastSyncWave=wave;MP._lastSyncAlive=aliveNow;MP._lastSyncLives=lives;MP._lastSyncFiring=firingNow;
   MP.roomRef.child('states/'+MP.playerId).set({
     x:P.x,y:P.y,
     alive:aliveNow,
+    firing:firingNow,
     lives:lives,
     score:score,
     wave:wave,
@@ -2729,6 +2720,7 @@ function mpListenStates(){
     s._seen=Date.now();
     if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
     MP.remotePlayers[pid]=s;
+    if(MP._remoteGoneTimer){clearTimeout(MP._remoteGoneTimer);MP._remoteGoneTimer=null;}
     mpCheckAllDead();
   });
   statesRef.on('child_changed',snap=>{
@@ -2738,19 +2730,23 @@ function mpListenStates(){
     s._seen=Date.now();
     if(!s._rx)s._rx=s.x;if(!s._ry)s._ry=s.y;
     MP.remotePlayers[pid]=s;
+    if(MP._remoteGoneTimer){clearTimeout(MP._remoteGoneTimer);MP._remoteGoneTimer=null;}
     mpCheckAllDead();
   });
   statesRef.on('child_removed',snap=>{
     const pid=snap.key;if(pid===MP.playerId)return;
     delete MP.remotePlayers[pid];
+    if(gState==='play'&&!MP.mpAllDeadTriggered&&!MP._remoteGoneTimer&&!MP.mpLocalDead){
+      MP._remoteGoneTimer=setTimeout(()=>{
+        MP._remoteGoneTimer=null;
+        if(gState==='play'&&!MP.mpAllDeadTriggered){
+          mpShowMatchEnd('win');
+        }
+      },4000);
+    }
   });
   MP.mpStateInterval=setInterval(()=>{
     if(gState!=='play'||MP.mpAllDeadTriggered)return;
-    const now=Date.now();
-    Object.keys(MP.remotePlayers).forEach(pid=>{
-      const s=MP.remotePlayers[pid];
-      if(s&&now-(s._seen||0)>4000){delete MP.remotePlayers[pid];}
-    });
     mpCheckAllDead();
   },1000);
 }
@@ -2773,6 +2769,7 @@ function mpResetToLobby(){
     MP.roomRef.child('status').set('waiting');
     MP.roomRef.child('wave').set(1);
     MP.roomRef.child('startedAt').remove();
+    MP.roomRef.child('matchOver').remove();
   }
   MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
   showScr('s-mp-room');
@@ -2791,6 +2788,7 @@ function mpShowMatchEnd(result){
   MP.mpMatchResult=result;
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
+  if(MP.host&&MP.roomRef){MP.roomRef.child('matchOver').set({result:result,by:MP.playerId});}
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
   document.getElementById('gc').classList.add('off');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
@@ -2861,6 +2859,13 @@ function drawRemotePlayers(){
     }
     const ang=Math.atan2((enemies[0]?.y||rp._ry+10)-rp._ry,(enemies[0]?.x||rp._rx+10)-rp._rx)+Math.PI/2;
     rc.draw(rp._rx,rp._ry,ang,cx);
+    if(!dead&&rp.firing){
+      const fx=rp._rx+Math.cos(ang-Math.PI/2)*((rc.stats?.power||20)+8);
+      const fy=rp._ry+Math.sin(ang-Math.PI/2)*((rc.stats?.power||20)+8);
+      cx.save();cx.globalAlpha=0.85;cx.shadowColor='#FFD54F';cx.shadowBlur=12;
+      cx.fillStyle='rgba(255,213,79,0.9)';
+      cx.beginPath();cx.arc(fx,fy,4+Math.random()*2,0,Math.PI*2);cx.fill();cx.restore();
+    }
     cx.globalAlpha=1;cx.shadowBlur=0;
     cx.fillStyle='rgba(0,0,0,0.85)';cx.font="bold 11px 'Cinzel',serif";cx.textAlign='center';
     cx.fillText((dead?'💀 ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-24);
