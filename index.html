@@ -456,6 +456,41 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   50% { opacity: 1; }
   100% { opacity: 0.6; }
 }
+/* ===== Redesigned Welcome / Start Menu ===== */
+.intro-stage{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:1.1rem;padding:1rem;text-align:center;}
+.intro-crest{filter:drop-shadow(0 0 24px rgba(212,175,55,.45));animation:crestFloat 4s ease-in-out infinite;}
+@keyframes crestFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.crest-draw path{stroke-dasharray:1400;stroke-dashoffset:1400;animation:crestDraw 2.6s ease forwards;}
+@keyframes crestDraw{to{stroke-dashoffset:0;}}
+.intro-title{font-family:'Cinzel Decorative',serif;font-weight:700;font-size:clamp(2.4rem,11vw,4.6rem);line-height:.9;letter-spacing:2px;margin:0;background:linear-gradient(180deg,#EDE4C8,#D4AF37 55%,#B89840);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 18px rgba(212,175,55,.4));}
+.intro-tagline{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-style:italic;font-size:clamp(.66rem,2.2vw,.95rem);letter-spacing:clamp(2px,1vw,5px);color:var(--ash);max-width:90vw;}
+.intro-prompt{font-family:'Barlow Condensed',sans-serif;font-size:clamp(.8rem,2.6vw,1.05rem);letter-spacing:4px;color:var(--gold-lit);text-transform:uppercase;animation:promptPulse 1.8s ease-in-out infinite;}
+@keyframes promptPulse{0%,100%{opacity:.55}50%{opacity:1}}
+#start-canvas{position:absolute;inset:0;pointer-events:none;z-index:0;}
+#start-particles{position:absolute;inset:0;pointer-events:none;z-index:1;}
+.start-crest{margin-bottom:.4rem;filter:drop-shadow(0 0 18px rgba(212,175,55,.35));animation:crestFloat 5s ease-in-out infinite;}
+.start-wordmark{font-family:'Cinzel Decorative',serif;font-weight:700;font-size:clamp(2.2rem,10vw,4rem);line-height:.92;letter-spacing:2px;text-align:center;color:var(--gold-lit);text-shadow:0 4px 30px rgba(212,175,55,.3);}
+.start-wordmark span{display:block;color:var(--red-hot);text-shadow:0 4px 30px rgba(217,0,31,.4);}
+.start-tagline{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-size:clamp(.62rem,2vw,.85rem);letter-spacing:clamp(2px,1vw,4px);color:var(--ash);margin:.5rem 0 1.4rem;text-align:center;padding:0 .5rem;}
+.name-field{display:flex;flex-direction:column;align-items:center;gap:.35rem;margin-bottom:1.4rem;}
+.name-input{width:min(280px,80vw);}
+.cta-row{display:flex;flex-direction:column;gap:.9rem;align-items:center;width:min(360px,90vw);}
+.btn-arena,.btn-companion{position:relative;overflow:hidden;width:100%;padding:clamp(.85rem,3vw,1.15rem) 1.4rem;cursor:pointer;border:1px solid rgba(184,152,64,.4);font-family:'Cinzel',serif;letter-spacing:clamp(2px,1vw,4px);text-transform:uppercase;transition:transform .18s,box-shadow .25s,border-color .25s;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-tap-highlight-color:transparent;}
+.btn-arena{background:linear-gradient(135deg,var(--crimson) 0%,var(--red) 50%,#7A0010 100%);color:var(--gold-pale);box-shadow:0 10px 40px rgba(140,0,26,.35);}
+.btn-companion{background:linear-gradient(160deg,rgba(20,16,12,.95),rgba(6,4,2,.98));color:var(--gold-lit);}
+.btn-arena .btn-main,.btn-companion .btn-main{font-size:clamp(.95rem,3.4vw,1.2rem);font-weight:700;}
+.btn-arena .btn-sub,.btn-companion .btn-sub{font-family:'Barlow Condensed',sans-serif;font-size:clamp(.55rem,1.8vw,.68rem);letter-spacing:2px;opacity:.8;}
+.btn-shine{position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-20deg);animation:btnShine 4s ease-in-out infinite;}
+@keyframes btnShine{0%,100%{left:-120%}55%,70%{left:130%}}
+.btn-arena:active,.btn-companion:active{transform:scale(.97);}
+.btn-arena:hover{box-shadow:0 14px 54px rgba(140,0,26,.5);border-color:var(--gold-lit);}
+.btn-companion:hover{border-color:var(--gold-lit);box-shadow:0 8px 30px rgba(184,152,64,.25);}
+.club-row{display:flex;gap:.7rem;margin-top:1.6rem;}
+.club-btn{width:46px;height:46px;border-radius:50%;border:1px solid rgba(184,152,64,.25);background:rgba(184,152,64,.06);color:var(--gold-dim);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.club-btn:hover{color:var(--gold-lit);border-color:var(--gold);box-shadow:0 0 16px rgba(184,152,64,.3);transform:translateY(-2px);}
+.version-stamp{margin-top:1.6rem;font-family:'Cinzel',serif;font-size:clamp(.5rem,1.6vw,.62rem);letter-spacing:3px;color:var(--ash2);opacity:.6;text-transform:uppercase;}
+@media (max-width:480px){.club-btn{width:42px;height:42px;font-size:1.05rem;}.cta-row{gap:.7rem;}}
+@media (prefers-reduced-motion: reduce){.intro-crest,.start-crest,.btn-shine,.intro-prompt{animation:none!important;}.crest-draw path{stroke-dashoffset:0;}}
 </style>
 </head>
 <body>
@@ -548,27 +583,24 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 
 <!-- CINEMATIC INTRO OVERLAY -->
 <div id="cinematic-intro" class="cinematic-intro active">
-  <div class="intro-black"></div>
-  <div class="intro-content">
-    <div class="intro-logo">
-      <svg viewBox="0 0 120 120" width="120" height="120">
-        <defs>
-          <radialGradient id="intro-cg" cx="50%" cy="40%" r="50%">
-            <stop offset="0%" stop-color="#E2C06A"/>
-            <stop offset="100%" stop-color="#8A6F2A"/>
-          </radialGradient>
-        </defs>
-        <path d="M60 10 L76 36 L104 28 L88 52 L110 68 L84 70 L80 100 L60 84 L40 100 L36 70 L20 68 L16 52 L32 52 L44 36 Z" fill="url(#intro-cg)" opacity=".9"/>
-        <circle cx="60" cy="56" r="14" fill="rgba(139,0,21,0.85)"/>
-        <path d="M60 44 L64 54 L76 54 L66 62 L70 74 L60 66 L50 74 L54 62 L44 54 L56 54 Z" fill="#E2C06A" opacity=".9"/>
-      </svg>
-    </div>
-    <div class="intro-title" data-text="TITANS STRIKE"></div>
-    <div class="intro-subtitle" data-text="FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS"></div>
-    <div class="intro-progress">
-      <div class="intro-progress-fill"></div>
-    </div>
-    <div class="intro-prompt">TOUCH OR PRESS ANY KEY TO BEGIN</div>
+  <div class="intro-stage">
+    <svg class="intro-crest" viewBox="0 0 200 200" width="170" height="170" aria-hidden="true">
+      <defs>
+        <linearGradient id="introCrestGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#EDE4C8"/>
+          <stop offset="45%" stop-color="#D4AF37"/>
+          <stop offset="100%" stop-color="#B89840"/>
+        </linearGradient>
+      </defs>
+      <g class="crest-draw" fill="none" stroke="url(#introCrestGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M100 16 L162 40 V104 C162 146 130 172 100 188 C70 172 38 146 38 104 V40 Z"/>
+        <path d="M100 54 L113 88 L150 88 L120 110 L132 146 L100 124 L68 146 L80 110 L50 88 L87 88 Z"/>
+        <path d="M60 72 H140" stroke-width="2" opacity=".65"/>
+      </g>
+    </svg>
+    <h1 class="intro-title">TITANS STRIKE</h1>
+    <p class="intro-tagline">FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS</p>
+    <div class="intro-prompt">TAP OR PRESS ANY KEY TO BEGIN</div>
   </div>
 </div>
 
@@ -578,239 +610,52 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div id="vignette" class="active"></div>
   <div id="start-particles"></div>
   <div class="start-inner">
-    <div class="start-background-layers">
-      <div class="bg-layer bg-layer-1"></div>
-      <div class="bg-layer bg-layer-2"></div>
-      <div class="bg-layer bg-layer-3"></div>
+    <div class="start-crest" aria-hidden="true">
+      <svg viewBox="0 0 200 200" width="104" height="104">
+        <defs>
+          <linearGradient id="startCrestGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#EDE4C8"/>
+            <stop offset="45%" stop-color="#D4AF37"/>
+            <stop offset="100%" stop-color="#B89840"/>
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke="url(#startCrestGrad)" stroke-width="4" stroke-linejoin="round" opacity=".9">
+          <path d="M100 24 L150 44 V100 C150 134 126 156 100 170 C74 156 50 134 50 100 V44 Z"/>
+          <path d="M100 58 L110 86 L142 86 L116 104 L126 138 L100 120 L74 138 L84 104 L58 86 L90 86 Z"/>
+        </g>
+      </svg>
     </div>
-    
-    <div class="start-content-wrapper">
-      <!-- Cinematic Title Sequence -->
-      <div class="title-sequence" id="title-sequence">
-        <div class="title-line title-line-1" data-text="TITANS"></div>
-        <div class="title-line title-line-2" data-text="STRIKE"></div>
-        <div class="title-underline">
-          <div class="title-underline-fill"></div>
-        </div>
-        <div class="title-tagline" data-text="Forged in Glory · Bound by Discipline · United as Titans"></div>
-      </div>
+    <div class="start-wordmark">TITANS <span>STRIKE</span></div>
+    <div class="start-tagline">FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS</div>
 
-      <!-- Player Name -->
-      <div class="player-name-wrap" style="margin:1.2rem 0 .4rem;display:flex;flex-direction:column;align-items:center;width:100%;">
-        <div class="input-label">WARRIOR NAME</div>
-        <input id="pname" class="name-input" type="text" placeholder="ENTER YOUR NAME" maxlength="14" autocomplete="off" style="text-transform:uppercase;">
-      </div>
-      <!-- Main Menu Buttons -->
-      <div class="main-menu-buttons" id="main-menu-buttons" style="opacity:0;transform:translateY(30px);">
-        <div class="menu-section">
-          <div class="section-title">SINGLE PLAYER</div>
-          <button class="btn-menu-primary" id="btn-start">
-            <span class="btn-icon">⚔</span>
-            <span class="btn-text">
-              <span class="btn-main">ENTER THE BATTLE</span>
-              <span class="btn-sub">Single Player Campaign</span>
-            </span>
-            <span class="btn-glow"></span>
-          </button>
-        </div>
-
-        <div class="menu-section">
-          <div class="section-title">MULTIPLAYER</div>
-          <div class="button-row">
-            <button class="btn-menu-secondary" id="btn-mp-lobby">
-              <span class="btn-icon">♛</span>
-              <span class="btn-text">
-                <span class="btn-main">HOST LOBBY</span>
-                <span class="btn-sub">Create a co-op session</span>
-              </span>
-            </button>
-            <button class="btn-menu-secondary" id="btn-mp-join">
-              <span class="btn-icon">🔗</span>
-              <span class="btn-text">
-                <span class="btn-main">JOIN LOBBY</span>
-                <span class="btn-sub">Enter room code</span>
-              </span>
-            </button>
-          </div>
-        </div>
-
-        <div class="menu-section">
-          <div class="section-title">COMMUNITY</div>
-          <div class="button-row">
-            <button class="btn-menu-ghost" id="btn-lobby">
-              <span class="btn-icon">♛</span>
-              <span class="btn-text">LEADERBOARD</span>
-            </button>
-            <button class="btn-menu-ghost" id="btn-start-stats">
-              <span class="btn-icon">📊</span>
-              <span class="btn-text">STATISTICS</span>
-            </button>
-          </div>
-          <div class="button-row">
-            <button class="btn-menu-ghost" id="btn-start-upgrades">
-              <span class="btn-icon">⬆</span>
-              <span class="btn-text">UPGRADES</span>
-            </button>
-            <button class="btn-menu-ghost" id="btn-start-achievements">
-              <span class="btn-icon">🏆</span>
-              <span class="btn-text">ACHIEVEMENTS</span>
-            </button>
-            <button class="btn-menu-ghost" id="btn-start-settings">
-              <span class="btn-icon">⚙</span>
-              <span class="btn-text">SETTINGS</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="menu-footer">
-          <div class="version-stamp">MMXXVI · TITANS CLUB · GALALA UNIVERSITY</div>
-          <div class="social-links">
-            <span class="footer-badge gold">✦ TITANS CLUB LEGEND</span>
-            <span class="footer-badge red">♛ ELITE WARRIOR</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Character Preview Carousel -->
-      <div class="character-preview" id="character-preview">
-        <div class="preview-label">CHOOSE YOUR CHAMPION</div>
-        <div class="preview-track" id="preview-track"></div>
-        <div class="preview-nav">
-          <button class="preview-btn" id="preview-prev" aria-label="Previous champion">‹</button>
-          <div class="preview-dots" id="preview-dots"></div>
-          <button class="preview-btn" id="preview-next" aria-label="Next champion">›</button>
-        </div>
-        <div class="preview-info" id="preview-info">
-          <div class="preview-name" id="preview-name">LEGIONARY</div>
-          <div class="preview-role" id="preview-role">Vanguard</div>
-          <div class="preview-stats" id="preview-stats">
-            <div class="stat"><span class="stat-val" id="stat-speed">60</span><span class="stat-label">SPEED</span></div>
-            <div class="stat"><span class="stat-val" id="stat-fire">70</span><span class="stat-label">FIRE</span></div>
-            <div class="stat"><span class="stat-val" id="stat-power">80</span><span class="stat-label">POWER</span></div>
-          </div>
-        </div>
-      </div>
+    <div class="name-field">
+      <label class="input-label" for="pname">WARRIOR NAME</label>
+      <input id="pname" class="name-input" type="text" placeholder="ENTER YOUR NAME" maxlength="14" autocomplete="off" style="text-transform:uppercase;">
     </div>
-  </div>
-</div>
 
-
-<!-- DIFFICULTY SELECT -->
-<div class="scr off" id="s-diff">
-  <div class="diff-inner">
-    <div class="screen-eyebrow" style="margin-bottom:.3rem;">Select Your Trial</div>
-    <div class="diff-title">DIFFICULTY</div>
-    <div class="diff-sub">Choose how hard the Legion pushes back</div>
-    <div class="diff-cards">
-      <div class="diff-card selected" id="dc-easy" data-diff="easy">
-        <div class="diff-icon">🛡️</div>
-        <div class="diff-info"><div class="diff-name">RECRUIT</div><div class="diff-desc">Slower enemies · More ammo drops · Forgiving</div></div>
-        <div class="diff-badge easy">EASY</div>
-      </div>
-      <div class="diff-card" id="dc-normal" data-diff="normal">
-        <div class="diff-icon">⚔️</div>
-        <div class="diff-info"><div class="diff-name">LEGIONARY</div><div class="diff-desc">Balanced challenge · Standard ammo flow</div></div>
-        <div class="diff-badge normal">NORMAL</div>
-      </div>
-      <div class="diff-card" id="dc-hard" data-diff="hard">
-        <div class="diff-icon">💀</div>
-        <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies · Scarce ammo · No mercy</div></div>
-        <div class="diff-badge hard">HARD</div>
-      </div>
+    <div class="cta-row">
+      <button class="btn-arena" id="btn-start">
+        <span class="btn-shine"></span>
+        <span class="btn-main">ENTER THE ARENA</span>
+        <span class="btn-sub">SINGLE PLAYER CAMPAIGN</span>
+      </button>
+      <button class="btn-companion" id="btn-mp-lobby">
+        <span class="btn-main">MULTIPLAYER</span>
+        <span class="btn-sub">2-4 PLAYERS · REAL-TIME</span>
+      </button>
     </div>
-    <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR →</button>
-    <button class="btn-ghost" id="btn-diff-back">← RETURN</button>
-  </div>
-</div>
 
-<!-- PAUSE OVERLAY -->
-<div id="pause-overlay">
-  <div class="pause-title">PAUSED</div>
-  <button class="pause-btn primary" id="btn-resume">RESUME</button>
-  <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
-  <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
-  <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
-  <button class="pause-btn" id="btn-pause-achievements">🏆 ACHIEVEMENTS</button>
-  <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
-</div>
-
-<!-- QUIT CONFIRMATION -->
-<div id="quit-confirm">
-  <div class="quit-title">LEAVE BATTLE?</div>
-  <div class="quit-msg">Your progress will be lost and you will return to the main gate.</div>
-  <div class="quit-btns">
-    <button class="quit-no" id="btn-quit-no">STAY</button>
-    <button class="quit-yes" id="btn-quit-yes">LEAVE</button>
-  </div>
-</div>
-
-<!-- SETTINGS SCREEN -->
-<div class="scr off overlay" id="s-settings">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">SETTINGS</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:.8rem;width:min(340px,92vw);margin:.5rem 0;">
-    <div style="display:flex;flex-direction:column;gap:.3rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">MUSIC VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="music-vol-lbl">80%</span></div>
-      <input type="range" id="music-vol" min="0" max="100" value="80" style="width:100%;accent-color:var(--gold);">
+    <div class="club-row">
+      <button class="club-btn" id="btn-start-settings" title="Settings"><span>&#9881;</span></button>
+      <button class="club-btn" id="btn-start-stats" title="Statistics"><span>&#9620;</span></button>
+      <button class="club-btn" id="btn-start-upgrades" title="Upgrades"><span>&#10548;</span></button>
+      <button class="club-btn" id="btn-start-achievements" title="Achievements"><span>&#9733;</span></button>
+      <button class="club-btn" id="btn-lobby" title="Leaderboard"><span>&#9776;</span></button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:.3rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">SFX VOLUME</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="sfx-vol-lbl">100%</span></div>
-      <input type="range" id="sfx-vol" min="0" max="100" value="100" style="width:100%;accent-color:var(--gold);">
-    </div>
-    <div style="display:flex;flex-direction:column;gap:.3rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">PARTICLE DENSITY</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="particle-lbl">HIGH</span></div>
-      <input type="range" id="particle-density" min="1" max="3" value="3" style="width:100%;accent-color:var(--gold);">
-    </div>
-    <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
+
+    <div class="version-stamp">TITANS STRIKE · ARENA EDITION</div>
   </div>
 </div>
-
-<!-- STATISTICS SCREEN -->
-<div class="scr off overlay" id="s-stats">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">WARRIOR STATISTICS</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div class="stat-grid" id="stats-grid">
-    <div class="stat-card"><span class="sv" id="st-total-kills">0</span><span class="sl">Total Kills</span></div>
-    <div class="stat-card"><span class="sv" id="st-games">0</span><span class="sl">Games Played</span></div>
-    <div class="stat-card"><span class="sv" id="st-best-score">0</span><span class="sl">Best Score</span></div>
-    <div class="stat-card"><span class="sv" id="st-best-wave">I</span><span class="sl">Best Wave</span></div>
-    <div class="stat-card"><span class="sv" id="st-best-combo">0</span><span class="sl">Best Combo</span></div>
-    <div class="stat-card"><span class="sv" id="st-accuracy">0%</span><span class="sl">Accuracy</span></div>
-    <div class="stat-card"><span class="sv" id="st-headshots">0</span><span class="sl">Titan Club Kills</span></div>
-    <div class="stat-card"><span class="sv" id="st-time">0h</span><span class="sl">Play Time</span></div>
-  </div>
-  <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">← RETURN</button>
-</div>
-
-<!-- UPGRADES SCREEN -->
-<div class="scr off overlay" id="s-upgrades">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB · ARMORY</div>
-    <div class="screen-title">PERMANENT UPGRADES</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div style="font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);margin:.3rem 0;">♛ TITANS CLUB CREDITS: <span id="credits-count" style="color:var(--red-hot);">0</span></div>
-  <div id="upgrades-list" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;max-height:50vh;overflow-y:auto;width:min(360px,95vw);"></div>
-  <button class="btn-ghost" id="btn-upgrades-back" style="margin-top:.5rem;">← RETURN</button>
-</div>
-
-<!-- ACHIEVEMENTS SCREEN -->
-<div class="scr off overlay" id="s-achievements">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">HALL OF FAME</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div id="achievements-list" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;max-height:55vh;overflow-y:auto;width:min(380px,95vw);"></div>
-  <button class="btn-ghost" id="btn-achievements-back" style="margin-top:.5rem;">← RETURN</button>
-</div>
-
 <!-- CHARACTER SELECT -->
 <div class="scr off" id="s-chars">
   <div class="screen-header">
