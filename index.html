@@ -1254,7 +1254,7 @@ function startTimer(){
     if(gState!=='play')return;timeLeft--;updateHUD();updateOpponentLivesHUD();
     const t=document.getElementById('htimer');
     if(timeLeft<=30)t.classList.add('warn');else t.classList.remove('warn');
-    if(timeLeft<=0){if(MP.roomCode&&MP.playerId){mpShowMatchEnd(mpDetermineResult());}else{endGame();}return;}
+    if(timeLeft<=0){if(MP.roomCode&&MP.playerId){if(!MP.mpLocalDead)mpShowMatchEnd(mpDetermineResult());}else{endGame();}return;}
     const [mn,mx]=diffCfg.ammoPackInterval;
     if(timeLeft<=nextAmmoPackTime&&nextAmmoPackTime>0){spawnAmmoPack();nextAmmoPackTime-=(mn+Math.random()*(mx-mn));}
   },1000);
@@ -1694,6 +1694,8 @@ document.getElementById('btn-mp-rematch').addEventListener('click',()=>{
     MP.roomRef.child('status').set('waiting');
     MP.roomRef.child('wave').set(1);
     MP.roomRef.child('startedAt').remove();
+    MP.roomRef.child('matchOver').remove();
+    MP.roomRef.child('mpEndSignal').remove();
     Object.keys(MP.players).forEach(pid=>{
       MP.roomRef.child('players/'+pid).update({ready:false,score:0});
     });
@@ -2347,6 +2349,7 @@ function mpDetermineResult(){
   const myAlive=!MP.mpLocalDead;
   const remote=Object.values(MP.remotePlayers)[0];
   const remoteAlive=remote&&remote.alive!==false;
+  if(!myAlive&&!remoteAlive)return 'draw';
   if(myAlive&&!remoteAlive)return 'win';
   if(!myAlive&&remoteAlive)return 'lose';
   const remoteScore=remote?remote.score||0:0;
@@ -2552,6 +2555,7 @@ function mpListenRoom(){
       }
     }
     if(room.matchOver&&gState==='play'){mpShowMatchEnd(room.matchOver.result||mpDetermineResult());return;}
+    if(room.mpEndSignal&&gState==='play'&&MP.host){mpShowMatchEnd(room.mpEndSignal.result||mpDetermineResult());return;}
     if(room.status==='playing'){mpStartGame();}
     if(room.status==='ended'){if(gState==='play'){mpResetToLobby();}else if(!MP.mpAllDeadTriggered){showScr('s-mp-room');mpRenderPlayers();}}
     if(room.wave&&room.wave!==wave&&gState==='play'){
@@ -2645,6 +2649,7 @@ function mpStartGame(){
   mpListenStates();
   if(MP.roomRef&&MP.playerId){
     MP.roomRef.child('matchOver').remove();
+    MP.roomRef.child('mpEndSignal').remove();
     MP.roomRef.child('states/'+MP.playerId).onDisconnect().remove();
   }
 }
@@ -2770,6 +2775,7 @@ function mpResetToLobby(){
     MP.roomRef.child('wave').set(1);
     MP.roomRef.child('startedAt').remove();
     MP.roomRef.child('matchOver').remove();
+    MP.roomRef.child('mpEndSignal').remove();
   }
   MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
   showScr('s-mp-room');
@@ -2789,6 +2795,7 @@ function mpShowMatchEnd(result){
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   if(MP.roomRef){MP.roomRef.child('states').off();}
   if(MP.host&&MP.roomRef){MP.roomRef.child('matchOver').set({result:result,by:MP.playerId});}
+  else if(MP.roomRef){MP.roomRef.child('mpEndSignal').set({result:result,by:MP.playerId});}
   if(MP.mpStateInterval){clearInterval(MP.mpStateInterval);MP.mpStateInterval=null;}
   document.getElementById('gc').classList.add('off');
   document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
