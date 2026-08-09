@@ -1450,7 +1450,7 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;MP._downedKillBaseline=null;MP.mpReviveHold=0;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';}var si=document.getElementById('spectator-indicator');si.querySelector('.spc-text').textContent='DOWNED — ALLY CAN REVIVE';si.style.display='block';}else{endGame();}}
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';}var si=document.getElementById('spectator-indicator');si.querySelector('.spc-text').textContent='DOWNED — ALLY CAN REVIVE';si.style.display='block';}else{endGame();}}
 }
 
 function showWaveAnnounce(n){
@@ -2302,11 +2302,13 @@ function update(dt){
   bullets=bullets.filter(b=>{
     b.x+=b.vx*dt;b.y+=b.vy*dt;
     if(b.x<-20||b.x>cv.width+20||b.y<-20||b.y>cv.height+20)return false;
+    const toKill=[];
     for(let i=enemies.length-1;i>=0;i--){
       const e=enemies[i];if(deadEnemies.includes(e))continue;
-      if(b.pierce){if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){e.hp-=b.dmg;spawnParts(b.x,b.y,e.col,3);if(!b.hit){stats.accuracy.hits++;b.hit=true;}if(e.hp<=0){killEnemy(e,i);}continue;}}
+      if(b.pierce){if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){e.hp-=b.dmg;spawnParts(b.x,b.y,e.col,3);if(!b.hit){stats.accuracy.hits++;b.hit=true;}if(e.hp<=0){toKill.push({enemy:e,idx:i});}continue;}}
       else{if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){checkBulletCollision(b,e,i);return false;}}
     }
+    for(const k of toKill)killEnemy(k.enemy,k.idx);
     return true;
   });
   deadEnemies.forEach(e=>{const idx=enemies.indexOf(e);if(idx>=0)killEnemy(e,idx);});
@@ -2744,6 +2746,7 @@ function mpCheckAllDead(){
 }
 function mpReviveLocal(msg){
   MP.mpLocalDead=false;MP.mpRevivedThisDeath=false;MP.mpDeathScreenShown=false;
+  MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;
   lives=Math.max(1,Math.ceil(diffCfg.lives*0.5));refreshDots();
   P.invinc=3;resetJoystick();
   const si=document.getElementById('spectator-indicator');if(si)si.style.display='none';
@@ -2761,6 +2764,7 @@ function mpSendPing(type){
 function mpNotifyTitanKill(){
   if(!MP.roomRef||!MP.playerId)return;
   MP._lastTitanKillSent=Date.now();
+  // Use update to avoid overwriting other state fields
   MP.roomRef.child('states/'+MP.playerId).update({titanKill:MP._lastTitanKillSent,ts:Date.now()});
 }
 function mpUpdateRevive(dt){
@@ -2773,7 +2777,7 @@ function mpUpdateRevive(dt){
     const rf=document.querySelector('#spectator-indicator .spc-revive');
     const rp=document.querySelector('#spectator-indicator .spc-revive-fill');
     if(remote&&remote.reviving){
-      MP.mpReviveHold=(MP.mpReviveHold||0)+dt;
+      MP.mpReviveHold=Math.min(REVIVE_TIME, (MP.mpReviveHold||0)+dt);
       if(rf)rf.style.display='block';
       if(rp)rp.style.width=Math.min(100,(MP.mpReviveHold/REVIVE_TIME)*100)+'%';
       if(MP.mpReviveHold>=REVIVE_TIME){mpReviveLocal('REVIVED BY ALLY');return;}
@@ -2789,10 +2793,17 @@ function mpUpdateRevive(dt){
     if(remote&&remote.alive===false){
       const rx=(remote._rx!==undefined?remote._rx:remote.x),ry=(remote._ry!==undefined?remote._ry:remote.y);
       const d=Math.hypot(P.x-rx,P.y-ry);
+      const wasReviving=MP._revivingAlly;
       MP._revivingAlly=d<REVIVE_RADIUS;
-      MP.mpReviveHold=(MP.mpReviveHold||0)+(MP._revivingAlly?dt:0);
-      if(MP.mpReviveHold>=REVIVE_TIME){MP._revivingAlly=true;MP.mpReviveHold=REVIVE_TIME;}
-    }else{MP._revivingAlly=false;MP.mpReviveHold=0;}
+      if(MP._revivingAlly){
+        MP.mpReviveHold=Math.min(REVIVE_TIME, (MP.mpReviveHold||0)+dt);
+        if(MP.mpReviveHold>=REVIVE_TIME){mpReviveLocal('REVIVED BY ALLY');}
+      }else{
+        MP.mpReviveHold=0;
+      }
+    }else{
+      MP._revivingAlly=false;MP.mpReviveHold=0;
+    }
   }
 }
 function mpSpawnAllyBullets(dt){
@@ -2962,8 +2973,13 @@ function drawRemotePlayers(){
   Object.values(MP.remotePlayers).forEach(rp=>{
     if(rp.titanKill&&rp.titanKill!==MP._lastTitanKillSeen){
       MP._lastTitanKillSeen=rp.titanKill;
-      const t=enemies.find(x=>x.isTitan);
-      if(t){enemies.splice(enemies.indexOf(t),1);spawnParts(t.x,t.y,'#C77DFF',16);addKillFeed('☄ SHARED TITAN SLAIN','#C77DFF');}
+      // Handle all titans to support multiple
+      const titans=enemies.filter(x=>x.isTitan);
+      for(const t of titans){
+        enemies.splice(enemies.indexOf(t),1);
+        spawnParts(t.x,t.y,'#C77DFF',16);
+        addKillFeed('☄ SHARED TITAN SLAIN','#C77DFF');
+      }
     }
     const rc=CHARS[rp.char]||CHARS[0];
     const dead=rp.alive===false;
