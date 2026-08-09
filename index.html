@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#04040A">
-<title>TITANS STRIKE · GALALA</title>
+<title>TITANS STRIKE Â· GALALA</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
@@ -348,7 +348,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   .btn-enter,.btn-ghost{min-height:46px;font-size:.68rem;}
 }
 
-/* ═══ MULTIPLAYER UI ═══ */
+/* â•â•â• MULTIPLAYER UI â•â•â• */
 .mp-inner,.mp-room-inner{display:flex;flex-direction:column;align-items:center;padding:clamp(1rem,4vw,2rem) clamp(.8rem,3vw,1.2rem);min-height:100vh;justify-content:center;gap:.6rem;}
 .mp-sub{font-family:'Barlow Condensed',sans-serif;font-weight:300;font-style:italic;font-size:clamp(.6rem,1.8vw,.78rem);letter-spacing:clamp(2px,1vw,4px);color:var(--ash);text-align:center;}
 .mp-or{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:3px;color:var(--ash);margin:.2rem 0;}
@@ -389,11 +389,12 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   position: fixed;
   inset: 0;
   z-index: 999;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,0.7);
 }
+.cinematic-intro.active{display:flex;}
 .intro-black {
   position: absolute;
   inset: 0;
@@ -489,7 +490,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div class="hud-block" id="weapon-hud">
     <span class="hud-lbl">Weapon</span>
     <span class="hud-val" id="weapon-name">PISTOL</span>
-    <span id="weapon-icon" style="font-size:.7rem;">🔫</span>
+    <span id="weapon-icon" style="font-size:.7rem;">ðŸ”«</span>
   </div>
   <div class="hud-block" id="power-hud">
     <span class="hud-lbl">Power</span>
@@ -518,24 +519,24 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
   <div class="hud-block" id="club-hud" style="display:none;">
     <span class="hud-lbl">Club</span>
-    <span class="hud-val" style="font-size:.55rem;color:var(--gold-dim);letter-spacing:2px;">♛ TITANS</span>
+    <span class="hud-val" style="font-size:.55rem;color:var(--gold-dim);letter-spacing:2px;">â™› TITANS</span>
   </div>
 </div>
 <div id="combo"></div>
 <div id="wave-announce"></div>
 <div id="power-announce"></div>
-<div id="low-ammo-warn">⚠ LOW AMMO</div>
+<div id="low-ammo-warn">âš  LOW AMMO</div>
 <div id="enemy-warn"></div>
-<div id="kills-left" style="position:fixed;top:58px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:4px;color:var(--ash);z-index:90;pointer-events:none;white-space:nowrap;text-transform:uppercase;display:none;">▸ <span id="kills-left-num">0</span> ENEMIES REMAIN</div>
-<div id="gate-prompt" style="position:fixed;bottom:170px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:5px;color:#E2C06A;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 14px rgba(200,168,75,0.8);">⬡ WALK INTO THE GATE TO ADVANCE ⬡</div>
+<div id="kills-left" style="position:fixed;top:58px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:4px;color:var(--ash);z-index:90;pointer-events:none;white-space:nowrap;text-transform:uppercase;display:none;">â–¸ <span id="kills-left-num">0</span> ENEMIES REMAIN</div>
+<div id="gate-prompt" style="position:fixed;bottom:170px;left:50%;transform:translateX(-50%);font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:5px;color:#E2C06A;z-index:90;pointer-events:none;opacity:0;transition:opacity .5s;white-space:nowrap;text-transform:uppercase;text-shadow:0 0 14px rgba(200,168,75,0.8);">â¬¡ WALK INTO THE GATE TO ADVANCE â¬¡</div>
 
 <!-- MOBILE CONTROLS -->
 <div id="mctrl" class="off">
   <div id="joystick-zone"><div id="joystick-knob"></div></div>
   <div class="right-btns">
-    <button id="weapon-btn" style="width:58px;height:28px;border-radius:6px;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;"><span id="weapon-btn-icon">🔫</span> <span id="weapon-btn-name" style="margin-left:3px;">PISTOL</span></button>
-    <button id="power-btn"><span class="power-icon">✦</span><span class="power-lbl">POWER</span></button>
-    <button id="fire-btn"><span class="fire-icon">⚔</span><span class="fire-lbl">FIRE</span></button>
+    <button id="weapon-btn" style="width:58px;height:28px;border-radius:6px;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;"><span id="weapon-btn-icon">ðŸ”«</span> <span id="weapon-btn-name" style="margin-left:3px;">PISTOL</span></button>
+    <button id="power-btn"><span class="power-icon">âœ¦</span><span class="power-lbl">POWER</span></button>
+    <button id="fire-btn"><span class="fire-icon">âš”</span><span class="fire-lbl">FIRE</span></button>
   </div>
   <div id="ping-bar" style="position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;">
     <button class="ping-btn" data-ping="help" style="width:64px;height:26px;border-radius:6px;background:rgba(192,0,26,0.18);border:1px solid rgba(192,0,26,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#FFB3B3;touch-action:none;cursor:pointer;">HELP!</button>
@@ -563,7 +564,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       </svg>
     </div>
     <div class="intro-title" data-text="TITANS STRIKE"></div>
-    <div class="intro-subtitle" data-text="FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS"></div>
+    <div class="intro-subtitle" data-text="FORGED IN GLORY Â· BOUND BY DISCIPLINE Â· UNITED AS TITANS"></div>
     <div class="intro-progress">
       <div class="intro-progress-fill"></div>
     </div>
@@ -591,7 +592,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="title-underline">
           <div class="title-underline-fill"></div>
         </div>
-        <div class="title-tagline" data-text="Forged in Glory · Bound by Discipline · United as Titans"></div>
+        <div class="title-tagline" data-text="Forged in Glory Â· Bound by Discipline Â· United as Titans"></div>
       </div>
 
       <!-- Main Menu Buttons -->
@@ -599,7 +600,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="menu-section">
           <div class="section-title">SINGLE PLAYER</div>
           <button class="btn-menu-primary" id="btn-start">
-            <span class="btn-icon">⚔</span>
+            <span class="btn-icon">âš”</span>
             <span class="btn-text">
               <span class="btn-main">ENTER THE BATTLE</span>
               <span class="btn-sub">Single Player Campaign</span>
@@ -612,14 +613,14 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
           <div class="section-title">MULTIPLAYER</div>
           <div class="button-row">
             <button class="btn-menu-secondary" id="btn-mp-lobby">
-              <span class="btn-icon">♛</span>
+              <span class="btn-icon">â™›</span>
               <span class="btn-text">
                 <span class="btn-main">HOST LOBBY</span>
                 <span class="btn-sub">Create a co-op session</span>
               </span>
             </button>
             <button class="btn-menu-secondary" id="btn-mp-join">
-              <span class="btn-icon">🔗</span>
+              <span class="btn-icon">ðŸ”—</span>
               <span class="btn-text">
                 <span class="btn-main">JOIN LOBBY</span>
                 <span class="btn-sub">Enter room code</span>
@@ -632,35 +633,35 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
           <div class="section-title">COMMUNITY</div>
           <div class="button-row">
             <button class="btn-menu-ghost" id="btn-lobby">
-              <span class="btn-icon">♛</span>
+              <span class="btn-icon">â™›</span>
               <span class="btn-text">LEADERBOARD</span>
             </button>
             <button class="btn-menu-ghost" id="btn-start-stats">
-              <span class="btn-icon">📊</span>
+              <span class="btn-icon">ðŸ“Š</span>
               <span class="btn-text">STATISTICS</span>
             </button>
           </div>
           <div class="button-row">
             <button class="btn-menu-ghost" id="btn-start-upgrades">
-              <span class="btn-icon">⬆</span>
+              <span class="btn-icon">â¬†</span>
               <span class="btn-text">UPGRADES</span>
             </button>
             <button class="btn-menu-ghost" id="btn-start-achievements">
-              <span class="btn-icon">🏆</span>
+              <span class="btn-icon">ðŸ†</span>
               <span class="btn-text">ACHIEVEMENTS</span>
             </button>
             <button class="btn-menu-ghost" id="btn-start-settings">
-              <span class="btn-icon">⚙</span>
+              <span class="btn-icon">âš™</span>
               <span class="btn-text">SETTINGS</span>
             </button>
           </div>
         </div>
 
         <div class="menu-footer">
-          <div class="version-stamp">MMXXVI · TITANS CLUB · GALALA UNIVERSITY</div>
+          <div class="version-stamp">MMXXVI Â· TITANS CLUB Â· GALALA UNIVERSITY</div>
           <div class="social-links">
-            <span class="footer-badge gold">✦ TITANS CLUB LEGEND</span>
-            <span class="footer-badge red">♛ ELITE WARRIOR</span>
+            <span class="footer-badge gold">âœ¦ TITANS CLUB LEGEND</span>
+            <span class="footer-badge red">â™› ELITE WARRIOR</span>
           </div>
         </div>
       </div>
@@ -670,9 +671,9 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
         <div class="preview-label">CHOOSE YOUR CHAMPION</div>
         <div class="preview-track" id="preview-track"></div>
         <div class="preview-nav">
-          <button class="preview-btn" id="preview-prev" aria-label="Previous champion">‹</button>
+          <button class="preview-btn" id="preview-prev" aria-label="Previous champion">â€¹</button>
           <div class="preview-dots" id="preview-dots"></div>
-          <button class="preview-btn" id="preview-next" aria-label="Next champion">›</button>
+          <button class="preview-btn" id="preview-next" aria-label="Next champion">â€º</button>
         </div>
         <div class="preview-info" id="preview-info">
           <div class="preview-name" id="preview-name">LEGIONARY</div>
@@ -688,32 +689,6 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
 </div>
 
-<!-- CINEMATIC INTRO OVERLAY -->
-<div id="cinematic-intro" class="cinematic-intro active">
-  <div class="intro-black"></div>
-  <div class="intro-content">
-    <div class="intro-logo">
-      <svg viewBox="0 0 120 120" width="120" height="120">
-        <defs>
-          <radialGradient id="intro-cg" cx="50%" cy="40%" r="50%">
-            <stop offset="0%" stop-color="#E2C06A"/>
-            <stop offset="100%" stop-color="#8A6F2A"/>
-          </radialGradient>
-        </defs>
-        <path d="M60 10 L76 36 L104 28 L88 52 L110 68 L84 70 L80 100 L60 84 L40 100 L36 70 L20 68 L16 52 L32 52 L44 36 Z" fill="url(#intro-cg)" opacity=".9"/>
-        <circle cx="60" cy="56" r="14" fill="rgba(139,0,21,0.85)"/>
-        <path d="M60 44 L64 54 L76 54 L66 62 L70 74 L60 66 L50 74 L54 62 L44 54 L56 54 Z" fill="#E2C06A" opacity=".9"/>
-      </svg>
-    </div>
-    <div class="intro-title" data-text="TITANS STRIKE"></div>
-    <div class="intro-subtitle" data-text="FORGED IN GLORY · BOUND BY DISCIPLINE · UNITED AS TITANS"></div>
-    <div class="intro-progress">
-      <div class="intro-progress-fill"></div>
-    </div>
-    <div class="intro-prompt">TOUCH OR PRESS ANY KEY TO BEGIN</div>
-  </div>
-</div>
-
 <!-- DIFFICULTY SELECT -->
 <div class="scr off" id="s-diff">
   <div class="diff-inner">
@@ -722,23 +697,23 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="diff-sub">Choose how hard the Legion pushes back</div>
     <div class="diff-cards">
       <div class="diff-card selected" id="dc-easy" data-diff="easy">
-        <div class="diff-icon">🛡️</div>
-        <div class="diff-info"><div class="diff-name">RECRUIT</div><div class="diff-desc">Slower enemies · More ammo drops · Forgiving</div></div>
+        <div class="diff-icon">ðŸ›¡ï¸</div>
+        <div class="diff-info"><div class="diff-name">RECRUIT</div><div class="diff-desc">Slower enemies Â· More ammo drops Â· Forgiving</div></div>
         <div class="diff-badge easy">EASY</div>
       </div>
       <div class="diff-card" id="dc-normal" data-diff="normal">
-        <div class="diff-icon">⚔️</div>
-        <div class="diff-info"><div class="diff-name">LEGIONARY</div><div class="diff-desc">Balanced challenge · Standard ammo flow</div></div>
+        <div class="diff-icon">âš”ï¸</div>
+        <div class="diff-info"><div class="diff-name">LEGIONARY</div><div class="diff-desc">Balanced challenge Â· Standard ammo flow</div></div>
         <div class="diff-badge normal">NORMAL</div>
       </div>
       <div class="diff-card" id="dc-hard" data-diff="hard">
-        <div class="diff-icon">💀</div>
-        <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies · Scarce ammo · No mercy</div></div>
+        <div class="diff-icon">ðŸ’€</div>
+        <div class="diff-info"><div class="diff-name">TITAN</div><div class="diff-desc">Fast aggressive enemies Â· Scarce ammo Â· No mercy</div></div>
         <div class="diff-badge hard">HARD</div>
       </div>
     </div>
-    <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR →</button>
-    <button class="btn-ghost" id="btn-diff-back">← RETURN</button>
+    <button class="btn-enter" id="btn-diff-next" style="margin-top:1.2rem;">CHOOSE WARRIOR â†’</button>
+    <button class="btn-ghost" id="btn-diff-back">â† RETURN</button>
   </div>
 </div>
 
@@ -749,7 +724,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
   <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
   <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
-  <button class="pause-btn" id="btn-pause-achievements">🏆 ACHIEVEMENTS</button>
+  <button class="pause-btn" id="btn-pause-achievements">ðŸ† ACHIEVEMENTS</button>
   <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
 </div>
 
@@ -783,7 +758,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">PARTICLE DENSITY</span><span style="font-family:'Cinzel',serif;font-size:.7rem;color:var(--ash);" id="particle-lbl">HIGH</span></div>
       <input type="range" id="particle-density" min="1" max="3" value="3" style="width:100%;accent-color:var(--gold);">
     </div>
-    <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
+    <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">â† RETURN</button>
   </div>
 </div>
 
@@ -804,19 +779,19 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="stat-card"><span class="sv" id="st-headshots">0</span><span class="sl">Titan Club Kills</span></div>
     <div class="stat-card"><span class="sv" id="st-time">0h</span><span class="sl">Play Time</span></div>
   </div>
-  <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">← RETURN</button>
+  <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">â† RETURN</button>
 </div>
 
 <!-- UPGRADES SCREEN -->
 <div class="scr off overlay" id="s-upgrades">
   <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB · ARMORY</div>
+    <div class="screen-eyebrow">TITANS CLUB Â· ARMORY</div>
     <div class="screen-title">PERMANENT UPGRADES</div>
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
   </div>
-  <div style="font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);margin:.3rem 0;">♛ TITANS CLUB CREDITS: <span id="credits-count" style="color:var(--red-hot);">0</span></div>
+  <div style="font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold-lit);margin:.3rem 0;">â™› TITANS CLUB CREDITS: <span id="credits-count" style="color:var(--red-hot);">0</span></div>
   <div id="upgrades-list" style="display:flex;flex-direction:column;align-items:center;gap:.2rem;max-height:50vh;overflow-y:auto;width:min(360px,95vw);"></div>
-  <button class="btn-ghost" id="btn-upgrades-back" style="margin-top:.5rem;">← RETURN</button>
+  <button class="btn-ghost" id="btn-upgrades-back" style="margin-top:.5rem;">â† RETURN</button>
 </div>
 
 <!-- ACHIEVEMENTS SCREEN -->
@@ -827,7 +802,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
   </div>
   <div id="achievements-list" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;max-height:55vh;overflow-y:auto;width:min(380px,95vw);"></div>
-  <button class="btn-ghost" id="btn-achievements-back" style="margin-top:.5rem;">← RETURN</button>
+  <button class="btn-ghost" id="btn-achievements-back" style="margin-top:.5rem;">â† RETURN</button>
 </div>
 
 <!-- CHARACTER SELECT -->
@@ -843,7 +818,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   </div>
   <div class="char-grid" id="char-grid"></div>
   <button class="btn-enter" id="btn-enter-arena">ENTER THE ARENA</button>
-  <button class="btn-ghost" id="btn-back-diff">← DIFFICULTY</button>
+  <button class="btn-ghost" id="btn-back-diff">â† DIFFICULTY</button>
 </div>
 
 <!-- MULTIPLAYER LOBBY -->
@@ -851,20 +826,20 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
   <div class="mp-inner">
     <div class="screen-eyebrow">TITANS CLUB</div>
     <div class="screen-title">MULTIPLAYER</div>
-    <div class="mp-sub">2-4 player rooms · Real-time battle</div>
+    <div class="mp-sub">2-4 player rooms Â· Real-time battle</div>
     <div class="div-line"><div class="div-gem"></div></div>
     <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
-    <div class="mp-or">— OR JOIN —</div>
+    <div class="mp-or">â€” OR JOIN â€”</div>
     <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" style="width:min(200px,60vw);">
     <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
-    <button class="btn-ghost" id="btn-mp-back">← BACK</button>
+    <button class="btn-ghost" id="btn-mp-back">â† BACK</button>
   </div>
 </div>
 
 <!-- MULTIPLAYER ROOM / WAITING -->
 <div class="scr off" id="s-mp-room">
   <div class="mp-room-inner">
-    <div class="screen-eyebrow">TITANS CLUB · ROOM</div>
+    <div class="screen-eyebrow">TITANS CLUB Â· ROOM</div>
     <div class="screen-title">LOBBY</div>
     <div class="mp-code-box">
       <div class="mp-code-label">ROOM CODE</div>
@@ -878,9 +853,9 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="mp-diff-wrap" id="mp-diff-wrap" style="display:none;">
       <div class="mp-diff-label">HOST DIFFICULTY</div>
       <div class="mp-diff-cards">
-        <div class="mp-diff-card" data-diff="easy">🛡️ RECRUIT</div>
-        <div class="mp-diff-card selected" data-diff="normal">⚔️ LEGIONARY</div>
-        <div class="mp-diff-card" data-diff="hard">💀 TITAN</div>
+        <div class="mp-diff-card" data-diff="easy">ðŸ›¡ï¸ RECRUIT</div>
+        <div class="mp-diff-card selected" data-diff="normal">âš”ï¸ LEGIONARY</div>
+        <div class="mp-diff-card" data-diff="hard">ðŸ’€ TITAN</div>
       </div>
     </div>
     <div class="mp-char-wrap" id="mp-char-wrap">
@@ -905,37 +880,37 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     <div class="lb-tab" data-lb="mp">MULTIPLAYER</div>
   </div>
   <div class="lb-list" id="lb-list"></div>
-  <button class="btn-ghost" id="btn-lb-back">← RETURN</button>
+  <button class="btn-ghost" id="btn-lb-back">â† RETURN</button>
 </div>
 
 <!-- GAME OVER -->
 <div class="scr off" id="s-over">
   <div class="over-inner">
-    <div class="over-eyebrow">TITANS CLUB · BATTLE REPORT</div>
+    <div class="over-eyebrow">TITANS CLUB Â· BATTLE REPORT</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <div style="font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:4px;color:var(--ash);margin-bottom:.4rem;text-transform:uppercase;">Club Rank Earned</div>
     <div class="final-score-lbl">Final Score</div>
     <div class="final-num" id="f-score">0</div>
     <div class="final-rank" id="f-rank">TITAN RECRUIT</div>
-    <div style="font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.6rem;" id="f-club-rank">♛ TITANS CLUB MEMBER</div>
+    <div style="font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.6rem;" id="f-club-rank">â™› TITANS CLUB MEMBER</div>
     <div class="final-stats">
       <div class="fstat"><span class="fstat-num" id="fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
       <div class="fstat"><span class="fstat-num" id="fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>
       <div class="fstat"><span class="fstat-num" id="fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
     </div>
     <div style="display:flex;gap:.8rem;margin:.3rem 0 .8rem;flex-wrap:wrap;justify-content:center;">
-      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--gold-dim);border:1px solid rgba(200,168,75,0.2);padding:.15rem .5rem;">✦ FORGED IN GLORY</span>
-      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--red);border:1px solid rgba(192,0,26,0.2);padding:.15rem .5rem;">♛ BOUND BY DISCIPLINE</span>
+      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--gold-dim);border:1px solid rgba(200,168,75,0.2);padding:.15rem .5rem;">âœ¦ FORGED IN GLORY</span>
+      <span style="font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:2px;color:var(--red);border:1px solid rgba(192,0,26,0.2);padding:.15rem .5rem;">â™› BOUND BY DISCIPLINE</span>
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-replay" style="margin-top:1rem;">FIGHT AGAIN</button>
-    <button class="btn-ghost" id="btn-lb-over">♛ LEADERBOARD</button>
+    <button class="btn-ghost" id="btn-lb-over">â™› LEADERBOARD</button>
     <button class="btn-ghost" id="btn-menu">MAIN GATE</button>
   </div>
 </div>
 <div class="scr off" id="s-mp-over">
   <div class="over-inner">
-    <div class="over-eyebrow">MULTIPLAYER · FALLEN</div>
+    <div class="over-eyebrow">MULTIPLAYER Â· FALLEN</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <div class="final-score-lbl">All Titans Have Fallen</div>
     <div class="final-rank" id="mp-f-rank" style="color:var(--red);">BATTLE ENDED</div>
@@ -945,14 +920,14 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
       <div class="fstat"><span class="fstat-num" id="mp-fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
-    <button class="btn-enter" id="btn-mp-return-lobby" style="margin-top:1rem;">♛ RETURN TO LOBBY</button>
+    <button class="btn-enter" id="btn-mp-return-lobby" style="margin-top:1rem;">â™› RETURN TO LOBBY</button>
   </div>
 </div>
 
 <!-- MP MATCH END -->
 <div class="scr off" id="s-mp-end">
   <div class="over-inner">
-    <div class="over-eyebrow">MULTIPLAYER · BATTLE REPORT</div>
+    <div class="over-eyebrow">MULTIPLAYER Â· BATTLE REPORT</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <div style="font-family:'Cinzel Decorative',serif;font-size:.62rem;letter-spacing:5px;color:var(--gold-dim);margin-bottom:-.4rem;">TEAM RESULT</div>
     <div class="final-score-lbl" id="mp-end-result">BATTLE ENDED</div>
@@ -979,7 +954,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <div style="display:flex;gap:.8rem;margin-top:.8rem;flex-wrap:wrap;justify-content:center;">
-      <button class="btn-enter" id="btn-mp-rematch" style="margin-top:0;">♛ REMATCH</button>
+      <button class="btn-enter" id="btn-mp-rematch" style="margin-top:0;">â™› REMATCH</button>
       <button class="btn-ghost" id="btn-mp-end-leave">LEAVE ROOM</button>
     </div>
   </div>
@@ -993,19 +968,19 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 </div>
 
 <script>
-/* ═══ HELPERS ═══ */
+/* â•â•â• HELPERS â•â•â• */
 function toRoman(n){const v=[1000,900,500,400,100,90,50,40,10,9,5,4,1];const s=['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];let r='';v.forEach((val,i)=>{while(n>=val){r+=s[i];n-=val;}});return r||'I';}
 
-/* ═══ CANVAS ═══ */
+/* â•â•â• CANVAS â•â•â• */
 const cv=document.getElementById('gc');
 const cx=cv.getContext('2d');
 function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
 resize();
 window.addEventListener('resize',()=>{resize();if(gState==='play')initStars();});
 
-/* ═══════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DIFFICULTY SETTINGS
-   ═══════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const DIFFICULTIES={
   easy:{label:'RECRUIT',badgeClass:'easy',enemyHpMult:0.65,enemySpdMult:0.70,enemyFireMult:0.60,spawnRateBase:2.8,ammoPackInterval:[8,12],ammoRefill:12,ammoRegenRate:1/3,scoreMult:0.8,lives:4},
   normal:{label:'LEGIONARY',badgeClass:'normal',enemyHpMult:1.0,enemySpdMult:1.0,enemyFireMult:1.0,spawnRateBase:2.2,ammoPackInterval:[10,14],ammoRefill:8,ammoRegenRate:1/5,scoreMult:1.0,lives:3},
@@ -1016,7 +991,7 @@ document.querySelectorAll('.diff-card').forEach(card=>{
   card.addEventListener('click',()=>{document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selDiff=card.dataset.diff;});
 });
 
-/* ═══ AUDIO ═══ */
+/* â•â•â• AUDIO â•â•â• */
 const AC=new(window.AudioContext||window.webkitAudioContext)();
 function wake(){if(AC.state==='suspended')AC.resume();}
 function sfxShoot(){wake();const b=AC.createBuffer(1,AC.sampleRate*.06,AC.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*.01));const s=AC.createBufferSource();s.buffer=b;const g=AC.createGain();g.gain.setValueAtTime(.14,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.07);const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=1600;f.Q.value=.5;s.connect(f);f.connect(g);g.connect(AC.destination);s.start();}
@@ -1033,7 +1008,7 @@ function sfxPowerupPickup(){wake();[660,880,1100,1320].forEach((f,i)=>{const o=A
 function sfxBossWarning(){wake();const o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(180,AC.currentTime);o.frequency.linearRampToValueAtTime(360,AC.currentTime+.4);o.frequency.linearRampToValueAtTime(180,AC.currentTime+.8);g.gain.setValueAtTime(.2,AC.currentTime);g.gain.linearRampToValueAtTime(.001,AC.currentTime+.9);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+.9);}
 function sfxVictory(){wake();[523,659,784,1047,1319,1568,1976].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+i*.1;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.12,t);g.gain.linearRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+.35);});}
 
-/* ═══ MUSIC ENGINE ═══ */
+/* â•â•â• MUSIC ENGINE â•â•â• */
 let bgOn=false,bgNodes=[],bgWave=0;
 let bgGain=null,bgDelay=null,bgReverb=null,bgTimeouts=[];
 function initAudioFX(){
@@ -1071,17 +1046,17 @@ function bgStart(waveNum){
 function bgStop(){bgOn=false;bgTimeouts.forEach(t=>clearTimeout(t));bgTimeouts=[];bgNodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect&&n.disconnect();}catch(e){}});bgNodes=[];}
 function bgTransition(newWave){if(bgWave===newWave)return;bgStop();bgTimeouts.push(setTimeout(()=>{if(gState==='play')bgStart(newWave);},200));}
 
-/* ═══════════════════════════════════════════
-   8 PLAYABLE CHARACTERS — including 4 Titan-themed
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   8 PLAYABLE CHARACTERS â€” including 4 Titan-themed
    Each has a unique superpower (key: E / power button)
-   ═══════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const CHARS=[
-  /* ─── ORIGINAL 4 ─── */
+  /* â”€â”€â”€ ORIGINAL 4 â”€â”€â”€ */
   {id:'legionary',name:'LEGIONARY',role:'Vanguard',color:'#C8A84B',trim:'#E2C06A',spd:240,fire:.16,dmg:1,shield:3,maxAmmo:30,stats:{speed:60,fire:70,power:80},
    powerName:'SHIELD WALL',powerDesc:'Absorbs next 3 hits for 4s',powerCooldown:12,
    power(state){
      state.powerBuff={type:'shield',hits:3,timer:4};
-     spawnParts(P.x,P.y,'#E2C06A',20);showPowerAnnounce('⚔ SHIELD WALL');
+     spawnParts(P.x,P.y,'#E2C06A',20);showPowerAnnounce('âš” SHIELD WALL');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-12,10);ctx.lineTo(-8,16);ctx.lineTo(0,12);ctx.lineTo(8,16);ctx.lineTo(12,10);ctx.closePath();ctx.fill();ctx.strokeStyle=this.trim;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-18);ctx.quadraticCurveTo(8,-28,4,-36);ctx.stroke();ctx.fillStyle='#8B0015';ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();const eg=ctx.createRadialGradient(0,14,0,0,14,8);eg.addColorStop(0,'rgba(255,140,0,.9)');eg.addColorStop(1,'rgba(255,100,0,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,14,6+Math.sin(Date.now()*.01)*2,0,Math.PI*2);ctx.fill();ctx.restore();}
   },
@@ -1090,7 +1065,7 @@ const CHARS=[
    power(state){
      state.powerBuff={type:'battlecry',timer:5,dmgMult:2};
      enemies.forEach(e=>{e.spdMod=(e.spdMod||1)*.4;});
-     spawnParts(P.x,P.y,'#FF4422',25);showPowerAnnounce('🔱 BATTLE CRY');
+     spawnParts(P.x,P.y,'#FF4422',25);showPowerAnnounce('ðŸ”± BATTLE CRY');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(-15,8);ctx.lineTo(-10,20);ctx.lineTo(0,14);ctx.lineTo(10,20);ctx.lineTo(15,8);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(192,0,26,0.55)';ctx.beginPath();ctx.moveTo(-14,0);ctx.lineTo(-20,12);ctx.lineTo(-10,14);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(20,12);ctx.lineTo(10,14);ctx.closePath();ctx.fill();ctx.fillStyle=this.trim;ctx.beginPath();ctx.moveTo(-6,-20);ctx.lineTo(6,-20);ctx.lineTo(4,-34);ctx.lineTo(-4,-34);ctx.closePath();ctx.fill();const eg=ctx.createRadialGradient(0,0,0,0,0,7);eg.addColorStop(0,'rgba(255,100,0,.8)');eg.addColorStop(1,'rgba(192,0,26,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();[-5,5].forEach(ox=>{const g2=ctx.createRadialGradient(ox,16,0,ox,16,6);g2.addColorStop(0,'rgba(255,120,0,.9)');g2.addColorStop(1,'rgba(255,80,0,0)');ctx.fillStyle=g2;ctx.beginPath();ctx.arc(ox,16,5+Math.sin(Date.now()*.012+ox)*2,0,Math.PI*2);ctx.fill();});ctx.restore();}
   },
@@ -1102,7 +1077,7 @@ const CHARS=[
      spawnParts(P.x,P.y,'#C8A84B',15);
      P.x=Math.max(20,Math.min(cv.width-20,nx));P.y=Math.max(60,Math.min(cv.height-20,ny));
      enemies.forEach(e=>{if(Math.hypot(e.x-P.x,e.y-P.y)<80){e.stunT=2;e.vx=0;e.vy=0;}});
-     spawnParts(P.x,P.y,'#E2C06A',15);showPowerAnnounce('⚡ LIGHTNING DASH');sfxTeleport();
+     spawnParts(P.x,P.y,'#E2C06A',15);showPowerAnnounce('âš¡ LIGHTNING DASH');sfxTeleport();
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(-6,4);ctx.lineTo(-4,18);ctx.lineTo(0,12);ctx.lineTo(4,18);ctx.lineTo(6,4);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(200,168,75,.65)';ctx.beginPath();ctx.moveTo(-6,2);ctx.lineTo(-18,14);ctx.lineTo(-8,14);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(6,2);ctx.lineTo(18,14);ctx.lineTo(8,14);ctx.closePath();ctx.fill();ctx.strokeStyle=this.trim;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(0,12);ctx.stroke();const eg=ctx.createRadialGradient(0,14,0,0,14,9);eg.addColorStop(0,'rgba(200,168,75,.95)');eg.addColorStop(1,'rgba(200,100,0,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,14,7+Math.sin(Date.now()*.015)*3,0,Math.PI*2);ctx.fill();ctx.restore();}
   },
@@ -1110,20 +1085,20 @@ const CHARS=[
    powerName:'NOVA VOLLEY',powerDesc:'Fires 24 bullets in all directions',powerCooldown:15,
    power(state){
      for(let i=0;i<24;i++){const a=(i/24)*Math.PI*2;bullets.push({x:P.x,y:P.y,vx:Math.cos(a)*640,vy:Math.sin(a)*640,r:6,dmg:4});}
-     spawnParts(P.x,P.y,'#D4AF37',30);showPowerAnnounce('💥 NOVA VOLLEY');sfxBigBoom();
+     spawnParts(P.x,P.y,'#D4AF37',30);showPowerAnnounce('ðŸ’¥ NOVA VOLLEY');sfxBigBoom();
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-20,10);ctx.lineTo(-14,22);ctx.lineTo(0,16);ctx.lineTo(14,22);ctx.lineTo(20,10);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(212,175,55,.5)';ctx.beginPath();ctx.moveTo(-18,6);ctx.lineTo(-28,20);ctx.lineTo(-16,18);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(18,6);ctx.lineTo(28,20);ctx.lineTo(16,18);ctx.closePath();ctx.fill();ctx.strokeStyle=this.trim;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,-4,6,Math.PI*.7,Math.PI*2.3);ctx.stroke();const og=ctx.createRadialGradient(0,-4,0,0,-4,5);og.addColorStop(0,'rgba(255,230,100,1)');og.addColorStop(1,'rgba(212,175,55,0)');ctx.fillStyle=og;ctx.beginPath();ctx.arc(0,-4,5,0,Math.PI*2);ctx.fill();[-8,0,8].forEach(ox=>{const g2=ctx.createRadialGradient(ox,18,0,ox,18,5);g2.addColorStop(0,'rgba(255,200,50,.95)');g2.addColorStop(1,'rgba(255,140,0,0)');ctx.fillStyle=g2;ctx.beginPath();ctx.arc(ox,18,4+Math.sin(Date.now()*.01+ox)*2,0,Math.PI*2);ctx.fill();});ctx.restore();}
   },
 
-  /* ─── 4 NEW TITAN-THEMED CHARACTERS ─── */
+  /* â”€â”€â”€ 4 NEW TITAN-THEMED CHARACTERS â”€â”€â”€ */
 
-  /* TITAN GUARDIAN — Massive defensive titan carrying a cosmic shield */
+  /* TITAN GUARDIAN â€” Massive defensive titan carrying a cosmic shield */
   {id:'guardian',name:'GUARDIAN',role:'Titan Protector',color:'#1E88E5',trim:'#82B1FF',spd:170,fire:.28,dmg:2,shield:6,maxAmmo:22,stats:{speed:30,fire:55,power:90},
    powerName:'TITAN AEGIS',powerDesc:'Invincible for 3s, reflects bullets',powerCooldown:20,
    power(state){
      state.powerBuff={type:'aegis',timer:3,reflect:true};
      P.invinc=3;
-     spawnParts(P.x,P.y,'#82B1FF',30);showPowerAnnounce('🛡 TITAN AEGIS');
+     spawnParts(P.x,P.y,'#82B1FF',30);showPowerAnnounce('ðŸ›¡ TITAN AEGIS');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      // Wide body
@@ -1138,7 +1113,7 @@ const CHARS=[
    ctx.restore();}
   },
 
-  /* TITAN COLOSSUS — The earth shaker, massive slow bruiser */
+  /* TITAN COLOSSUS â€” The earth shaker, massive slow bruiser */
   {id:'colossus',name:'COLOSSUS',role:'Earth Shaker',color:'#8D6E63',trim:'#FFCC80',spd:155,fire:.35,dmg:4,shield:5,maxAmmo:12,stats:{speed:25,fire:35,power:100},
    powerName:'SEISMIC SLAM',powerDesc:'Shockwave stuns & damages all enemies',powerCooldown:22,
    power(state){
@@ -1146,7 +1121,7 @@ const CHARS=[
      enemies.forEach(e=>{const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<350){e.hp-=3;e.stunT=2.5;e.vx*=-.5;e.vy*=-.5;spawnParts(e.x,e.y,'#FFCC80',6);}});
      // Visual ring
      state.shockwave={x:P.x,y:P.y,r:10,maxR:360,alpha:1};
-     spawnParts(P.x,P.y,'#8D6E63',35);showPowerAnnounce('🌍 SEISMIC SLAM');sfxBigBoom();
+     spawnParts(P.x,P.y,'#8D6E63',35);showPowerAnnounce('ðŸŒ SEISMIC SLAM');sfxBigBoom();
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      // Huge hulking body
@@ -1160,7 +1135,7 @@ const CHARS=[
    ctx.restore();}
   },
 
-  /* TITAN VORTEX — Chaos titan, fast and creates black holes */
+  /* TITAN VORTEX â€” Chaos titan, fast and creates black holes */
   {id:'vortex',name:'VORTEX',role:'Chaos Titan',color:'#7C3AED',trim:'#C4B5FD',spd:290,fire:.14,dmg:2,shield:2,maxAmmo:35,stats:{speed:88,fire:80,power:75},
    powerName:'BLACK HOLE',powerDesc:'Pulls all enemies toward you then blasts',powerCooldown:16,
    power(state){
@@ -1171,7 +1146,7 @@ const CHARS=[
        enemies.forEach(e=>{if(Math.hypot(e.x-P.x,e.y-P.y)<160){e.hp-=5;spawnParts(e.x,e.y,'#7C3AED',8);}});
        for(let i=0;i<16;i++){const a=(i/16)*Math.PI*2;bullets.push({x:P.x,y:P.y,vx:Math.cos(a)*560,vy:Math.sin(a)*560,r:5,dmg:3});}
      },800);
-     spawnParts(P.x,P.y,'#7C3AED',30);showPowerAnnounce('🌀 BLACK HOLE');sfxBigBoom();
+     spawnParts(P.x,P.y,'#7C3AED',30);showPowerAnnounce('ðŸŒ€ BLACK HOLE');sfxBigBoom();
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      // Sleek chaos form
@@ -1185,12 +1160,12 @@ const CHARS=[
    ctx.restore();}
   },
 
-  /* TITAN SUNFIRE — Solar titan, rains burning meteors */
+  /* TITAN SUNFIRE â€” Solar titan, rains burning meteors */
   {id:'sunfire',name:'SUNFIRE',role:'Solar Titan',color:'#FF6D00',trim:'#FFD54F',spd:210,fire:.2,dmg:2,shield:3,maxAmmo:25,stats:{speed:55,fire:65,power:88},
    powerName:'METEOR RAIN',powerDesc:'20 meteors fall on random enemies',powerCooldown:14,
    power(state){
      state.meteorCount=20;state.meteorTimer=0;
-     showPowerAnnounce('☄️ METEOR RAIN');sfxBigBoom();
+     showPowerAnnounce('â˜„ï¸ METEOR RAIN');sfxBigBoom();
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      // Fiery shape
@@ -1204,13 +1179,13 @@ const CHARS=[
    ctx.restore();}
   },
 
-  /* PHANTOM ASSASSIN — Invisible, high damage, low health */
+  /* PHANTOM ASSASSIN â€” Invisible, high damage, low health */
   {id:'phantom_assassin',name:'PHANTOM ASSASSIN',role:'Shadow Killer',color:'#1A1A2E',trim:'#4A4A6A',spd:280,fire:.18,dmg:4,shield:1,maxAmmo:25,stats:{speed:85,fire:75,power:60},
    powerName:'SMOKE BOMB',powerDesc:'Invisible 4s, next shot 3x damage',powerCooldown:14,
    power(state){
      state.powerBuff={type:'smoke',timer:4,nextShotMult:3};
      P.invinc=4;
-     spawnParts(P.x,P.y,'#4A4A6A',15);showPowerAnnounce('💨 SMOKE BOMB');
+     spawnParts(P.x,P.y,'#4A4A6A',15);showPowerAnnounce('ðŸ’¨ SMOKE BOMB');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(-10,4);ctx.lineTo(-8,18);ctx.lineTo(0,12);ctx.lineTo(8,18);ctx.lineTo(10,4);ctx.closePath();ctx.fill();
@@ -1218,12 +1193,12 @@ const CHARS=[
      const eg=ctx.createRadialGradient(0,14,0,0,14,8);eg.addColorStop(0,'rgba(74,74,106,.9)');eg.addColorStop(1,'rgba(26,26,46,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,14,6+Math.sin(Date.now()*.013)*2,0,Math.PI*2);ctx.fill();
    ctx.restore();}
   },
-  /* BERSERKER — Very high damage, very slow */
+  /* BERSERKER â€” Very high damage, very slow */
   {id:'berserker',name:'BERSERKER',role:'Rage Tank',color:'#8B0000',trim:'#FF2200',spd:140,fire:.3,dmg:5,shield:2,maxAmmo:18,stats:{speed:20,fire:40,power:100},
    powerName:'BLOODLUST',powerDesc:'3x damage 6s, takes 2x damage',powerCooldown:18,
    power(state){
      state.powerBuff={type:'bloodlust',timer:6,dmgMult:3,dmgTakenMult:2};
-     spawnParts(P.x,P.y,'#FF2200',25);showPowerAnnounce('🩸 BLOODLUST');
+     spawnParts(P.x,P.y,'#FF2200',25);showPowerAnnounce('ðŸ©¸ BLOODLUST');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(-18,6);ctx.lineTo(-14,20);ctx.lineTo(0,14);ctx.lineTo(14,20);ctx.lineTo(18,6);ctx.closePath();ctx.fill();
@@ -1231,12 +1206,12 @@ const CHARS=[
      const eg=ctx.createRadialGradient(0,16,0,0,16,10);eg.addColorStop(0,'rgba(255,34,0,.9)');eg.addColorStop(1,'rgba(139,0,0,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,16,8+Math.sin(Date.now()*.01)*3,0,Math.PI*2);ctx.fill();
    ctx.restore();}
   },
-  /* SNIPER — Long range, high damage, slow fire rate */
+  /* SNIPER â€” Long range, high damage, slow fire rate */
   {id:'sniper',name:'SNIPER',role:'Marksman',color:'#2E4A1A',trim:'#6AFF4A',spd:190,fire:.45,dmg:5,shield:2,maxAmmo:15,stats:{speed:40,fire:30,power:90},
    powerName:'DEAD EYE',powerDesc:'Piercing bullets 8s, 5x damage',powerCooldown:20,
    power(state){
      state.powerBuff={type:'deadeye',timer:8,dmgMult:5};
-     spawnParts(P.x,P.y,'#6AFF4A',20);showPowerAnnounce('🎯 DEAD EYE');
+     spawnParts(P.x,P.y,'#6AFF4A',20);showPowerAnnounce('ðŸŽ¯ DEAD EYE');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-8,6);ctx.lineTo(-6,16);ctx.lineTo(0,10);ctx.lineTo(6,16);ctx.lineTo(8,6);ctx.closePath();ctx.fill();
@@ -1244,13 +1219,13 @@ const CHARS=[
      const eg=ctx.createRadialGradient(0,12,0,0,12,7);eg.addColorStop(0,'rgba(106,255,74,.9)');eg.addColorStop(1,'rgba(46,74,26,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,12,5+Math.sin(Date.now()*.015)*2,0,Math.PI*2);ctx.fill();
    ctx.restore();}
   },
-  /* ENGINEER — Medium speed, places turrets */
+  /* ENGINEER â€” Medium speed, places turrets */
   {id:'engineer',name:'ENGINEER',role:'Tech Specialist',color:'#1A3A4A',trim:'#4AFFFF',spd:220,fire:.2,dmg:2,shield:3,maxAmmo:28,stats:{speed:55,fire:60,power:80},
    powerName:'TURRET DEPLOY',powerDesc:'Spawns auto-firing turret 10s',powerCooldown:16,
    power(state){
      activeTurrets.push({x:P.x+40,y:P.y-20,timer:10,cd:.5,col:'#4AFFFF'});
      activeTurrets.push({x:P.x-40,y:P.y-20,timer:10,cd:.5,col:'#4AFFFF'});
-     spawnParts(P.x,P.y,'#4AFFFF',20);showPowerAnnounce('🔧 TURRET DEPLOY');
+     spawnParts(P.x,P.y,'#4AFFFF',20);showPowerAnnounce('ðŸ”§ TURRET DEPLOY');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(-12,8);ctx.lineTo(-10,16);ctx.lineTo(0,10);ctx.lineTo(10,16);ctx.lineTo(12,8);ctx.closePath();ctx.fill();
@@ -1258,13 +1233,13 @@ const CHARS=[
      const eg=ctx.createRadialGradient(0,14,0,0,14,8);eg.addColorStop(0,'rgba(74,255,255,.9)');eg.addColorStop(1,'rgba(26,58,74,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,14,6+Math.sin(Date.now()*.012)*2,0,Math.PI*2);ctx.fill();
    ctx.restore();}
   },
-  /* MEDIC — Support, heals over time */
+  /* MEDIC â€” Support, heals over time */
   {id:'medic',name:'MEDIC',role:'Field Medic',color:'#FFFFFF',trim:'#4CAF50',spd:210,fire:.22,dmg:1.5,shield:3,maxAmmo:30,stats:{speed:60,fire:65,power:70},
    powerName:'HEALING FIELD',powerDesc:'Heals 3 HP, regen 8s',powerCooldown:12,
    power(state){
      state.powerBuff={type:'heal',timer:8};
      lives=Math.min(lives+3, diffCfg.lives);
-     spawnParts(P.x,P.y,'#4CAF50',20);showPowerAnnounce('💚 HEALING FIELD');
+     spawnParts(P.x,P.y,'#4CAF50',20);showPowerAnnounce('ðŸ’š HEALING FIELD');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(-10,6);ctx.lineTo(-8,16);ctx.lineTo(0,10);ctx.lineTo(8,16);ctx.lineTo(10,6);ctx.closePath();ctx.fill();
@@ -1272,13 +1247,13 @@ const CHARS=[
      const eg=ctx.createRadialGradient(0,14,0,0,14,8);eg.addColorStop(0,'rgba(76,175,80,.9)');eg.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=eg;ctx.beginPath();ctx.arc(0,14,6+Math.sin(Date.now()*.011)*2,0,Math.PI*2);ctx.fill();
    ctx.restore();}
   },
-  /* JUGGERNAUT — Very slow, very high shield */
+  /* JUGGERNAUT â€” Very slow, very high shield */
   {id:'juggernaut',name:'JUGGERNAUT',role:'Immovable Object',color:'#455A64',trim:'#B0BEC5',spd:120,fire:.38,dmg:3,shield:8,maxAmmo:20,stats:{speed:15,fire:45,power:95},
    powerName:'IMPENETRABLE',powerDesc:'5s invincibility, cannot move',powerCooldown:22,
    power(state){
      state.powerBuff={type:'impenetrable',timer:5};
      P.invinc=5;
-     spawnParts(P.x,P.y,'#B0BEC5',25);showPowerAnnounce('🛡️ IMPENETRABLE');
+     spawnParts(P.x,P.y,'#B0BEC5',25);showPowerAnnounce('ðŸ›¡ï¸ IMPENETRABLE');
    },
    draw(x,y,angle,ctx){ctx.save();ctx.translate(x,y);ctx.rotate(angle);
      ctx.fillStyle=this.color;ctx.beginPath();ctx.moveTo(0,-24);ctx.lineTo(-22,6);ctx.lineTo(-18,22);ctx.lineTo(0,16);ctx.lineTo(18,22);ctx.lineTo(22,6);ctx.closePath();ctx.fill();
@@ -1288,7 +1263,7 @@ const CHARS=[
   }
 ];
 
-/* ═══ CHAR SELECT UI ═══ */
+/* â•â•â• CHAR SELECT UI â•â•â• */
 let selChar=0;
 (function buildCharGrid(){
   const grid=document.getElementById('char-grid');
@@ -1299,7 +1274,7 @@ let selChar=0;
     c.draw(35,46,-Math.PI/2,mctx);
     const nm=document.createElement('div');nm.className='char-name';nm.textContent=c.name;
     const rl=document.createElement('div');rl.className='char-role';rl.textContent=c.role;
-    const pw=document.createElement('div');pw.className='char-power-badge';pw.textContent='✦ '+c.powerName;
+    const pw=document.createElement('div');pw.className='char-power-badge';pw.textContent='âœ¦ '+c.powerName;
     const ab=document.createElement('div');ab.style.cssText='font-size:.48rem;letter-spacing:2px;color:var(--ammo-col);text-transform:uppercase;margin-top:1px;';ab.textContent=`${c.maxAmmo} rounds`;
     const st=document.createElement('div');st.className='char-stats';
     [['SPD',c.stats.speed],['FIRE',c.stats.fire],['PWR',c.stats.power]].forEach(([k,v])=>{const row=document.createElement('div');row.className='stat-row';row.innerHTML=`<span class="stat-key">${k}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${v}%"></div></div>`;st.appendChild(row);});
@@ -1309,101 +1284,101 @@ let selChar=0;
   });
 })();
 
-/* ═══ START SCREEN PARTICLES ═══ */
+/* â•â•â• START SCREEN PARTICLES â•â•â• */
 const startCv=document.getElementById('start-canvas');const startCtx=startCv.getContext('2d');
 let startParts=[],menuAnimActive=false,menuRAF=null;
 function initStartCanvas(){startCv.width=window.innerWidth;startCv.height=window.innerHeight;startParts=[];const count=Math.floor((window.innerWidth*window.innerHeight)/6000);for(let i=0;i<count;i++){startParts.push({x:Math.random()*startCv.width,y:Math.random()*startCv.height,vx:(Math.random()-.5)*.4,vy:-.3-Math.random()*.5,r:Math.random()*1.5+.2,col:Math.random()<.7?`rgba(200,168,75,${Math.random()*.25+.05})`:`rgba(192,0,26,${Math.random()*.15+.03})`,life:Math.random(),dec:.002+Math.random()*.003});}for(let i=0;i<12;i++){startParts.push({x:Math.random()*startCv.width,y:Math.random()*startCv.height,vx:(Math.random()-.5)*.2,vy:-.15-Math.random()*.25,r:2.5+Math.random()*2,col:`rgba(200,168,75,${Math.random()*.4+.1})`,life:Math.random(),dec:.001+Math.random()*.002,ember:true});}}
 function drawStartBG(){if(!menuAnimActive)return;startCtx.clearRect(0,0,startCv.width,startCv.height);const grad=startCtx.createRadialGradient(startCv.width/2,startCv.height*.4,0,startCv.width/2,startCv.height*.4,startCv.width*.8);grad.addColorStop(0,'rgba(20,8,6,1)');grad.addColorStop(.5,'rgba(10,4,4,1)');grad.addColorStop(1,'rgba(4,4,10,1)');startCtx.fillStyle=grad;startCtx.fillRect(0,0,startCv.width,startCv.height);startParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.life-=p.dec;if(p.life<=0||p.y<-10){p.x=Math.random()*startCv.width;p.y=startCv.height+5;p.life=Math.random()*.5+.2;}startCtx.save();startCtx.globalAlpha=p.life;if(p.ember){startCtx.shadowColor='rgba(200,168,75,0.8)';startCtx.shadowBlur=8;}startCtx.beginPath();startCtx.arc(p.x,p.y,p.r,0,Math.PI*2);startCtx.fillStyle=p.col;startCtx.fill();startCtx.restore();});menuRAF=requestAnimationFrame(drawStartBG);}
 
-/* ═══════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    30 ENEMY TYPES (10 original + 20 new)
    Each with: minWave, hp, spd, sz, pts, col, ability, weight(w)
-   ═══════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const EDEFS=[
-  /* ─── WAVE 1-2: Starter enemies ─── */
+  /* â”€â”€â”€ WAVE 1-2: Starter enemies â”€â”€â”€ */
   {type:'scout',label:'SCOUT',minWave:1,hp:1,spd:1.1,sz:14,pts:80,col:'#C8A84B',sRate:0,ability:'none',weight(w){return w<=3?40:w<=5?20:8;}},
   {type:'skirmisher',label:'SKIRMISHER',minWave:2,hp:1,spd:0.65,sz:16,pts:120,col:'#8BA86A',sRate:0.55,ability:'strafe',weight(w){return w<2?0:w<=4?25:10;}},
   {type:'soldier',label:'SOLDIER',minWave:2,hp:2,spd:0.8,sz:20,pts:180,col:'#E25822',sRate:0.8,ability:'none',weight(w){return w<2?0:w<=4?35:12;}},
 
-  // NEW wave 1: RUNNER — ultra fast, no shooting, just charges
+  // NEW wave 1: RUNNER â€” ultra fast, no shooting, just charges
   {type:'runner',label:'RUNNER',minWave:1,hp:1,spd:2.4,sz:12,pts:100,col:'#FFB300',sRate:0,ability:'charge',weight(w){return w<=3?30:w<=6?15:5;}},
 
-  // NEW wave 1: CRAWLER — ground hugger, very small, sneaky
+  // NEW wave 1: CRAWLER â€” ground hugger, very small, sneaky
   {type:'crawler',label:'CRAWLER',minWave:1,hp:1,spd:0.9,sz:11,pts:90,col:'#66BB6A',sRate:0,ability:'zigzag',weight(w){return w<=2?35:w<=5?15:5;}},
 
-  // NEW wave 2: SPITTER — lobs slow arcing shots
+  // NEW wave 2: SPITTER â€” lobs slow arcing shots
   {type:'spitter',label:'SPITTER',minWave:2,hp:2,spd:0.5,sz:18,pts:200,col:'#26C6DA',sRate:1.0,ability:'lob',weight(w){return w<2?0:w<=4?22:10;}},
 
-  // NEW wave 2: TWIN — spawns 2 copies when killed
+  // NEW wave 2: TWIN â€” spawns 2 copies when killed
   {type:'twin',label:'TWIN',minWave:2,hp:2,spd:0.95,sz:16,pts:250,col:'#EF9A9A',sRate:0.5,ability:'split',weight(w){return w<2?0:w<=5?18:8;}},
 
-  /* ─── WAVE 3-4: Mid enemies ─── */
+  /* â”€â”€â”€ WAVE 3-4: Mid enemies â”€â”€â”€ */
   {type:'shielder',label:'SHIELDER',minWave:2,hp:4,spd:0.55,sz:24,pts:260,col:'#4A7EC7',sRate:0,ability:'shield',weight(w){return w<2?0:w<=5?20:10;}},
   {type:'elite',label:'ELITE',minWave:3,hp:3,spd:1.2,sz:19,pts:320,col:'#C0001A',sRate:1.6,ability:'burst',weight(w){return w<3?0:w<=6?28:14;}},
   {type:'berserker',label:'BERSERKER',minWave:3,hp:2,spd:2.0,sz:17,pts:280,col:'#FF4422',sRate:0,ability:'charge',weight(w){return w<3?0:w<=6?22:10;}},
 
-  // NEW wave 3: JUGGERNAUT — slow, huge, tanks everything
+  // NEW wave 3: JUGGERNAUT â€” slow, huge, tanks everything
   {type:'juggernaut',label:'JUGGERNAUT',minWave:3,hp:7,spd:0.4,sz:32,pts:500,col:'#546E7A',sRate:0.4,ability:'none',weight(w){return w<3?0:w<=6?15:8;}},
 
-  // NEW wave 3: SNIPER — stays far away, precise long-range shots
+  // NEW wave 3: SNIPER â€” stays far away, precise long-range shots
   {type:'sniper',label:'SNIPER',minWave:3,hp:2,spd:0.6,sz:15,pts:280,col:'#00ACC1',sRate:0.7,ability:'snipe',weight(w){return w<3?0:w<=6?18:10;}},
 
-  // NEW wave 3: SMOKER — creates smoke cloud that obscures
+  // NEW wave 3: SMOKER â€” creates smoke cloud that obscures
   {type:'smoker',label:'SMOKER',minWave:3,hp:2,spd:0.7,sz:17,pts:230,col:'#78909C',sRate:0,ability:'smoke',weight(w){return w<3?0:w<=6?16:8;}},
 
-  // NEW wave 4: LEECH — heals HP over time, must be killed fast
+  // NEW wave 4: LEECH â€” heals HP over time, must be killed fast
   {type:'leech',label:'LEECH',minWave:4,hp:4,spd:0.75,sz:19,pts:350,col:'#4CAF50',sRate:0.6,ability:'regen',weight(w){return w<4?0:w<=7?20:12;}},
 
-  /* ─── WAVE 5-6: Advanced enemies ─── */
+  /* â”€â”€â”€ WAVE 5-6: Advanced enemies â”€â”€â”€ */
   {type:'tribune',label:'TRIBUNE',minWave:4,hp:5,spd:0.65,sz:28,pts:550,col:'#8B0015',sRate:2.0,ability:'spread',weight(w){return w<4?0:w<=7?22:12;}},
   {type:'phantom',label:'PHANTOM',minWave:4,hp:2,spd:1.4,sz:18,pts:420,col:'#9B59B6',sRate:1.0,ability:'teleport',weight(w){return w<4?0:w<=7?20:12;}},
 
-  // NEW wave 5: BOMBER — rushes in and explodes, massive AoE
+  // NEW wave 5: BOMBER â€” rushes in and explodes, massive AoE
   {type:'bomber',label:'BOMBER',minWave:5,hp:3,spd:1.3,sz:20,pts:450,col:'#FF7043',sRate:0,ability:'explode',weight(w){return w<5?0:w<=8?20:12;}},
 
-  // NEW wave 5: NECROMANCER — revives dead enemies once
+  // NEW wave 5: NECROMANCER â€” revives dead enemies once
   {type:'necromancer',label:'NECROMANCER',minWave:5,hp:5,spd:0.55,sz:26,pts:600,col:'#CE93D8',sRate:1.2,ability:'revive',weight(w){return w<5?0:w<=8?14:8;}},
 
-  // NEW wave 5: VIPER — leaves poison trail behind it
+  // NEW wave 5: VIPER â€” leaves poison trail behind it
   {type:'viper',label:'VIPER',minWave:5,hp:3,spd:1.5,sz:16,pts:380,col:'#AED581',sRate:0.8,ability:'poison',weight(w){return w<5?0:w<=8?18:10;}},
 
-  // NEW wave 6: IRON TITAN — heavily armored, resists 80% damage
+  // NEW wave 6: IRON TITAN â€” heavily armored, resists 80% damage
   {type:'irontitan',label:'IRON TITAN',minWave:6,hp:12,spd:0.55,sz:36,pts:1200,col:'#607D8B',sRate:1.5,ability:'armored',weight(w){return w<6?0:w<=9?15:10;}},
 
-  // NEW wave 6: THUNDERER — drops lightning bolts at player position
+  // NEW wave 6: THUNDERER â€” drops lightning bolts at player position
   {type:'thunderer',label:'THUNDERER',minWave:6,hp:6,spd:0.7,sz:28,pts:750,col:'#FFF176',sRate:1.8,ability:'lightning',weight(w){return w<6?0:w<=9?16:10;}},
 
-  // NEW wave 6: CORRUPTOR — turns ammo packs into enemies
+  // NEW wave 6: CORRUPTOR â€” turns ammo packs into enemies
   {type:'corruptor',label:'CORRUPTOR',minWave:6,hp:4,spd:0.85,sz:22,pts:520,col:'#F06292',sRate:1.0,ability:'corrupt',weight(w){return w<6?0:w<=9?14:8;}},
 
-  /* ─── WAVE 7-8: Elite bosses ─── */
+  /* â”€â”€â”€ WAVE 7-8: Elite bosses â”€â”€â”€ */
   {type:'warlord',label:'WARLORD',minWave:5,hp:8,spd:0.9,sz:34,pts:900,col:'#FF8C00',sRate:2.5,ability:'spiral',weight(w){return w<5?0:w<=8?14:18;}},
 
-  // NEW wave 7: COLOSSUS GUARD — titan bodyguard, spawns shields mid-fight
+  // NEW wave 7: COLOSSUS GUARD â€” titan bodyguard, spawns shields mid-fight
   {type:'colossusg',label:'TITAN GUARD',minWave:7,hp:10,spd:0.7,sz:38,pts:1000,col:'#5C6BC0',sRate:2.0,ability:'fortify',weight(w){return w<7?0:w<=9?14:10;}},
 
-  // NEW wave 7: STORM EAGLE — flies in erratic patterns, very fast
+  // NEW wave 7: STORM EAGLE â€” flies in erratic patterns, very fast
   {type:'stormeagle',label:'STORM EAGLE',minWave:7,hp:5,spd:2.2,sz:22,pts:680,col:'#80CBC4',sRate:2.2,ability:'dive',weight(w){return w<7?0:w<=10?18:12;}},
 
-  // NEW wave 8: VOID WALKER — phases in and out of visibility
+  // NEW wave 8: VOID WALKER â€” phases in and out of visibility
   {type:'voidwalker',label:'VOID WALKER',minWave:8,hp:6,spd:1.6,sz:24,pts:850,col:'#37474F',sRate:1.8,ability:'phase',weight(w){return w<8?0:w<=10?16:12;}},
 
-  // NEW wave 8: CHAOS LORD — combines spread + spiral + burst
+  // NEW wave 8: CHAOS LORD â€” combines spread + spiral + burst
   {type:'chaoslord',label:'CHAOS LORD',minWave:8,hp:14,spd:0.8,sz:40,pts:1800,col:'#E040FB',sRate:2.8,ability:'chaos',weight(w){return w<8?0:w<=10?10:8;}},
 
-  /* ─── WAVE 9-10: Apex bosses ─── */
-  // NEW wave 9: TITAN HERALD — summons smaller enemies periodically
+  /* â”€â”€â”€ WAVE 9-10: Apex bosses â”€â”€â”€ */
+  // NEW wave 9: TITAN HERALD â€” summons smaller enemies periodically
   {type:'herald',label:'TITAN HERALD',minWave:9,hp:18,spd:0.5,sz:46,pts:2200,col:'#FF8F00',sRate:3.0,ability:'summon',weight(w){return w<9?0:w<=10?8:6;}},
 
   {type:'caesar',label:'CAESAR',minWave:6,hp:20,spd:0.4,sz:44,pts:2500,col:'#D4AF37',sRate:3.2,ability:'nova',weight(w){return w<6?0:Math.min(8,w-5)*2;}},
 
-  // NEW wave 10: TITAN GOD — the ultimate boss
+  // NEW wave 10: TITAN GOD â€” the ultimate boss
   {type:'titangod',label:'TITAN GOD',minWave:10,hp:35,spd:0.6,sz:54,pts:5000,col:'#FFD700',sRate:4.0,ability:'godmode',weight(w){return w<10?0:12;}}
 ];
 
 function pickEnemyDef(wave){const pool=[];EDEFS.forEach(d=>{const w=d.weight(wave);if(w>0)for(let i=0;i<w;i++)pool.push(d);});return pool[Math.floor(Math.random()*pool.length)]||EDEFS[0];}
 
-/* ═══ GAME STATE ═══ */
+/* â•â•â• GAME STATE â•â•â• */
 const DURATION=300;
 let gState='menu';
 let pName='TITAN';
@@ -1444,7 +1419,7 @@ function updateOpponentLivesHUD(){
   const scoreEl=document.getElementById('opponent-score');
   if(!remote||remote.alive===false){
     container.innerHTML='<span class="ldot dead"></span>';
-    if(scoreEl)scoreEl.textContent=remote?('💀 '+((remote.score||0).toLocaleString())):'';
+    if(scoreEl)scoreEl.textContent=remote?('ðŸ’€ '+((remote.score||0).toLocaleString())):'';
     return;
   }
   const remoteLives=remote.lives||0;
@@ -1506,11 +1481,11 @@ function updatePowerHUD(){
   else{pbar.classList.remove('ready');pcount.classList.remove('ready');pcool.classList.remove('ready');}
 }
 const WAVE_MODIFIERS=[
-  {name:'⚡ HORDES',effect:'hordes',desc:'More enemies'},
-  {name:'🚀 FAST',effect:'fast',desc:'Enemies move faster'},
-  {name:'🛡️ ARMORED',effect:'armored',desc:'Enemies take reduced damage'},
-  {name:'❄️ FROZEN',effect:'slow',desc:'Enemies move slower'},
-  {name:'🔥 BURNING',effect:'burning',desc:'Player takes damage over time'}
+  {name:'âš¡ HORDES',effect:'hordes',desc:'More enemies'},
+  {name:'ðŸš€ FAST',effect:'fast',desc:'Enemies move faster'},
+  {name:'ðŸ›¡ï¸ ARMORED',effect:'armored',desc:'Enemies take reduced damage'},
+  {name:'â„ï¸ FROZEN',effect:'slow',desc:'Enemies move slower'},
+  {name:'ðŸ”¥ BURNING',effect:'burning',desc:'Player takes damage over time'}
 ];
 function mpModifierForWave(w){
   if(w<3)return null;
@@ -1532,7 +1507,7 @@ function applyWaveModifier(){
     const modEl=document.getElementById('wave-modifier');
     const modName=WAVE_MODIFIERS.find(m=>m.effect===waveModifier)?.name||'';
     modEl.textContent=modName;modEl.style.display='block';
-    showPowerAnnounce('⚠ '+modName);
+    showPowerAnnounce('âš  '+modName);
     triggerShake(4,200);
   }else{
     waveModifier=null;document.getElementById('wave-modifier').style.display='none';
@@ -1555,7 +1530,7 @@ function activatePower(){
   powerCharge=0;powerCooldownTimer=ch.powerCooldown;
   triggerSlowMo(0.4, 0.3);
   triggerShake(6, 250);
-  sfxPower();spawnPop(P.x,P.y-30,'✦ '+ch.powerName,'power');
+  sfxPower();spawnPop(P.x,P.y-30,'âœ¦ '+ch.powerName,'power');
   ch.power(gameState2);updatePowerHUD();
 }
 function switchWeapon(){
@@ -1575,11 +1550,11 @@ function updateWeaponHUD(){
   if(btnName)btnName.textContent=wp.name;
 }
 
-/* ═══ AMMO PACK ═══ */
+/* â•â•â• AMMO PACK â•â•â• */
 function spawnAmmoPack(){const margin=60;ammoPacks.push({x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:14,pulse:0,age:0,maxAge:18,club:Math.random()<.2});}
 function drawAmmoPackGlyph(ctx,x,y,r,pulse,isClub){ctx.save();ctx.translate(x,y);const glow=ctx.createRadialGradient(0,0,r*.3,0,0,r*2.2);glow.addColorStop(0,isClub?'rgba(212,175,55,0.35)':'rgba(0,200,168,0.22)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,r*2.2,0,Math.PI*2);ctx.fill();const pr=r*(1+pulse*.4);ctx.strokeStyle=isClub?`rgba(212,175,55,${.8-pulse*.4})`:`rgba(0,200,168,${.6-pulse*.4})`;ctx.lineWidth=isClub?2.5:1.5;ctx.beginPath();ctx.arc(0,0,pr,0,Math.PI*2);ctx.stroke();if(isClub){ctx.fillStyle='rgba(212,175,55,0.15)';ctx.beginPath();ctx.arc(0,0,r*1.3,0,Math.PI*2);ctx.fill();}ctx.fillStyle='rgba(0,30,26,0.85)';ctx.strokeStyle=isClub?'rgba(212,175,55,0.85)':'rgba(0,200,168,0.85)';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle=isClub?'rgba(212,175,55,0.95)':'rgba(0,200,168,0.95)';ctx.fillRect(-3,-7,6,10);ctx.beginPath();ctx.moveTo(-3,3);ctx.lineTo(3,3);ctx.lineTo(0,8);ctx.closePath();ctx.fill();ctx.fillStyle=isClub?'rgba(245,228,168,0.5)':'rgba(0,200,168,0.5)';ctx.fillRect(-3,-9,6,3);ctx.restore();}
 
-/* ═══ SPAWN ENEMY ═══ */
+/* â•â•â• SPAWN ENEMY â•â•â• */
 function spawnEnemy(forceDef,forceX,forceY){
   const def=forceDef||pickEnemyDef(wave);
   const mg=def.sz+20;const side=Math.floor(Math.random()*3);let x,y;
@@ -1618,13 +1593,13 @@ function spawnEnemy(forceDef,forceX,forceY){
   if(def.ability==='poison'){e.trail=[];}
   if(def.ability==='revive'){e.revived=false;e.revivedTarget=null;}
   if(def.ability==='armored'){e.armorMod=0.2;}// takes only 20% damage
-  if(def.type==='caesar')showEnemyWarn('♛ CAESAR · TITANS CLUB LEGEND');
-  if(def.type==='warlord')showEnemyWarn('⚔ WARLORD · TITANS CLUB ELITE');
-  if(def.type==='titangod')showEnemyWarn('☀ TITAN GOD · TITANS CLUB PRIME');
-  if(def.type==='herald')showEnemyWarn('⚑ TITAN HERALD · TITANS CLUB');
-  if(def.type==='chaoslord')showEnemyWarn('✦ CHAOS LORD · TITANS CLUB');
-  if(def.type==='irontitan')showEnemyWarn('♛ IRON TITAN · TITANS CLUB VANGUARD');
-  if(def.type==='colossusg')showEnemyWarn('⚔ TITAN GUARD · TITANS CLUB');
+  if(def.type==='caesar')showEnemyWarn('â™› CAESAR Â· TITANS CLUB LEGEND');
+  if(def.type==='warlord')showEnemyWarn('âš” WARLORD Â· TITANS CLUB ELITE');
+  if(def.type==='titangod')showEnemyWarn('â˜€ TITAN GOD Â· TITANS CLUB PRIME');
+  if(def.type==='herald')showEnemyWarn('âš‘ TITAN HERALD Â· TITANS CLUB');
+  if(def.type==='chaoslord')showEnemyWarn('âœ¦ CHAOS LORD Â· TITANS CLUB');
+  if(def.type==='irontitan')showEnemyWarn('â™› IRON TITAN Â· TITANS CLUB VANGUARD');
+  if(def.type==='colossusg')showEnemyWarn('âš” TITAN GUARD Â· TITANS CLUB');
   enemies.push(e);
 }
 function spawnTitan(wave){
@@ -1634,12 +1609,12 @@ function spawnTitan(wave){
   const e={...def,maxHp:hp,hp:hp,x:cv.width/2,y:-70,vx:0,vy:0,st:0,wob:0,wm:1,ang:0,spdMod:1,stunT:0,spd:def.spd*diffCfg.enemySpdMult,sRate:def.sRate*diffCfg.enemyFireMult,isElite:false,isTitan:true,col:'#C77DFF'};
   enemies.push(e);
   MP._lastTitanKillSeen=0;
-  showEnemyWarn('☄ SHARED TITAN · CO-OP TARGET');
+  showEnemyWarn('â˜„ SHARED TITAN Â· CO-OP TARGET');
 }
 
 function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
 
-/* ═══ PARTICLES / POPS ═══ */
+/* â•â•â• PARTICLES / POPS â•â•â• */
 function spawnParts(x,y,col,n){if(parts.length>220)return;for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=35+Math.random()*110;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dec:.05+Math.random()*.07,r:1.2+Math.random()*2.8,col});}}
 function spawnPop(x,y,txt,cls){const el=document.createElement('div');el.className='spop'+(cls?' '+cls:'');el.textContent=txt;el.style.left=(x-30)+'px';el.style.top=(y-15)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),750);}
 
@@ -1655,14 +1630,14 @@ function takeDmg(amount){
   let dmgMult=1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmgMult=gameState2.powerBuff.dmgTakenMult||1;
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='impenetrable')return;
-  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'×';}var si=document.getElementById('spectator-indicator');si.querySelector('.spc-text').textContent='DOWNED — ALLY CAN REVIVE';si.style.display='block';}else{endGame();}}
+  lives-=Math.ceil(amount*dmgMult);sfxDamage();document.getElementById('flash').style.opacity='1';setTimeout(()=>document.getElementById('flash').style.opacity='0',90);document.body.style.animation='shake .32s ease';setTimeout(()=>document.body.style.animation='',320);P.invinc=2.5;refreshDots();spawnParts(P.x,P.y,'#C0001A',10);  if(lives<=0){if(MP.roomCode&&MP.playerId){MP.mpLocalDead=true;MP.mpRevivedThisDeath=false;MP._downedKillBaseline=null;MP.mpReviveHold=0;MP._revivingAlly=false;resetJoystick();if(!MP.mpDeathScreenShown){MP.mpDeathScreenShown=true;updateStats();checkAchievements();document.getElementById('mp-fstat-wave').textContent=toRoman(wave);document.getElementById('mp-fstat-kills').textContent=totalKills;document.getElementById('mp-fstat-combo').textContent=bestCombo+'Ã—';}var si=document.getElementById('spectator-indicator');si.querySelector('.spc-text').textContent='DOWNED â€” ALLY CAN REVIVE';si.style.display='block';}else{endGame();}}
 }
 
 function showWaveAnnounce(n){
   const el=document.getElementById('wave-announce');const prof=getWaveMusic(n);const moodLabel=n<=2?'MARCH':n<=4?'ADVANCE':n<=5?'ASSAULT':'FURY';
-  const clubMsg=n>=10?'♛ TITANS CLUB · FINAL STAND':n>=7?'✦ TITANS CLUB · ELITE ONSLAUGHT':n>=5?'⚔ TITANS CLUB · ADVANCE':n>=3?'✦ TITANS CLUB · MARCH':'♛ TITANS CLUB · RECRUIT TRIAL';
-  const extraMsg=n>=10?'☀ FACE THE TITAN GOD':n>=9?'⚑ TITAN HERALD APPROACHES':'';
-  el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} · ${prof.bpm} BPM</span><br><span style="font-family:'Cinzel';font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);">${clubMsg}</span>${extraMsg?`<br><span style="font-family:'Cinzel Decorative';font-size:.6rem;letter-spacing:2px;color:var(--red-hot);">${extraMsg}</span>`:''}`;
+  const clubMsg=n>=10?'â™› TITANS CLUB Â· FINAL STAND':n>=7?'âœ¦ TITANS CLUB Â· ELITE ONSLAUGHT':n>=5?'âš” TITANS CLUB Â· ADVANCE':n>=3?'âœ¦ TITANS CLUB Â· MARCH':'â™› TITANS CLUB Â· RECRUIT TRIAL';
+  const extraMsg=n>=10?'â˜€ FACE THE TITAN GOD':n>=9?'âš‘ TITAN HERALD APPROACHES':'';
+  el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} Â· ${prof.bpm} BPM</span><br><span style="font-family:'Cinzel';font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);">${clubMsg}</span>${extraMsg?`<br><span style="font-family:'Cinzel Decorative';font-size:.6rem;letter-spacing:2px;color:var(--red-hot);">${extraMsg}</span>`:''}`;
   el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2500);
   if(n>=5)triggerShake(3,200);
   if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
@@ -1702,7 +1677,7 @@ function sfxComboMilestone(){
 function fireAt(e,tx,ty,speed,r){const a=Math.atan2(ty-e.y,tx-e.x);eBullets.push({x:e.x,y:e.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:r||5,col:e.col});}
 function fireAngle(e,ang,speed,r){eBullets.push({x:e.x,y:e.y,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,r:r||5,col:e.col});}
 
-/* ═══ WAVE BACKGROUNDS ═══ */
+/* â•â•â• WAVE BACKGROUNDS â•â•â• */
 const WAVE_BGS=[
   {r:4,g:4,b:10},{r:4,g:10,b:18},{r:8,g:4,b:18},{r:14,g:4,b:22},{r:18,g:4,b:14},
   {r:22,g:6,b:4},{r:24,g:10,b:0},{r:20,g:4,b:4},{r:10,g:0,b:20},{r:28,g:2,b:2}
@@ -1744,7 +1719,7 @@ function mpResyncWave(w){
     P.invinc=3;
     resetJoystick();
     document.getElementById('spectator-indicator').style.display='none';
-    showPowerAnnounce('✚ REVIVED BY ALLY');
+    showPowerAnnounce('âœš REVIVED BY ALLY');
     spawnParts(P.x,P.y,'#4CAF50',24);
     sfxCombo();
     updateOpponentLivesHUD();
@@ -1764,7 +1739,7 @@ function drawGate(ctx,g){
   ctx.globalAlpha=0.7+Math.sin(t*3)*0.3;ctx.fillStyle=g.col;ctx.font="bold 11px 'Cinzel', serif";ctx.textAlign='center';ctx.shadowColor=g.col;ctx.shadowBlur=10;ctx.fillText('ENTER',0,-g.r-14);ctx.restore();
 }
 
-/* ═══ DRAW ENEMIES ═══ */
+/* â•â•â• DRAW ENEMIES â•â•â• */
 function drawEnemy(e){
   if(e.ability==='phase'&&!e.visible&&Math.floor(Date.now()/150)%3===0)return;
   cx.save();cx.translate(e.x,e.y);
@@ -1831,9 +1806,9 @@ function drawEnemy(e){
   }
 }
 
-/* ═══ DRAW ═══ */
-function rankMsg(sc){if(sc>=20000)return 'TITAN PRIME · IMMORTAL LEGEND';if(sc>=15000)return 'ALPHA TITAN · FIRST AMONG ALL';if(sc>=8000)return 'PRIMUS · ELITE OF THE LEGION';if(sc>=3000)return 'MILES · SENIOR WARRIOR';return 'TIRO · THE JOURNEY BEGINS';}
-function clubRank(sc){if(sc>=20000)return '♛ TITANS CLUB · LEGENDARY MEMBER';if(sc>=15000)return '♛ TITANS CLUB · ALPHA TITAN';if(sc>=8000)return '✦ TITANS CLUB · PRIMUS ELITE';if(sc>=3000)return '✦ TITANS CLUB · SENIOR WARRIOR';return '✦ TITANS CLUB · RECRUIT';}
+/* â•â•â• DRAW â•â•â• */
+function rankMsg(sc){if(sc>=20000)return 'TITAN PRIME Â· IMMORTAL LEGEND';if(sc>=15000)return 'ALPHA TITAN Â· FIRST AMONG ALL';if(sc>=8000)return 'PRIMUS Â· ELITE OF THE LEGION';if(sc>=3000)return 'MILES Â· SENIOR WARRIOR';return 'TIRO Â· THE JOURNEY BEGINS';}
+function clubRank(sc){if(sc>=20000)return 'â™› TITANS CLUB Â· LEGENDARY MEMBER';if(sc>=15000)return 'â™› TITANS CLUB Â· ALPHA TITAN';if(sc>=8000)return 'âœ¦ TITANS CLUB Â· PRIMUS ELITE';if(sc>=3000)return 'âœ¦ TITANS CLUB Â· SENIOR WARRIOR';return 'âœ¦ TITANS CLUB Â· RECRUIT';}
 
 function drawMinimap(){
   const mc=document.getElementById('minimap');
@@ -1850,7 +1825,7 @@ function drawMinimap(){
   activeTurrets.forEach(t=>{mctx.fillStyle='#4AFFFF';mctx.beginPath();mctx.arc(t.x*sx,t.y*sy,2,0,Math.PI*2);mctx.fill();});
 }
 
-/* ═══ INPUT ═══ */
+/* â•â•â• INPUT â•â•â• */
 function isInputFocused(){const t=document.activeElement;return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
 document.addEventListener('keydown',e=>{if(isInputFocused()||(MP.mpLocalDead&&MP.roomCode&&MP.playerId))return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
 document.addEventListener('keyup',e=>{if(isInputFocused())return;keys[e.code]=false;if(e.code==='Space')shooting=false;});
@@ -1885,7 +1860,7 @@ wb.addEventListener('touchstart',e=>{e.preventDefault();switchWeapon();wake();},
 wb.addEventListener('mousedown',()=>{switchWeapon();wake();});
 document.addEventListener('keydown',e=>{if(isInputFocused())return;if(e.code==='KeyQ'||e.code==='KeyR'){e.preventDefault();switchWeapon();}});
 
-/* ═══ BUTTON WIRING ═══ */
+/* â•â•â• BUTTON WIRING â•â•â• */
 document.getElementById('btn-start').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
 document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-chars');});
 document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
@@ -1979,14 +1954,14 @@ document.addEventListener('keydown',e=>{
   else if(e.code==='KeyC')mpSendPing('here');
 });
 
-/* ═══ BOOT ═══ */
+/* â•â•â• BOOT â•â•â• */
 initStartCanvas();menuAnimActive=true;menuRAF=requestAnimationFrame(drawStartBG);
 
-/* ═══════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    NEW ENHANCEMENT SYSTEMS
-   ═══════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* ═══ PAUSE MENU ═══ */
+/* â•â•â• PAUSE MENU â•â•â• */
 let isPaused=false;
 const pauseOverlay=document.getElementById('pause-overlay');
 function togglePause(){
@@ -2024,7 +1999,7 @@ document.getElementById('btn-achievements-back').addEventListener('click',()=>{
 });
 document.getElementById('btn-pause-achievements').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-achievements');renderAchievements();});
 
-/* ═══ SETTINGS ═══ */
+/* â•â•â• SETTINGS â•â•â• */
 let settings={musicVol:0.8,sfxVol:1.0,particleDensity:3};
 function loadSettings(){
   try{const s=JSON.parse(localStorage.getItem('titans_settings'));if(s)settings={...settings,...s};}catch(e){}
@@ -2043,7 +2018,7 @@ document.getElementById('music-vol').addEventListener('input',e=>{settings.music
 document.getElementById('sfx-vol').addEventListener('input',e=>{settings.sfxVol=e.target.value/100;updateSettingsLabels();saveSettings();});
 document.getElementById('particle-density').addEventListener('input',e=>{settings.particleDensity=parseInt(e.target.value);updateSettingsLabels();saveSettings();});
 
-/* ═══ STATISTICS ═══ */
+/* â•â•â• STATISTICS â•â•â• */
 let stats={totalKills:0,gamesPlayed:0,bestScore:0,bestWave:1,bestCombo:0,headshots:0,playTime:0,accuracy:{shots:0,hits:0}};
 function loadStats(){
   try{const s=JSON.parse(localStorage.getItem('titans_stats'));if(s)stats={...stats,...s};}catch(e){}
@@ -2060,7 +2035,7 @@ function renderStats(){
   document.getElementById('st-games').textContent=stats.gamesPlayed;
   document.getElementById('st-best-score').textContent=stats.bestScore.toLocaleString();
   document.getElementById('st-best-wave').textContent=toRoman(stats.bestWave);
-  document.getElementById('st-best-combo').textContent=stats.bestCombo+'×';
+  document.getElementById('st-best-combo').textContent=stats.bestCombo+'Ã—';
   const acc=stats.accuracy.shots>0?Math.round(stats.accuracy.hits/stats.accuracy.shots*100):0;
   document.getElementById('st-accuracy').textContent=acc+'%';
   document.getElementById('st-headshots').textContent=stats.headshots;
@@ -2069,20 +2044,20 @@ function renderStats(){
 }
 let gameStartTime=0;
 
-/* ═══ ACHIEVEMENTS ═══ */
+/* â•â•â• ACHIEVEMENTS â•â•â• */
 const ACHIEVEMENTS=[
-  {id:'first_blood',name:'FIRST BLOOD',desc:'Kill your first enemy',icon:'⚔',check:s=>s.totalKills>=1},
-  {id:'combo_5',name:'CLUB STRIKE',desc:'Reach a 5× combo',icon:'✦',check:s=>s.bestCombo>=5},
-  {id:'combo_10',name:'LEGIONARY',desc:'Reach a 10× combo',icon:'♛',check:s=>s.bestCombo>=10},
-  {id:'combo_20',name:'IMMORTAL',desc:'Reach a 20× combo',icon:'☀',check:s=>s.bestCombo>=20},
-  {id:'wave_5',name:'ADVANCE',desc:'Reach Wave 5',icon:'⚔',check:s=>s.bestWave>=5},
-  {id:'wave_10',name:'FINAL STAND',desc:'Reach Wave 10',icon:'♛',check:s=>s.bestWave>=10},
-  {id:'score_5k',name:'RISING STAR',desc:'Score 5,000 points',icon:'⭐',check:s=>s.bestScore>=5000},
-  {id:'score_20k',name:'TITAN PRIME',desc:'Score 20,000 points',icon:'☀',check:s=>s.bestScore>=20000},
-  {id:'games_10',name:'VETERAN',desc:'Play 10 games',icon:'🏆',check:s=>s.gamesPlayed>=10},
-  {id:'games_50',name:'LEGEND',desc:'Play 50 games',icon:'♛',check:s=>s.gamesPlayed>=50},
-  {id:'accuracy',name:'SHARPSHOOTER',desc:'90%+ accuracy',icon:'🎯',check:s=>s.accuracy.shots>10&&s.accuracy.hits/s.accuracy.shots>=0.9},
-  {id:'titan_hunter',name:'TITAN HUNTER',desc:'Defeat 50 Titan Club enemies',icon:'⚔',check:s=>s.headshots>=50},
+  {id:'first_blood',name:'FIRST BLOOD',desc:'Kill your first enemy',icon:'âš”',check:s=>s.totalKills>=1},
+  {id:'combo_5',name:'CLUB STRIKE',desc:'Reach a 5Ã— combo',icon:'âœ¦',check:s=>s.bestCombo>=5},
+  {id:'combo_10',name:'LEGIONARY',desc:'Reach a 10Ã— combo',icon:'â™›',check:s=>s.bestCombo>=10},
+  {id:'combo_20',name:'IMMORTAL',desc:'Reach a 20Ã— combo',icon:'â˜€',check:s=>s.bestCombo>=20},
+  {id:'wave_5',name:'ADVANCE',desc:'Reach Wave 5',icon:'âš”',check:s=>s.bestWave>=5},
+  {id:'wave_10',name:'FINAL STAND',desc:'Reach Wave 10',icon:'â™›',check:s=>s.bestWave>=10},
+  {id:'score_5k',name:'RISING STAR',desc:'Score 5,000 points',icon:'â­',check:s=>s.bestScore>=5000},
+  {id:'score_20k',name:'TITAN PRIME',desc:'Score 20,000 points',icon:'â˜€',check:s=>s.bestScore>=20000},
+  {id:'games_10',name:'VETERAN',desc:'Play 10 games',icon:'ðŸ†',check:s=>s.gamesPlayed>=10},
+  {id:'games_50',name:'LEGEND',desc:'Play 50 games',icon:'â™›',check:s=>s.gamesPlayed>=50},
+  {id:'accuracy',name:'SHARPSHOOTER',desc:'90%+ accuracy',icon:'ðŸŽ¯',check:s=>s.accuracy.shots>10&&s.accuracy.hits/s.accuracy.shots>=0.9},
+  {id:'titan_hunter',name:'TITAN HUNTER',desc:'Defeat 50 Titan Club enemies',icon:'âš”',check:s=>s.headshots>=50},
 ];
 let unlockedAchievements=new Set();
 function loadAchievements(){try{const a=JSON.parse(localStorage.getItem('titans_achievements'));if(a)unlockedAchievements=new Set(a);}catch(e){unlockedAchievements=new Set();}}
@@ -2090,7 +2065,7 @@ function saveAchievements(){localStorage.setItem('titans_achievements',JSON.stri
 function checkAchievements(){
   ACHIEVEMENTS.forEach(ach=>{
     if(!unlockedAchievements.has(ach.id)&&ach.check(stats)){
-      unlockedAchievements.add(ach.id);saveAchievements();showPowerAnnounce('🏆 '+ach.name);spawnParts(cv.width/2,cv.height/2,'#FFD700',30);triggerShake(5,200);sfxComboMilestone();
+      unlockedAchievements.add(ach.id);saveAchievements();showPowerAnnounce('ðŸ† '+ach.name);spawnParts(cv.width/2,cv.height/2,'#FFD700',30);triggerShake(5,200);sfxComboMilestone();
     }
   });
 }
@@ -2104,15 +2079,15 @@ function renderAchievements(){
   });
 }
 
-/* ═══ UPGRADES ═══ */
+/* â•â•â• UPGRADES â•â•â• */
 const UPGRADES=[
-  {id:'ammo_cap',name:'AMMO CAPACITY',desc:'+5 max ammo',icon:'📦',cost:100,type:'ammo',maxLevel:5,current:0,apply:()=>{maxAmmo+=5;}},
-  {id:'fire_rate',name:'RAPID FIRE',desc:'15% faster fire rate',icon:'⚡',cost:150,type:'fire',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.fire*=0.85;});}},
-  {id:'damage',name:'HEAVY ROUNDS',desc:'+20% bullet damage',icon:'💥',cost:200,type:'dmg',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.dmg*=1.2;});}},
-  {id:'speed',name:'AGILITY',desc:'+10% movement speed',icon:'👟',cost:120,type:'spd',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.spd*=1.1;});}},
-  {id:'regen',name:'AMMO REGEN',desc:'Faster ammo regeneration',icon:'🔄',cost:180,type:'regen',maxLevel:3,current:0,apply:()=>{diffCfg.ammoRegenRate*=1.4;}},
-  {id:'shield',name:'EXTRA LIFE',desc:'+1 maximum life',icon:'🛡️',cost:250,type:'life',maxLevel:3,current:0,apply:()=>{diffCfg.lives+=1;}},
-  {id:'crit',name:'CRITICAL STRIKE',desc:'10% chance for 2× damage',icon:'🎯',cost:300,type:'crit',maxLevel:3,current:0,apply:()=>{window.critChance=(window.critChance||0)+0.1;}},
+  {id:'ammo_cap',name:'AMMO CAPACITY',desc:'+5 max ammo',icon:'ðŸ“¦',cost:100,type:'ammo',maxLevel:5,current:0,apply:()=>{maxAmmo+=5;}},
+  {id:'fire_rate',name:'RAPID FIRE',desc:'15% faster fire rate',icon:'âš¡',cost:150,type:'fire',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.fire*=0.85;});}},
+  {id:'damage',name:'HEAVY ROUNDS',desc:'+20% bullet damage',icon:'ðŸ’¥',cost:200,type:'dmg',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.dmg*=1.2;});}},
+  {id:'speed',name:'AGILITY',desc:'+10% movement speed',icon:'ðŸ‘Ÿ',cost:120,type:'spd',maxLevel:5,current:0,apply:()=>{CHARS.forEach(c=>{c.spd*=1.1;});}},
+  {id:'regen',name:'AMMO REGEN',desc:'Faster ammo regeneration',icon:'ðŸ”„',cost:180,type:'regen',maxLevel:3,current:0,apply:()=>{diffCfg.ammoRegenRate*=1.4;}},
+  {id:'shield',name:'EXTRA LIFE',desc:'+1 maximum life',icon:'ðŸ›¡ï¸',cost:250,type:'life',maxLevel:3,current:0,apply:()=>{diffCfg.lives+=1;}},
+  {id:'crit',name:'CRITICAL STRIKE',desc:'10% chance for 2Ã— damage',icon:'ðŸŽ¯',cost:300,type:'crit',maxLevel:3,current:0,apply:()=>{window.critChance=(window.critChance||0)+0.1;}},
 ];
 let credits=0;
 let upgrades={};
@@ -2128,26 +2103,26 @@ function renderUpgrades(){
     card.innerHTML=`<div class="upg-icon">${upg.icon}</div><div class="upg-info"><div class="upg-name">${upg.name} ${owned?'[MAX]':`[${upg.current}/${upg.maxLevel}]`}</div><div class="upg-desc">${upg.desc}</div></div><div class="upg-cost">${owned?'MAXED':upg.cost+' CREDITS'}</div>`;
     if(!owned&&canAfford){
       card.addEventListener('click',()=>{
-        if(credits>=upg.cost&&upg.current<upg.maxLevel){credits-=upg.cost;upg.current++;upg.apply();saveUpgrades();renderUpgrades();showPowerAnnounce('⬆ '+upg.name+' UPGRADED');sfxCombo();}
+        if(credits>=upg.cost&&upg.current<upg.maxLevel){credits-=upg.cost;upg.current++;upg.apply();saveUpgrades();renderUpgrades();showPowerAnnounce('â¬† '+upg.name+' UPGRADED');sfxCombo();}
       });
     }
     list.appendChild(card);
   });
 }
 
-/* ═══ WEAPON SYSTEM ═══ */
-/* ═══ POWER-UPS ═══ */
+/* â•â•â• WEAPON SYSTEM â•â•â• */
+/* â•â•â• POWER-UPS â•â•â• */
 const POWERUP_TYPES=[
-  {id:'speed',name:'SPEED BOOST',icon:'⚡',color:'#00C8A8',duration:8,effect:'speed'},
-  {id:'damage',name:'DAMAGE BOOST',icon:'💥',color:'#FF6D00',duration:6,effect:'damage'},
-  {id:'shield',name:'SHIELD',icon:'🛡️',color:'#4A9EFF',duration:10,effect:'shield'},
-  {id:'rapid',name:'RAPID FIRE',icon:'🔥',color:'#E8001F',duration:5,effect:'rapid'},
-  {id:'magnet',name:'AMMO MAGNET',icon:'🧲',color:'#D4AF37',duration:12,effect:'magnet'},
-  {id:'timewarp',name:'TIME WARP',icon:'⏳',color:'#9C27B0',duration:8,effect:'timewarp'},
-  {id:'shieldgen',name:'SHIELD GENERATOR',icon:'🔰',color:'#00E5FF',duration:15,effect:'shieldgen'},
-  {id:'doubleshot',name:'DOUBLE SHOT',icon:'🎯',color:'#FFD700',duration:10,effect:'doubleshot'},
-  {id:'invisibility',name:'INVISIBILITY',icon:'👁️',color:'#B0BEC5',duration:6,effect:'invisibility'},
-  {id:'nuke',name:'NUKE',icon:'☢️',color:'#FF1744',duration:0,effect:'nuke'},
+  {id:'speed',name:'SPEED BOOST',icon:'âš¡',color:'#00C8A8',duration:8,effect:'speed'},
+  {id:'damage',name:'DAMAGE BOOST',icon:'ðŸ’¥',color:'#FF6D00',duration:6,effect:'damage'},
+  {id:'shield',name:'SHIELD',icon:'ðŸ›¡ï¸',color:'#4A9EFF',duration:10,effect:'shield'},
+  {id:'rapid',name:'RAPID FIRE',icon:'ðŸ”¥',color:'#E8001F',duration:5,effect:'rapid'},
+  {id:'magnet',name:'AMMO MAGNET',icon:'ðŸ§²',color:'#D4AF37',duration:12,effect:'magnet'},
+  {id:'timewarp',name:'TIME WARP',icon:'â³',color:'#9C27B0',duration:8,effect:'timewarp'},
+  {id:'shieldgen',name:'SHIELD GENERATOR',icon:'ðŸ”°',color:'#00E5FF',duration:15,effect:'shieldgen'},
+  {id:'doubleshot',name:'DOUBLE SHOT',icon:'ðŸŽ¯',color:'#FFD700',duration:10,effect:'doubleshot'},
+  {id:'invisibility',name:'INVISIBILITY',icon:'ðŸ‘ï¸',color:'#B0BEC5',duration:6,effect:'invisibility'},
+  {id:'nuke',name:'NUKE',icon:'â˜¢ï¸',color:'#FF1744',duration:0,effect:'nuke'},
 ];
 let activePowerups=[];
 let curWeapon=0;
@@ -2162,11 +2137,11 @@ let killstreakBonus=0;
 
 let weaponSwitchCD=0;
 const WEAPONS=[
-  {id:'pistol',name:'PISTOL',icon:'🔫',ammoCost:1,fireRate:.16,spd:690,dmg:1,count:1,spread:0,r:4,pierce:false,color:'#E2C06A'},
-  {id:'shotgun',name:'SHOTGUN',icon:'💥',ammoCost:2,fireRate:.4,spd:680,dmg:1,count:5,spread:.22,r:3,pierce:false,color:'#FF8C00'},
-  {id:'sniper',name:'SNIPER RIFLE',icon:'🎯',ammoCost:2,fireRate:.55,spd:900,dmg:5,count:1,spread:0,r:5,pierce:true,color:'#6AFF4A'},
-  {id:'laser',name:'LASER',icon:'⚡',ammoCost:.5,fireRate:.06,spd:1000,dmg:.5,count:1,spread:0,r:3,pierce:true,color:'#00FFFF'},
-  {id:'rocket',name:'ROCKET LAUNCHER',icon:'🚀',ammoCost:3,fireRate:.6,spd:500,dmg:6,count:1,spread:0,r:6,pierce:false,color:'#FF4422',explosive:true,explR:120}
+  {id:'pistol',name:'PISTOL',icon:'ðŸ”«',ammoCost:1,fireRate:.16,spd:690,dmg:1,count:1,spread:0,r:4,pierce:false,color:'#E2C06A'},
+  {id:'shotgun',name:'SHOTGUN',icon:'ðŸ’¥',ammoCost:2,fireRate:.4,spd:680,dmg:1,count:5,spread:.22,r:3,pierce:false,color:'#FF8C00'},
+  {id:'sniper',name:'SNIPER RIFLE',icon:'ðŸŽ¯',ammoCost:2,fireRate:.55,spd:900,dmg:5,count:1,spread:0,r:5,pierce:true,color:'#6AFF4A'},
+  {id:'laser',name:'LASER',icon:'âš¡',ammoCost:.5,fireRate:.06,spd:1000,dmg:.5,count:1,spread:0,r:3,pierce:true,color:'#00FFFF'},
+  {id:'rocket',name:'ROCKET LAUNCHER',icon:'ðŸš€',ammoCost:3,fireRate:.6,spd:500,dmg:6,count:1,spread:0,r:6,pierce:false,color:'#FF4422',explosive:true,explR:120}
 ];
 function spawnPowerup(){
   if(Math.random()>0.003)return;
@@ -2216,7 +2191,7 @@ function drawPowerups(){
   });
 }
 
-/* ═══ DAMAGE NUMBERS ═══ */
+/* â•â•â• DAMAGE NUMBERS â•â•â• */
 let dmgNums=[];
 function spawnDmgNum(x,y,amount,color){
   if(dmgNums.length<20)dmgNums.push({x,y,amount:Math.round(amount),color:color||'#E2C06A',life:1,vy:-60});
@@ -2230,7 +2205,7 @@ function drawDmgNums(){
   });
 }
 
-/* ═══ KILL FEED ═══ */
+/* â•â•â• KILL FEED â•â•â• */
 let killFeed=[];
 function addKillFeed(msg,col){killFeed.unshift({msg,col,time:2.5});if(killFeed.length>5)killFeed.pop();}
 function updateKillFeed(dt){killFeed=killFeed.filter(k=>{k.time-=dt;return k.time>0;});}
@@ -2240,7 +2215,7 @@ function drawKillFeed(){
   });
 }
 
-/* ═══ NEW WEAPON FIRE LOGIC ═══ */
+/* â•â•â• NEW WEAPON FIRE LOGIC â•â•â• */
 function fireBullet(){
   if(ammo<=0){const now=Date.now();if(now-lastEmptyClick>350){sfxEmpty();lastEmptyClick=now;}return;}
   let wp={...WEAPONS[curWeapon]};
@@ -2270,7 +2245,7 @@ function fireBullet(){
   updateAmmoHUD();
 }
 
-/* ═══ ENHANCED ENEMY SPAWN ═══ */
+/* â•â•â• ENHANCED ENEMY SPAWN â•â•â• */
 let spawnVariantTimer=0;
 function spawnEnemyVariant(){
   if(Math.random()>0.08||enemies.length>=Math.min(4+wave,MP.roomCode?10:14))return;
@@ -2279,10 +2254,10 @@ function spawnEnemyVariant(){
   if(def)spawnEnemy(def);
 }
 
-/* ═══ CRITICAL HIT SYSTEM ═══ */
+/* â•â•â• CRITICAL HIT SYSTEM â•â•â• */
 function rollCrit(){return Math.random()<(window.critChance||0);}
 
-/* ═══ ENHANCED BULLET COLLISION ═══ */
+/* â•â•â• ENHANCED BULLET COLLISION â•â•â• */
 function checkBulletCollision(b,e,i){
   if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){
     if(e.ability==='reflect'&&e.visible!==false){spawnParts(b.x,b.y,'#B0BEC5',4);eBullets.push({x:b.x,y:b.y,vx:-b.vx*.8,vy:-b.vy*.8,r:b.r,col:'#B0BEC5'});stats.accuracy.hits++;return false;}
@@ -2314,14 +2289,14 @@ function checkBulletCollision(b,e,i){
   }
 }
 
-/* ═══ MAGNET EFFECT ═══ */
+/* â•â•â• MAGNET EFFECT â•â•â• */
 function updateMagnet(){
   if(window.magnetRange&&ammoPacks.length>0){
     ammoPacks.forEach(pk=>{const d=Math.hypot(pk.x-P.x,pk.y-P.y);if(d<window.magnetRange){const force=(window.magnetRange-d)/window.magnetRange*8;pk.x+=(P.x-pk.x)/d*force;pk.y+=(P.y-pk.y)/d*force;}});
   }
 }
 
-/* ═══ GAME INITIALIZATION ENHANCEMENT ═══ */
+/* â•â•â• GAME INITIALIZATION ENHANCEMENT â•â•â• */
 function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   if(MP.roomCode&&MP.playerId){diffCfg={...diffCfg,enemyHpMult:diffCfg.enemyHpMult*1.3,enemyFireMult:diffCfg.enemyFireMult*1.15};}
@@ -2353,7 +2328,7 @@ function initGame(){
   applyWaveModifier();
 }
 
-/* ═══ ENHANCED UPDATE LOOP ═══ */
+/* â•â•â• ENHANCED UPDATE LOOP â•â•â• */
 function update(dt){
   const ch=CHARS[selChar];
   if(MP.mpLocalDead&&MP.roomCode&&MP.playerId){
@@ -2434,8 +2409,8 @@ function update(dt){
       sfxAmmoPickup();document.getElementById('ammo-flash').style.opacity='1';setTimeout(()=>{document.getElementById('ammo-flash').style.opacity='0';},150);
       spawnParts(pk.x,pk.y,pk.club?'#D4AF37':'#00C8A8',pk.club?15:10);
       if(pk.isCorrupt){const scoutDef=EDEFS.find(d=>d.type==='scout');spawnEnemy(scoutDef,pk.x+30,pk.y-20);spawnParts(pk.x,pk.y,'#FF1744',8);triggerShake(3,150);}
-      else{spawnPop(pk.x,pk.y,pk.club?`+${gained} ♛ TITANS CLUB`:`+${gained} AMMO`,pk.club?'power':'ammo');}
-      if(pk.club){showPowerAnnounce('♛ TITANS CLUB AMMO');triggerShake(3,150);}
+      else{spawnPop(pk.x,pk.y,pk.club?`+${gained} â™› TITANS CLUB`:`+${gained} AMMO`,pk.club?'power':'ammo');}
+      if(pk.club){showPowerAnnounce('â™› TITANS CLUB AMMO');triggerShake(3,150);}
       updateAmmoHUD();return false;
     }
     return pk.age<pk.maxAge;
@@ -2448,7 +2423,7 @@ function update(dt){
   if(waveModifier==='burning'&&mpIsLocalAlive()&&P.invinc<=0){takeDmg(dt*2);spawnParts(P.x,P.y,'#FF6D00',1);}
   if(waveModifierTimer>0){waveModifierTimer-=dt;if(waveModifierTimer<=0){waveModifier=null;document.getElementById('wave-modifier').style.display='none';}}
 
-  /* ─── ENEMY UPDATE ─── */
+  /* â”€â”€â”€ ENEMY UPDATE â”€â”€â”€ */
   const deadEnemies=[];
   enemies.forEach(e=>{
     e.wob+=dt*2.2;
@@ -2533,7 +2508,7 @@ function update(dt){
   activeTurrets=activeTurrets.filter(t=>{t.timer-=dt;t.cd-=dt;if(t.cd<=0){const nearest=enemies.reduce((best,e)=>{const d=Math.hypot(e.x-t.x,e.y-t.y);return d<best.d?{e,d}:best;},{e:null,d:Infinity}).e;if(nearest){const a=Math.atan2(nearest.y-t.y,nearest.x-t.x);eBullets.push({x:t.x,y:t.y,vx:Math.cos(a)*350,vy:Math.sin(a)*350,r:3,col:'#4AFFFF'});t.cd=.35;}}return t.timer>0;});
 }
 
-/* ═══ ENHANCED KILL SYSTEM ═══ */
+/* â•â•â• ENHANCED KILL SYSTEM â•â•â• */
 function killEnemy(e,idx){
   const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord';
   const isTitanClub=e.type==='irontitan'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='colossusg';
@@ -2547,21 +2522,21 @@ function killEnemy(e,idx){
   const eliteMult=e.isElite?2:1;
   const pts=Math.round(e.pts*mult*diffCfg.scoreMult*killstreakMult*eliteMult);
   score+=pts;spawnParts(e.x,e.y,e.col,isBoss?12:isTitanClub?6:5);
-  if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} ♛ TITANS CLUB`,'boss');
-  else spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
+  if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} â™› TITANS CLUB`,'boss');
+  else spawnPop(e.x,e.y,combo>=3?`+${pts} Ã—${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
   if(combo>=3){
     const cd=document.getElementById('combo');
-    const comboName=combo>=20?'☀ IMMORTAL':combo>=15?'⚔ TITAN WRATH':combo>=10?'♛ LEGIONARY':combo>=5?'✦ CLUB STRIKE':'';
-    cd.textContent=comboName?`${combo}× ${comboName}`:`${combo}× COMBO`;
+    const comboName=combo>=20?'â˜€ IMMORTAL':combo>=15?'âš” TITAN WRATH':combo>=10?'â™› LEGIONARY':combo>=5?'âœ¦ CLUB STRIKE':'';
+    cd.textContent=comboName?`${combo}Ã— ${comboName}`:`${combo}Ã— COMBO`;
     cd.style.opacity='1';cd.classList.remove('milestone');void cd.offsetWidth;cd.classList.add('milestone');if(combo>=5)sfxCombo();
   }
-  if(combo===5){showPowerAnnounce('✦ 5× COMBO · TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',5);sfxComboMilestone();}
-  if(combo===10){showPowerAnnounce('♛ 10× COMBO · LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',8);sfxComboMilestone();}
-  if(combo===15){showPowerAnnounce('⚔ 15× COMBO · TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',10);sfxComboMilestone();}
-  if(combo===20){showPowerAnnounce('☀ 20× COMBO · IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',12);sfxComboMilestone();}
-  if(isBoss){addKillFeed('⚔ '+e.label+' DEFEATED','#FFD700');triggerSlowMo(0.6,0.3);triggerShake(12,350);spawnParts(cv.width/2,cv.height/2,'#FFD700',12);showPowerAnnounce('♛ '+e.label+' FALLEN');sfxBigBoom();}
-  else if(isTitanClub){addKillFeed('♛ '+e.label+' SLAIN','#C8A84B');}
-  else{addKillFeed('⚔ '+e.label+' KILLED','#E2C06A');}
+  if(combo===5){showPowerAnnounce('âœ¦ 5Ã— COMBO Â· TITANS CLUB STRIKE');triggerShake(4,150);spawnParts(P.x,P.y,'#E2C06A',5);sfxComboMilestone();}
+  if(combo===10){showPowerAnnounce('â™› 10Ã— COMBO Â· LEGIONARY RAGE');triggerSlowMo(0.3,0.4);triggerShake(8,250);spawnParts(P.x,P.y,'#FF4422',8);sfxComboMilestone();}
+  if(combo===15){showPowerAnnounce('âš” 15Ã— COMBO Â· TITAN WRATH');triggerSlowMo(0.5,0.3);triggerShake(12,350);spawnParts(P.x,P.y,'#D4AF37',10);sfxComboMilestone();}
+  if(combo===20){showPowerAnnounce('â˜€ 20Ã— COMBO Â· IMMORTAL LEGEND');triggerSlowMo(0.7,0.25);triggerShake(18,500);spawnParts(P.x,P.y,'#FFD700',12);sfxComboMilestone();}
+  if(isBoss){addKillFeed('âš” '+e.label+' DEFEATED','#FFD700');triggerSlowMo(0.6,0.3);triggerShake(12,350);spawnParts(cv.width/2,cv.height/2,'#FFD700',12);showPowerAnnounce('â™› '+e.label+' FALLEN');sfxBigBoom();}
+  else if(isTitanClub){addKillFeed('â™› '+e.label+' SLAIN','#C8A84B');}
+  else{addKillFeed('âš” '+e.label+' KILLED','#E2C06A');}
   powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
   if(e.isElite)spawnPop(e.x,e.y-20,`+${Math.round(e.pts*.5)} ELITE`,'boss');
   if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
@@ -2569,7 +2544,7 @@ function killEnemy(e,idx){
   enemies.splice(idx,1);waveKills++;updateHUD();
 }
 
-/* ═══ END GAME ═══ */
+/* â•â•â• END GAME â•â•â• */
 function endGame(){
   if(gState==='over')return;
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
@@ -2579,7 +2554,7 @@ function endGame(){
   document.getElementById('f-club-rank').textContent=clubRank(score);
   document.getElementById('fstat-wave').textContent=toRoman(wave);
   document.getElementById('fstat-kills').textContent=totalKills;
-  document.getElementById('fstat-combo').textContent=bestCombo+'×';
+  document.getElementById('fstat-combo').textContent=bestCombo+'Ã—';
   showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
   document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
@@ -2609,7 +2584,7 @@ function mpDetermineResult(){
   return 'draw';
 }
 
-/* ═══ ENHANCED DRAW ═══ */
+/* â•â•â• ENHANCED DRAW â•â•â• */
 function draw(){
   cx.save();
   cx.translate(shakeX,shakeY);
@@ -2649,7 +2624,7 @@ function draw(){
   drawMinimap();
 }
 
-/* ═══ ENHANCED LOOP ═══ */
+/* â•â•â• ENHANCED LOOP â•â•â• */
 function loop(ts){
   if(gState!=='play'||isPaused)return;
   const dt=Math.min((ts-lastTS)/1000,.05);lastTS=ts;
@@ -2657,10 +2632,10 @@ function loop(ts){
   animID=requestAnimationFrame(loop);
 }
 
-/* ═══ SCREEN MANAGEMENT ═══ */
+/* â•â•â• SCREEN MANAGEMENT â•â•â• */
 function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.add('off'));if(id)document.getElementById(id).classList.remove('off');}
 
-/* ═══ MULTIPLAYER SYSTEM ═══ */
+/* â•â•â• MULTIPLAYER SYSTEM â•â•â• */
 const MP={
   roomRef:null,
   roomCode:null,
@@ -2797,7 +2772,7 @@ function mpListenRoom(){
     const startBtn=document.getElementById('btn-start-mp');
     const myEntry=MP.players[MP.playerId];
     if(myEntry){
-      startBtn.textContent=MP.host?(allReady?'START BATTLE':'Waiting...'):(myEntry.ready?'READY ✓':'READY');
+      startBtn.textContent=MP.host?(allReady?'START BATTLE':'Waiting...'):(myEntry.ready?'READY âœ“':'READY');
       startBtn.disabled=MP.host?!allReady:false;
     }else{
       startBtn.textContent='START BATTLE';
@@ -2969,11 +2944,11 @@ function mpReviveLocal(msg){
   lives=Math.max(1,Math.ceil(diffCfg.lives*0.5));refreshDots();
   P.invinc=3;resetJoystick();
   const si=document.getElementById('spectator-indicator');if(si)si.style.display='none';
-  showPowerAnnounce('✚ '+(msg||'REVIVED BY ALLY'));
+  showPowerAnnounce('âœš '+(msg||'REVIVED BY ALLY'));
   spawnParts(P.x,P.y,'#4CAF50',24);sfxCombo();
   updateOpponentLivesHUD();
 }
-const MP_PING_TXT={help:'⚠ HELP!',nice:'✦ NICE!',here:'📍 HERE!'};
+const MP_PING_TXT={help:'âš  HELP!',nice:'âœ¦ NICE!',here:'ðŸ“ HERE!'};
 function mpSendPing(type){
   if(!MP.roomCode||!MP.playerId||gState!=='play')return;
   MP._lastPingType=type;MP._lastPingTime=Date.now();
@@ -3180,8 +3155,8 @@ function mpShowMatchEnd(result){
   if(MP.roomCode&&MP.playerId){mpSubmitScore(score);}
   const resultEl=document.getElementById('mp-end-result');
   const rankEl=document.getElementById('mp-end-rank');
-  if(result==='win'){resultEl.textContent='VICTORY';resultEl.style.color='var(--gold-lit)';rankEl.textContent='♛ TITANS CLUB · TRIUMPH';rankEl.style.color='var(--gold-lit)';}
-  else if(result==='lose'){resultEl.textContent='DEFEATED';resultEl.style.color='var(--red-hot)';rankEl.textContent='♛ TITANS CLUB · FALLEN';rankEl.style.color='var(--red-hot)';}
+  if(result==='win'){resultEl.textContent='VICTORY';resultEl.style.color='var(--gold-lit)';rankEl.textContent='â™› TITANS CLUB Â· TRIUMPH';rankEl.style.color='var(--gold-lit)';}
+  else if(result==='lose'){resultEl.textContent='DEFEATED';resultEl.style.color='var(--red-hot)';rankEl.textContent='â™› TITANS CLUB Â· FALLEN';rankEl.style.color='var(--red-hot)';}
   else{resultEl.textContent='BATTLE ENDED';resultEl.style.color='var(--ash)';rankEl.textContent='DRAW';rankEl.style.color='var(--ash)';}
   document.getElementById('mp-end-p0-name').textContent=pName||'YOU';
   document.getElementById('mp-end-p0-wave').textContent=toRoman(wave);
@@ -3213,7 +3188,7 @@ function drawRemotePlayers(){
       for(const t of titans){
         enemies.splice(enemies.indexOf(t),1);
         spawnParts(t.x,t.y,'#C77DFF',16);
-        addKillFeed('☄ SHARED TITAN SLAIN','#C77DFF');
+        addKillFeed('â˜„ SHARED TITAN SLAIN','#C77DFF');
       }
     }
     const rc=CHARS[rp.char]||CHARS[0];
@@ -3257,7 +3232,7 @@ function drawRemotePlayers(){
     }
     cx.globalAlpha=1;cx.shadowBlur=0;
     cx.fillStyle='rgba(0,0,0,0.85)';cx.font="bold 11px 'Cinzel',serif";cx.textAlign='center';
-    cx.fillText((dead?'💀 ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-24);
+    cx.fillText((dead?'ðŸ’€ ':'')+(rp.name||'ALLY'),rp._rx,rp._ry-24);
     if(!dead){
       cx.fillStyle='rgba(76,175,80,1)';cx.font="bold 8px 'Cinzel',serif";
       cx.fillText('ALLY',rp._rx,rp._ry+24);
@@ -3318,7 +3293,32 @@ function mpStopLeaderboard(){
   if(MP.lbRef){MP.lbRef.off();MP.lbRef=null;}
 }
 
-/* ═══ INITIALIZATION ═══ */
+/* â•â•â• INITIALIZATION â•â•â• */
+// --- Cinematic intro dismiss: tap / key / click hides the overlay and reveals the start screen ---
+(function(){
+  const ci = document.getElementById('cinematic-intro');
+  if(!ci) return;
+  function dismissIntro(){
+    if(!ci.classList.contains('active')) return;
+    ci.classList.remove('active');
+    try{
+      if(typeof showScr==='function') showScr('s-start');
+      menuAnimActive=true;
+      if(typeof initStartCanvas==='function') initStartCanvas();
+      if(typeof drawStartBG==='function') menuRAF=requestAnimationFrame(drawStartBG);
+    }catch(e){}
+    window.removeEventListener('keydown',dismissIntro);
+    window.removeEventListener('touchstart',dismissIntro);
+    window.removeEventListener('pointerdown',dismissIntro);
+    window.removeEventListener('click',dismissIntro);
+  }
+  window.addEventListener('keydown',dismissIntro);
+  window.addEventListener('touchstart',dismissIntro,{passive:true});
+  window.addEventListener('pointerdown',dismissIntro);
+  window.addEventListener('click',dismissIntro);
+  setTimeout(dismissIntro, 6000); // fallback auto-dismiss
+})();
+
 loadSettings();loadStats();loadAchievements();loadUpgrades();
 </script>
 </body>
