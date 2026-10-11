@@ -1,4 +1,4 @@
-const CACHE='titans-strike-v5';
+const CACHE='titans-strike-v6';
 const ASSETS=[
   '/',
   '/index.html',
