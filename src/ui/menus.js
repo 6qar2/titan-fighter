@@ -48,7 +48,7 @@ function checkAchievements(){ACHIEVEMENTS.forEach(ach=>{if(!unlockedAchievements
 function renderAchievements(){const list=document.getElementById('achievements-list');list.innerHTML='';ACHIEVEMENTS.forEach(ach=>{const unlocked=unlockedAchievements.has(ach.id);const card=document.createElement('div');card.className='achievement-card'+(unlocked?' unlocked':'');card.innerHTML=`<div class="ach-icon">${ach.icon}</div><div class="ach-info"><div class="ach-name">${ach.name}</div><div class="ach-desc">${ach.desc}</div></div>`;list.appendChild(card);});}
 
 /* ═══ UPGRADES ═══ */
-const _CHARS_BASE=[];
+let _CHARS_BASE=[];
 let _diffBase=null;
 const UPGRADES=[
   {id:'ammo_cap',name:'AMMO CAPACITY',desc:'+5 max ammo',icon:'📦',cost:100,type:'ammo',maxLevel:5,current:0,apply:(lvl=1)=>{maxAmmo+=5*lvl;}},
