@@ -19,33 +19,13 @@ function enterGate(){
   fl.style.background=`rgba(${r2},${g2},${b2},0.38)`;fl.style.opacity='1';setTimeout(()=>{fl.style.opacity='0';fl.style.background='rgba(200,0,26,0.35)';},200);
   sfxGateEnter();
   const timeBonus=Math.floor(timeLeft*10);score+=timeBonus;if(timeBonus>0)spawnPop(cv.width/2,cv.height/2-40,`+${timeBonus} WAVE BONUS`,'boss');
-  if(wave>=10){if(MP.roomCode&&MP.playerId){mpShowMatchEnd(mpDetermineResult());}else{endGame();}return;}
+  if(wave>=10){endGame();return;}
+  gateOpen=true;openGate();
   wave++;
   waveModifier=null;document.getElementById('wave-modifier').style.display='none';
   bgColTarget={...WAVE_BGS[Math.min(wave-1,WAVE_BGS.length-1)]};showWaveAnnounce(wave);sfxCombo();haptic('success');
   document.getElementById('hwave').textContent=toRoman(wave);spawnParts(cv.width/2,cv.height/2,WAVE_GATE_COLS[Math.min(wave-2,WAVE_GATE_COLS.length-1)],22);
   bgTransition(wave);waveKills=0;setTimeout(()=>{waveAdvancing=false;spawnT=1.8;},1400);
-  if(MP.roomCode&&MP.playerId&&MP.roomRef){MP.roomRef.child('wave').set(wave);}
-}
-function mpResyncWave(w){
-  if(gState!=='play'||w===wave)return;
-  if(MP.mpLocalDead&&!MP.mpRevivedThisDeath){
-    MP.mpLocalDead=false;
-    MP.mpRevivedThisDeath=true;
-    MP.mpDeathScreenShown=false;
-    lives=1;refreshDots();
-    P.invinc=3;
-    resetJoystick();
-    document.getElementById('spectator-indicator').style.display='none';
-    showPowerAnnounce('✚ REVIVED BY ALLY');
-    spawnParts(P.x,P.y,'#4CAF50',24);
-    sfxCombo();
-    updateOpponentLivesHUD();
-  }
-  wave=w;waveKills=0;gate=null;gateOpen=false;waveAdvancing=false;
-  const gp=document.getElementById('gate-prompt');if(gp){gp.style.opacity='0';gp.classList.remove('visible');}
-  document.getElementById('hwave').textContent=toRoman(w);
-  bgTransition(w);showWaveAnnounce(w);
 }
 function drawGate(ctx,g){
   ctx.save();ctx.translate(g.x,g.y);const t=Date.now()*.001;

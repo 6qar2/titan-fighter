@@ -9,37 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>TITANS STRIKE · GALALA</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>">
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
-<script>
-  const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyCbOtApsAEDpgI-zHZ5ZQntIi4iXeWsdCg",
-    authDomain: "titan-strike-b1931.firebaseapp.com",
-    databaseURL: "https://titan-strike-b1931-default-rtdb.firebaseio.com",
-    projectId: "titan-strike-b1931",
-    storageBucket: "titan-strike-b1931.firebasestorage.app",
-    messagingSenderId: "5461509647",
-    appId: "1:5461509647:web:9e465c0bb473c58ad3c57a"
-  };
-  let db = null;
-  function initFirebase(){
-    try {
-      if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-        firebase.initializeApp(FIREBASE_CONFIG);
-        db = firebase.database();
-        console.log("Firebase initialized");
-      }
-    } catch (e) {
-      console.warn("Firebase init failed:", e);
-    }
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFirebase);
-  } else {
-    initFirebase();
-  }
-</script>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -89,12 +59,6 @@
     <span class="hud-lbl">Lives</span>
     <div class="lives-row" id="ldots"></div>
   </div>
-  <div class="hud-block" id="opponent-lives-hud" style="display:none;">
-    <span class="hud-lbl" style="color:rgba(76,175,80,0.9);">Opponent</span>
-    <div class="lives-row" id="opponent-lives"></div>
-    <span class="hud-lbl" id="opponent-score" style="color:rgba(76,175,80,0.7);margin-top:2px;"></span>
-    <span class="hud-lbl" id="team-score" style="color:rgba(212,175,55,0.9);margin-top:4px;font-size:.7rem;letter-spacing:1px;">TEAM 0</span>
-  </div>
   <div class="hud-block">
     <span class="hud-lbl">Wave</span>
     <span class="hud-val" id="hwave">I</span>
@@ -124,12 +88,7 @@
     <button id="power-btn"><span class="power-icon">✦</span><span class="power-lbl">POWER</span></button>
      <button id="fire-btn"><span class="fire-icon">⚔</span><span class="fire-lbl">FIRE</span></button>
      <button id="autofire-btn" style="width:42px;height:42px;border-radius:50%;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;">🔥</button>
-  </div>
-  <div id="ping-bar" style="position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;">
-    <button class="ping-btn" data-ping="help" style="width:64px;height:26px;border-radius:6px;background:rgba(192,0,26,0.18);border:1px solid rgba(192,0,26,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#FFB3B3;touch-action:none;cursor:pointer;">HELP!</button>
-    <button class="ping-btn" data-ping="nice" style="width:64px;height:26px;border-radius:6px;background:rgba(76,175,80,0.18);border:1px solid rgba(76,175,80,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#A5D6A7;touch-action:none;cursor:pointer;">NICE!</button>
-    <button class="ping-btn" data-ping="here" style="width:64px;height:26px;border-radius:6px;background:rgba(184,152,64,0.18);border:1px solid rgba(184,152,64,0.4);font-family:'Cinzel',serif;font-size:.38rem;letter-spacing:1px;color:#E2C06A;touch-action:none;cursor:pointer;">HERE!</button>
-  </div>
+   </div>
 </div>
 <canvas id="minimap" width="100" height="100" style="position:fixed;bottom:110px;right:10px;width:100px;height:100px;z-index:99;pointer-events:none;border:1px solid rgba(184,152,64,0.2);background:rgba(6,6,14,0.6);display:none;"></canvas>
 
@@ -188,10 +147,6 @@
         <span class="btn-shine"></span>
         <span class="btn-main">ENTER THE ARENA</span>
         <span class="btn-sub">SINGLE PLAYER CAMPAIGN</span>
-      </button>
-      <button class="btn-companion" id="btn-mp-lobby">
-        <span class="btn-main">MULTIPLAYER</span>
-        <span class="btn-sub">CO-OP · SURVIVAL · PVP · 2-4 PLAYERS</span>
       </button>
     </div>
     <div class="club-row">
@@ -348,68 +303,6 @@
   <button class="btn-ghost" id="btn-back-diff">← DIFFICULTY</button>
 </div>
 
-<!-- MULTIPLAYER LOBBY -->
-<div class="scr off" id="s-mp-lobby">
-  <div class="mp-inner">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">MULTIPLAYER</div>
-    <div class="mp-sub">2-4 player rooms · Real-time battle</div>
-    <div class="div-line"><div class="div-gem"></div></div>
-    <button class="btn-enter" id="btn-create-room">CREATE ROOM</button>
-    <div class="mp-or">— OR JOIN —</div>
-    <input id="room-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" style="width:min(200px,60vw);">
-    <button class="btn-enter" id="btn-join-room" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
-    <button class="btn-ghost" id="btn-mp-back">← BACK</button>
-  </div>
-</div>
-
-<!-- MULTIPLAYER ROOM / WAITING -->
-<div class="scr off" id="s-mp-room">
-  <div class="mp-room-inner">
-    <div class="screen-eyebrow">TITANS CLUB · ROOM</div>
-    <div class="screen-title">LOBBY</div>
-    <div class="mp-code-box">
-      <div class="mp-code-label">ROOM CODE</div>
-      <div class="mp-code-value" id="mp-room-code">----</div>
-      <button class="btn-ghost" id="btn-copy-code" style="margin-top:.4rem;font-size:.6rem;padding:.3rem .8rem;">COPY CODE</button>
-    </div>
-    <div class="mp-players">
-      <div class="mp-player" id="mp-p0"><div class="mp-player-dot"></div><span>Player 1</span></div>
-      <div class="mp-player" id="mp-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-    </div>
-    <div class="mp-diff-wrap" id="mp-diff-wrap" style="display:none;">
-      <div class="mp-diff-label">HOST DIFFICULTY</div>
-      <div class="mp-diff-cards">
-        <div class="mp-diff-card" data-diff="easy">🛡️ RECRUIT</div>
-        <div class="mp-diff-card selected" data-diff="normal">⚔️ LEGIONARY</div>
-        <div class="mp-diff-card" data-diff="hard">💀 TITAN</div>
-      </div>
-    </div>
-    <div class="mp-char-wrap" id="mp-char-wrap">
-      <div class="mp-char-label">YOUR CHAMPION</div>
-      <div class="mp-char-grid" id="mp-char-grid"></div>
-    </div>
-    <div class="mp-status" id="mp-status">Waiting for players...</div>
-    <button class="btn-enter" id="btn-start-mp" disabled>START BATTLE</button>
-    <button class="btn-ghost" id="btn-leave-room">LEAVE ROOM</button>
-  </div>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="scr off overlay" id="s-leaderboard">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">LEADERBOARD</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div class="lb-tabs" id="lb-tabs">
-    <div class="lb-tab selected" data-lb="sp">SINGLE PLAYER</div>
-    <div class="lb-tab" data-lb="mp">MULTIPLAYER</div>
-  </div>
-  <div class="lb-list" id="lb-list"></div>
-  <button class="btn-ghost" id="btn-lb-back">← RETURN</button>
-</div>
-
 <!-- GAME OVER -->
 <div class="scr off" id="s-over">
   <div class="over-inner">
@@ -431,121 +324,9 @@
     </div>
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-replay" style="margin-top:1rem;">FIGHT AGAIN</button>
-    <button class="btn-ghost" id="btn-lb-over">♛ LEADERBOARD</button>
     <button class="btn-ghost" id="btn-menu">MAIN GATE</button>
   </div>
 </div>
-<div class="scr off" id="s-mp-over">
-  <div class="over-inner">
-    <div class="over-eyebrow">MULTIPLAYER · FALLEN</div>
-    <div class="over-divline"><div class="over-diamond"></div></div>
-    <div class="final-score-lbl">All Titans Have Fallen</div>
-    <div class="final-rank" id="mp-f-rank" style="color:var(--red);">BATTLE ENDED</div>
-    <div class="final-stats">
-      <div class="fstat"><span class="fstat-num" id="mp-fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
-      <div class="fstat"><span class="fstat-num" id="mp-fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>
-      <div class="fstat"><span class="fstat-num" id="mp-fstat-combo">0</span><span class="fstat-lbl">Best Combo</span></div>
-    </div>
-    <div class="over-divline"><div class="over-diamond"></div></div>
-    <button class="btn-enter" id="btn-mp-return-lobby" style="margin-top:1rem;">♛ RETURN TO LOBBY</button>
-  </div>
-</div>
-
-<!-- MP MATCH END -->
-<div class="scr off" id="s-mp-end">
-  <div class="over-inner">
-    <div class="over-eyebrow">MULTIPLAYER · BATTLE REPORT</div>
-    <div class="over-divline"><div class="over-diamond"></div></div>
-    <div style="font-family:'Cinzel Decorative',serif;font-size:.62rem;letter-spacing:5px;color:var(--gold-dim);margin-bottom:-.4rem;">TEAM RESULT</div>
-    <div class="final-score-lbl" id="mp-end-result">BATTLE ENDED</div>
-    <div class="final-rank" id="mp-end-rank" style="color:var(--gold-lit);">DRAW</div>
-    <div style="display:flex;gap:1.5rem;margin:1rem 0;flex-wrap:wrap;justify-content:center;">
-      <div style="flex:1;min-width:120px;text-align:center;padding:.8rem;border:1px solid rgba(184,152,64,0.2);border-radius:10px;background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));">
-        <div style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--ash);text-transform:uppercase;margin-bottom:.4rem;">YOU</div>
-        <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);" id="mp-end-p0-name">PLAYER 1</div>
-        <div class="final-stats" style="margin-top:.6rem;">
-          <div class="fstat"><span class="fstat-num" id="mp-end-p0-wave">I</span><span class="fstat-lbl">Wave</span></div>
-          <div class="fstat"><span class="fstat-num" id="mp-end-p0-kills">0</span><span class="fstat-lbl">Kills</span></div>
-          <div class="fstat"><span class="fstat-num" id="mp-end-p0-score">0</span><span class="fstat-lbl">Score</span></div>
-        </div>
-      </div>
-      <div style="flex:1;min-width:120px;text-align:center;padding:.8rem;border:1px solid rgba(184,152,64,0.2);border-radius:10px;background:linear-gradient(160deg,rgba(18,14,12,0.95),rgba(6,4,2,0.98));">
-        <div style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:2px;color:var(--ash);text-transform:uppercase;margin-bottom:.4rem;">OPPONENT</div>
-        <div style="font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:2px;color:var(--gold-lit);" id="mp-end-p1-name">PLAYER 2</div>
-        <div class="final-stats" style="margin-top:.6rem;">
-          <div class="fstat"><span class="fstat-num" id="mp-end-p1-wave">I</span><span class="fstat-lbl">Wave</span></div>
-          <div class="fstat"><span class="fstat-num" id="mp-end-p1-kills">0</span><span class="fstat-lbl">Kills</span></div>
-          <div class="fstat"><span class="fstat-num" id="mp-end-p1-score">0</span><span class="fstat-lbl">Score</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="over-divline"><div class="over-diamond"></div></div>
-    <div style="display:flex;gap:.8rem;margin-top:.8rem;flex-wrap:wrap;justify-content:center;">
-      <button class="btn-enter" id="btn-mp-rematch" style="margin-top:0;">♛ REMATCH</button>
-      <button class="btn-ghost" id="btn-mp-end-leave">LEAVE ROOM</button>
-    </div>
-  </div>
-</div>
-
-<!-- NEW MULTIPLAYER LOBBY -->
-<div class="scr off" id="s-mp2-lobby">
-  <div class="mp-inner">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">MULTIPLAYER</div>
-    <div class="mp-sub">Co-op · Survival · PVP · 2-4 players</div>
-    <div class="div-line"><div class="div-gem"></div></div>
-    <button class="btn-enter" id="btn-mp2-create">CREATE ROOM</button>
-    <div class="mp-or">— OR JOIN —</div>
-    <input id="mp2-code-input" class="name-input" type="text" placeholder="ENTER CODE" maxlength="4" autocomplete="off" style="width:min(200px,60vw);">
-    <button class="btn-enter" id="btn-mp2-join" style="background:linear-gradient(135deg,#1a1a2e,#16213e);">JOIN ROOM</button>
-    <button class="btn-ghost" id="btn-mp2-back">← BACK</button>
-  </div>
-</div>
-
-<!-- NEW MULTIPLAYER ROOM -->
-<div class="scr off" id="s-mp2-room">
-  <div class="mp-room-inner">
-    <div class="screen-eyebrow">TITANS CLUB · ROOM</div>
-    <div class="screen-title">LOBBY</div>
-    <div class="mp-code-box">
-      <div class="mp-code-label">ROOM CODE</div>
-      <div class="mp-code-value" id="mp2-room-code">----</div>
-      <button class="btn-ghost" id="btn-mp2-copy" style="margin-top:.4rem;font-size:.6rem;padding:.3rem .8rem;">COPY CODE</button>
-    </div>
-    <div class="mp-players">
-      <div class="mp-player" id="mp2-p0"><div class="mp-player-dot"></div><span>Player 1</span></div>
-      <div class="mp-player" id="mp2-p1"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-      <div class="mp-player" id="mp2-p2"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-      <div class="mp-player" id="mp2-p3"><div class="mp-player-dot"></div><span>Waiting...</span></div>
-    </div>
-    <div class="mp-mode-wrap" style="display:flex;flex-direction:column;gap:.5rem;width:min(260px,78vw);margin:.4rem 0;">
-      <div class="mp-mode-label" style="font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:2px;color:var(--gold-lit);">GAME MODE</div>
-      <select id="mp2-mode-select" style="width:100%;padding:.5rem;background:rgba(18,14,12,.95);color:var(--gold-lit);border:1px solid rgba(184,152,64,.3);border-radius:6px;font-family:'Cinzel',serif;font-size:.65rem;">
-        <option value="coop">🤝 CO-OP</option>
-        <option value="survival">♾️ SURVIVAL</option>
-        <option value="pvp">⚔️ PVP DUEL</option>
-      </select>
-      <div class="mp-mode-label" style="font-family:'Cinzel',serif;font-size:.55rem;letter-spacing:2px;color:var(--gold-lit);margin-top:.2rem;">DIFFICULTY</div>
-      <div class="mp-diff-cards" style="display:flex;gap:.4rem;">
-        <div class="mp-diff-card selected" data-diff="easy" style="flex:1;text-align:center;">🛡️ EASY</div>
-        <div class="mp-diff-card" data-diff="normal" style="flex:1;text-align:center;">⚔️ NORMAL</div>
-        <div class="mp-diff-card" data-diff="hard" style="flex:1;text-align:center;">💀 HARD</div>
-      </div>
-    </div>
-    <div class="mp-status" id="mp2-status">Waiting for players...</div>
-    <button class="btn-enter" id="btn-mp2-ready">READY</button>
-    <button class="btn-enter" id="btn-mp2-start" disabled>START BATTLE</button>
-    <button class="btn-ghost" id="btn-mp2-leave">LEAVE ROOM</button>
-  </div>
-</div>
-
-<!-- SPECTATOR / DOWNED INDICATOR -->
-<div id="spectator-indicator" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;pointer-events:none;text-align:center;">
-  <div class="spc-text" style="font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,1.8rem);letter-spacing:4px;color:var(--gold-dim);text-shadow:0 0 20px rgba(212,175,55,0.3);">DOWNED</div>
-  <div class="spc-sub" style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;color:var(--ash);margin-top:.3rem;">ALLY CAN REVIVE YOU</div>
-  <div class="spc-revive" style="width:180px;height:6px;margin:.5rem auto 0;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden;display:none;"><div class="spc-revive-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#4CAF50,#A5D6A7);transition:width .1s;"></div></div>
-</div>
-
 <!-- GAME MODE SELECT -->
 <div class="scr off" id="s-game-modes">
   <div class="screen-header">
@@ -653,13 +434,6 @@
 <script src="src/systems/waves.js"></script>
 <script src="src/systems/combat.js"></script>
 <script src="src/systems/fx.js"></script>
-<script src="src/mp/core.js"></script>
-<script src="src/mp/sync.js"></script>
-<script src="src/mp/match.js"></script>
-<script src="src/mp/remote.js"></script>
-<script src="src/mp/revive.js"></script>
-<script src="src/mp/leaderboard.js"></script>
-<script src="src/mp/multiplayer2.js"></script>
 <script src="src/systems/profile.js"></script>
 <script src="src/ui/screens.js"></script>
 <script src="src/ui/hud.js"></script>

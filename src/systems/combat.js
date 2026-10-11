@@ -32,7 +32,6 @@ function killEnemy(e,idx){
   CharProgression.addXp(CHARS[selChar].id,xpGain);
   if(e.isElite)spawnPop(e.x,e.y-20,`+${Math.round(e.pts*.5)} ELITE`,'boss');
   if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
-  if(e.isTitan)mpNotifyTitanKill();
   enemies.splice(idx,1);waveKills++;updateHUD();
 }
 

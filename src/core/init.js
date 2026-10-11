@@ -1,9 +1,6 @@
 /* ═══ GAME INITIALIZATION ═══ */
 function initGame(){
-  const baseDiff=(MP2.roomCode&&MP2.playerId)?(MP2.diff||selDiff):(MP.roomCode&&MP.playerId?(MP.roomDiff||selDiff):selDiff);
-  diffCfg=DIFFICULTIES[baseDiff]||DIFFICULTIES.normal;
-  if(MP.roomCode&&MP.playerId){diffCfg={...diffCfg,enemyHpMult:diffCfg.enemyHpMult*1.3,enemyFireMult:diffCfg.enemyFireMult*1.15};}
-  if(MP2.roomCode&&MP2.playerId){diffCfg={...diffCfg,enemyHpMult:diffCfg.enemyHpMult*1.2,enemyFireMult:diffCfg.enemyFireMult*1.1};}
+  diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   
   if(GameModes.current==='endless'){diffCfg={...diffCfg,lives:1,timeLimit:0};}
   else if(GameModes.current==='daily'){diffCfg={...diffCfg,lives:2,timeLimit:300};}
@@ -99,31 +96,10 @@ function endGame(){
     ExpandedStats.recordBossDefeated();
   }
   
-  CharProgression.addXp(CHARS[selChar].id,score);
-  
-  if(MP.roomCode&&MP.playerId){
-    mpSubmitScore(score);
-    if(MP.host&&MP.roomRef){
-      MP.roomRef.child('status').set('ended');
-      MP.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
-    }
-  }else if(MP2.roomCode&&MP2.playerId){
-    mp2SubmitScore(score);
-    if(MP2.host&&MP2.roomRef){
-      MP2.roomRef.child('status').set('ended');
-      MP2.roomRef.child('endedAt').set(firebase.database.ServerValue.TIMESTAMP);
-    }
-  }else{
-    spSubmitScore(score);
-  }
-  
-  GameModes.reset();
-  
-  if(MP2.roomCode&&MP2.playerId){
-    if(MP2.roomRef)MP2.roomRef.off();
-    mp2Reset();
-  }
-  
-  Profile.setLastChar(selChar);
+   CharProgression.addXp(CHARS[selChar].id,score);
+   
+   GameModes.reset();
+   
+   Profile.setLastChar(selChar);
   Profile.setLastDiff(selDiff);
 }

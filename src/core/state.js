@@ -37,41 +37,13 @@ let gameStartTime=0;
 function initStars(){stars=[];for(let i=0;i<80;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.2,spd:Math.random()*16+3,a:Math.random()*.35+.07});}
 function buildDots(){const el=document.getElementById('ldots');el.innerHTML='';for(let i=0;i<lives;i++){const d=document.createElement('div');d.className='ldot';d.id='d'+i;el.appendChild(d);}}
 function refreshDots(){document.querySelectorAll('.ldot').forEach((d,i)=>{d.className='ldot'+(i>=lives?' dead':'');});}
-function updateOpponentLivesHUD(){
-  const el=document.getElementById('opponent-lives-hud');
-  if(!el)return;
-  if(!MP.roomCode||!MP.playerId||Object.keys(MP.players).length<2){el.style.display='none';return;}
-  el.style.display='flex';
-  const remote=Object.values(MP.remotePlayers)[0];
-  const container=document.getElementById('opponent-lives');
-  const scoreEl=document.getElementById('opponent-score');
-  if(!remote||remote.alive===false){
-    container.innerHTML='<span class="ldot dead"></span>';
-    if(scoreEl)scoreEl.textContent=remote?('💀 '+((remote.score||0).toLocaleString())):'';
-    return;
-  }
-  const remoteLives=remote.lives||0;
-  const maxLives=diffCfg.lives;
-  if(container._n!==remoteLives){
-    container._n=remoteLives;
-    container.innerHTML='';
-    for(let i=0;i<maxLives;i++){
-      const dot=document.createElement('span');
-      dot.className='ldot'+(i>=remoteLives?' dead':'');
-      container.appendChild(dot);
-    }
-  }
-  if(scoreEl)scoreEl.textContent=(remote.score||0).toLocaleString();
-  const teamEl=document.getElementById('team-score');
-  if(teamEl)teamEl.textContent='TEAM '+((score||0)+(remote.score||0)).toLocaleString();
-}
 function startTimer(){
   clearInterval(timerID);
   timerID=setInterval(()=>{
-    if(gState!=='play')return;timeLeft--;updateHUD();updateOpponentLivesHUD();
+    if(gState!=='play')return;timeLeft--;updateHUD();
     const t=document.getElementById('htimer');
     if(timeLeft<=30)t.classList.add('warn');else t.classList.remove('warn');
-    if(timeLeft<=0){if(MP.roomCode&&MP.playerId){mpShowMatchEnd(mpDetermineResult());}else{endGame();}return;}
+    if(timeLeft<=0){endGame();return;}
     const [mn,mx]=diffCfg.ammoPackInterval;
     if(timeLeft<=nextAmmoPackTime&&nextAmmoPackTime>0){spawnAmmoPack();nextAmmoPackTime-=(mn+Math.random()*(mx-mn));}
   },1000);
@@ -138,7 +110,6 @@ function showWaveAnnounce(n){
   if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
   applyWaveModifier();
   bgTransition(n);
-  if(MP.roomCode&&MP.playerId&&(n===5||n===8))spawnTitan(n);
 }
 function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
 function triggerSlowMo(duration, intensity){slowMoTimer=duration;slowMo=intensity||0.25;}
@@ -167,12 +138,7 @@ function switchWeapon(){
 }
 function applyWaveModifier(){
   if(wave<3){waveModifier=null;(DOM.waveMod||document.getElementById('wave-modifier')).style.display='none';return;}
-  let effect;
-  if(MP.roomCode&&MP.playerId){
-    effect=mpModifierForWave(wave);
-  }else{
-    effect=Math.random()<.35?WAVE_MODIFIERS[Math.floor(Math.random()*WAVE_MODIFIERS.length)].effect:null;
-  }
+  let effect=Math.random()<.35?WAVE_MODIFIERS[Math.floor(Math.random()*WAVE_MODIFIERS.length)].effect:null;
   if(effect){
     waveModifier=effect;waveModifierTimer=15+Math.random()*10;
     const modEl=DOM.waveMod||document.getElementById('wave-modifier');

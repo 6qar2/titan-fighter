@@ -4,7 +4,7 @@ let lastTapTime=0;
 const SWIPE_THRESHOLD=50,TAP_MAX_DIST=15,JOYSTICK_DEADZONE=0.15;
 let aimTouchX=0,aimTouchY=0,aimTouchActive=false;
 document.addEventListener('touchstart',e=>{
-  if(e.target.closest('#joystick-zone')||e.target.closest('#fire-btn')||e.target.closest('#power-btn')||e.target.closest('.ping-btn')||e.target.closest('button')||e.target.closest('input'))return;
+  if(e.target.closest('#joystick-zone')||e.target.closest('#fire-btn')||e.target.closest('#power-btn')||e.target.closest('button')||e.target.closest('input'))return;
   if(e.touches.length===1){
     touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;touchStartTime=Date.now();
     if(Mobile.autoAim){aimTouchX=e.touches[0].clientX;aimTouchY=e.touches[0].clientY;aimTouchActive=true;}
@@ -41,7 +41,7 @@ document.addEventListener('touchend',e=>{
 
 /* ═══ INPUT ═══ */
 function isInputFocused(){const t=document.activeElement;return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
-document.addEventListener('keydown',e=>{if(isInputFocused()||(MP.mpLocalDead&&MP.roomCode&&MP.playerId))return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
+document.addEventListener('keydown',e=>{if(isInputFocused())return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
 document.addEventListener('keyup',e=>{if(isInputFocused())return;keys[e.code]=false;if(e.code==='Space')shooting=false;});
 cv.addEventListener('mousemove',e=>{mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
 cv.addEventListener('mousedown',e=>{if(e.button===0){shooting=true;wake();}});

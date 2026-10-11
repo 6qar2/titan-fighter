@@ -229,46 +229,7 @@ function wireUI(){
     gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   });
   document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
-  document.getElementById('btn-mp-lobby').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();Profile.setName(pName);showScr('s-mp2-lobby');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
-  document.getElementById('btn-create-room').addEventListener('click',()=>{mpCreateRoom();});
-  document.getElementById('btn-join-room').addEventListener('click',()=>{
-    const btn=document.getElementById('btn-join-room');
-    if(btn.disabled)return;
-    btn.disabled=true;
-    mpJoinRoom();
-    setTimeout(()=>{btn.disabled=false;},2000);
-  });
-  document.getElementById('btn-mp-back').addEventListener('click',()=>{showScr('s-chars');});
-  document.getElementById('btn-copy-code').addEventListener('click',()=>{
-    const code=document.getElementById('mp-room-code').textContent;
-    if(navigator.clipboard){navigator.clipboard.writeText(code).then(()=>{alert('Room code copied: '+code);});}else{alert('Room code: '+code);}
-  });
-  document.getElementById('btn-start-mp').addEventListener('click',()=>{mpSetReady();});
-  document.getElementById('btn-leave-room').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
-  document.getElementById('btn-mp-return-lobby').addEventListener('click',()=>{mpResetToLobby();});
-  document.getElementById('btn-mp-rematch').addEventListener('click',()=>{
-    if(MP.mpEndTimer)clearTimeout(MP.mpEndTimer);
-    MP.mpMatchResult=null;
-    if(MP.roomRef){
-      MP.roomRef.child('status').set('waiting');
-      MP.roomRef.child('wave').set(1);
-      MP.roomRef.child('startedAt').remove();
-      MP.roomRef.child('matchOver').remove();
-      MP.roomRef.child('mpEndSignal').remove();
-      Object.keys(MP.players).forEach(pid=>{
-        MP.roomRef.child('players/'+pid).update({ready:false,score:0});
-      });
-    }
-    MP.started=false;MP.mpLocalDead=false;MP.mpAllDeadTriggered=false;MP.mpDeathScreenShown=false;MP.mpRevivedThisDeath=false;MP.mpMatchResult=null;MP.mpEndTimer=null;MP._lastSyncX=0;MP._lastSyncY=0;MP._lastSyncScore=0;MP._lastSyncWave=0;MP._lastSyncedWave=0;MP._lastSyncKills=0;
-    showScr('s-mp-room');
-    mpListenRoom();
-    mpRenderPlayers();
-  });
-  document.getElementById('btn-mp-end-leave').addEventListener('click',()=>{mpLeaveRoom();showScr('s-mp-lobby');});
-  document.querySelectorAll('.mp-diff-card').forEach(card=>{
-    card.addEventListener('click',()=>{mpDiffChange(card.dataset.diff);});
-  });
-  document.getElementById('btn-lb-back').addEventListener('click',()=>{mpStopLeaderboard();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
+  document.getElementById('btn-mode-next').addEventListener('click',()=>{showScr('s-chars');});
   document.getElementById('btn-replay').addEventListener('click',()=>{
     wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
     document.getElementById('hud').classList.remove('off');
@@ -283,9 +244,8 @@ function wireUI(){
     document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
     document.getElementById('htimer').classList.remove('warn');
     ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
-    document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);mpStopLeaderboard();
+    document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
   });
-  document.getElementById('btn-lb-over').addEventListener('click',()=>{mpStopLeaderboard();mpLoadLeaderboard();showScr('s-leaderboard');});
   document.getElementById('btn-start-settings').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr('s-settings');});
   document.getElementById('btn-start-stats').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderStats();showScr('s-stats');});
   document.getElementById('btn-start-upgrades').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderUpgrades();showScr('s-upgrades');});
@@ -305,22 +265,7 @@ function wireUI(){
   document.querySelectorAll('.mode-card').forEach(card=>{
     card.addEventListener('click',()=>{document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');GameModes.current=card.dataset.mode;});
   });
-  document.querySelectorAll('.lb-tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-      document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('selected'));
-      tab.classList.add('selected');
-      MP.lbMode=tab.dataset.lb;
-      mpLoadLeaderboard();
-    });
-  });
   document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
-  document.querySelectorAll('.ping-btn').forEach(btn=>{btn.addEventListener('click',()=>{mpSendPing(btn.dataset.ping);});});
-  document.addEventListener('keydown',e=>{
-    if(gState!=='play')return;
-    if(e.code==='KeyZ')mpSendPing('help');
-    else if(e.code==='KeyX')mpSendPing('nice');
-    else if(e.code==='KeyC')mpSendPing('here');
-  });
 
   /* ═══ PAUSE MENU ═══ */
   const pauseOverlay=document.getElementById('pause-overlay');
@@ -391,44 +336,6 @@ function wireUI(){
   if(btnResetProfile){
     btnResetProfile.addEventListener('click',()=>{
       if(confirm('Reset all profile data? This cannot be undone.')){Profile.reset();updateProfileNameField();pName=Profile.getName();showPowerAnnounce('PROFILE RESET');}
-    });
-  }
-  
-  /* ═══ NEW MULTIPLAYER ═══ */
-  document.getElementById('btn-mp2-create').addEventListener('click',()=>{
-    const mode=document.getElementById('mp2-mode-select').value;
-    const diff=document.querySelector('#s-mp2-room .mp-diff-card.selected')?.dataset.diff||'normal';
-    mp2CreateRoom(mode,diff);
-  });
-  document.getElementById('btn-mp2-join').addEventListener('click',()=>{
-    const code=document.getElementById('mp2-code-input').value.trim();
-    const mode=document.getElementById('mp2-mode-select').value;
-    const diff=document.querySelector('#s-mp2-room .mp-diff-card.selected')?.dataset.diff||'normal';
-    mp2JoinRoom(code,mode,diff);
-  });
-  document.getElementById('btn-mp2-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-mp2-copy').addEventListener('click',()=>{
-    const code=document.getElementById('mp2-room-code').textContent;
-    if(navigator.clipboard){navigator.clipboard.writeText(code).then(()=>{alert('Room code copied: '+code);});}else{alert('Room code: '+code);}
-  });
-  document.getElementById('btn-mp2-start').addEventListener('click',()=>{mp2StartGame();});
-  document.getElementById('btn-mp2-ready').addEventListener('click',()=>{mp2SetReady();});
-  document.getElementById('btn-mp2-leave').addEventListener('click',()=>{mp2LeaveRoom();showScr('s-mp2-lobby');});
-  document.querySelectorAll('#s-mp2-room .mp-diff-card').forEach(card=>{
-    card.addEventListener('click',()=>{
-      document.querySelectorAll('#s-mp2-room .mp-diff-card').forEach(c=>c.classList.remove('selected'));
-      card.classList.add('selected');
-      if(MP2.host&&MP2.roomRef){
-        MP2.roomRef.child('diff').set(card.dataset.diff);
-      }
-    });
-  });
-  const mp2ModeSelect=document.getElementById('mp2-mode-select');
-  if(mp2ModeSelect){
-    mp2ModeSelect.addEventListener('change',()=>{
-      if(MP2.host&&MP2.roomRef){
-        MP2.roomRef.child('mode').set(mp2ModeSelect.value);
-      }
     });
   }
 }

@@ -13,13 +13,6 @@ const WAVE_MODIFIERS=[
   {name:'❄️ FROZEN',effect:'slow',desc:'Enemies move slower'},
   {name:'🔥 BURNING',effect:'burning',desc:'Player takes damage over time'}
 ];
-function mpModifierForWave(w){
-  if(w<3)return null;
-  const r=((w*2654435761)%1000)/1000;
-  if(r<0.35)return null;
-  const idx=((w*40503)%WAVE_MODIFIERS.length+WAVE_MODIFIERS.length)%WAVE_MODIFIERS.length;
-  return WAVE_MODIFIERS[idx].effect;
-}
 
 /* ═══ MUSIC ENGINE ═══ */
 const WAVE_MUSIC=[

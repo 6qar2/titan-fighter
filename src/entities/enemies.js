@@ -70,8 +70,7 @@ function spawnTitan(wave){
   const def={type:'mp_titan',label:'SHARED TITAN',hp:hp,sz:48,spd:0.42,sRate:0.7,pts:600};
   const e={...def,maxHp:hp,hp:hp,x:cv.width/2,y:-70,vx:0,vy:0,st:0,wob:0,wm:1,ang:0,spdMod:1,stunT:0,spd:def.spd*diffCfg.enemySpdMult,sRate:def.sRate*diffCfg.enemyFireMult,isElite:false,isTitan:true,col:'#C77DFF'};
   enemies.push(e);
-  MP._lastTitanKillSeen=0;
-  showEnemyWarn('☄ SHARED TITAN · CO-OP TARGET');
+  showEnemyWarn('☄ TITAN APPROACHING');
 }
 function spawnEnemyVariant(){
   if(Math.random()>0.08||enemies.length>=getSpawnCap())return;
