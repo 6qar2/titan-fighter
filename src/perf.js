@@ -39,6 +39,5 @@ function startPerfMonitor(){
   perfInterval=setInterval(()=>{measureFPS(performance.now());applyAdaptiveQuality();},2000);
 }
 function getSpawnCap(){return Perf.maxEnemies;}
-function getParticleCount(base){return Math.floor(base*Perf.particleMult);}
 function shouldDrawTrail(){return Perf.trailAlpha>0.5;}
 function shouldDrawShadow(){return Perf.shadowBlur;}

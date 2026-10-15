@@ -17,7 +17,7 @@ function checkBulletCollision(b,e,i){
     if(e.ability==='godmode'&&e.godShield&&e.hp/e.maxHp>0.66){spawnParts(b.x,b.y,'#FFD700',4);return false;}
     let finalDmg=b.dmg*dmgMult;
     if(rollCrit()){finalDmg*=2;spawnDmgNum(e.x,e.y,finalDmg,'#FFD700');stats.headshots++;}else{spawnDmgNum(e.x,e.y,finalDmg,'#E2C06A');}
-    e.hp-=finalDmg;spawnParts(b.x,b.y,e.col,5);hitSparks.push({x:b.x,y:b.y,vx:(Math.random()-.5)*80,vy:(Math.random()-.5)*80-40,r:1.5+Math.random()*2,life:1,color:'#FFD700'});
+    e.hp-=finalDmg;stats.accuracy.hits++;spawnParts(b.x,b.y,e.col,5);hitSparks.push({x:b.x,y:b.y,vx:(Math.random()-.5)*80,vy:(Math.random()-.5)*80-40,r:1.5+Math.random()*2,life:1,color:'#FFD700'});
     if(b.explosive){
       const toKill=[];
       for(let j=enemies.length-1;j>=0;j--){

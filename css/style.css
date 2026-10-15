@@ -663,7 +663,7 @@ input,textarea{
 body.colorblind-mode{--gold:#FFD700;--gold-lit:#FFEB3B;--red:#FF5722;--red-hot:#FF9800;}
 body.high-contrast{--ash:#FFFFFF;--ash2:#CCCCCC;--gold-dim:#FFD700;--gold-lit:#FFEB3B;}
 body.high-contrast .scr{background:#000000 !important;}
-body.high-contrast .char-card,.body.high-contrast .diff-card,.body.high-contrast .mode-card{border-color:#FFFFFF !important;background:#000000 !important;}
+body.high-contrast .char-card,body.high-contrast .diff-card,body.high-contrast .mode-card{border-color:#FFFFFF !important;background:#000000 !important;}
 body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
 
 /* ═══ GAME MODE BADGES ═══ */

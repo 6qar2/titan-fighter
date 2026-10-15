@@ -3,8 +3,6 @@ function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   
   if(GameModes.current==='endless'){diffCfg={...diffCfg,lives:1,timeLimit:0};}
-  else if(GameModes.current==='daily'){diffCfg={...diffCfg,lives:2,timeLimit:300};}
-  else if(GameModes.current==='bossrush'){diffCfg={...diffCfg,lives:3,timeLimit:0};}
   
   _diffBase={...diffCfg};
   reapplyUpgrades();
@@ -41,13 +39,9 @@ function initGame(){
   
   if(GameModes.current==='endless'){
     GameModes.startEndless();
-  }else if(GameModes.current==='daily'){
-    GameModes.startDaily();
-  }else if(GameModes.current==='bossrush'){
-    GameModes.startBossRush();
   }
   
-  if(GameModes.current!=='campaign'){
+  if(GameModes.current==='endless'){
     const modeBadge=document.getElementById('mode-badge');
     if(modeBadge){
       modeBadge.textContent=GameModes.getModeConfig().name;
@@ -88,13 +82,7 @@ function endGame(){
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();sfxVictory();
   
-  if(GameModes.current==='endless'){
-    ExpandedStats.recordEndlessWave(GameModes.endlessWave);
-  }else if(GameModes.current==='daily'){
-    ExpandedStats.recordDailyComplete();
-  }else if(GameModes.current==='bossrush'){
-    ExpandedStats.recordBossDefeated();
-  }
+  if(GameModes.current==='endless'){ExpandedStats.recordEndlessWave(GameModes.endlessWave);}
   
    CharProgression.addXp(CHARS[selChar].id,score);
    

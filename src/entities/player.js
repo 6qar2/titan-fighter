@@ -4,11 +4,16 @@ function fireBullet(){
   let wp={...WEAPONS[curWeapon]};
   const ch=CHARS[selChar];
   const ang=Math.atan2(myP-P.y,mxP-P.x),spd=wp.spd;
-  let dmg=wp.dmg*(ch.dmg||1);
-  if(gameState2.powerBuff&&gameState2.powerBuff.type==='battlecry')dmg*=gameState2.powerBuff.dmgMult;
-  if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmg*=gameState2.powerBuff.dmgMult;
-  if(gameState2.powerBuff&&gameState2.powerBuff.type==='deadeye'){dmg*=gameState2.powerBuff.dmgMult;wp.pierce=true;}
-  if(gameState2.powerBuff&&gameState2.powerBuff.type==='smoke')dmg*=gameState2.powerBuff.nextShotMult||1;
+   let dmg=wp.dmg*(ch.dmg||1)*(diffCfg.playerDmgMult||1);
+   if(window.dmgBuff)dmg*=window.dmgBuff;
+   if(gameState2.powerBuff&&gameState2.powerBuff.type==='battlecry')dmg*=gameState2.powerBuff.dmgMult;
+   if(gameState2.powerBuff&&gameState2.powerBuff.type==='bloodlust')dmg*=gameState2.powerBuff.dmgMult;
+   if(gameState2.powerBuff&&gameState2.powerBuff.type==='deadeye'){dmg*=gameState2.powerBuff.dmgMult;wp.pierce=true;}
+   if(gameState2.powerBuff&&gameState2.powerBuff.type==='smoke'){
+     const mult=gameState2.powerBuff.nextShotMult||1;
+     dmg*=mult;
+     gameState2.powerBuff.nextShotMult=null;
+   }
   const count=window.doubleShot?wp.count*2:wp.count;
   const spread=wp.spread;
   for(let i=0;i<count;i++){

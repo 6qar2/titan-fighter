@@ -7,8 +7,8 @@ function spawnEnemy(forceDef,forceX,forceY){
   else if(side===1){x=-def.sz;y=mg+Math.random()*cv.height*.5;}
   else{x=cv.width+def.sz;y=mg+Math.random()*cv.height*.5;}
   const wm=1+(wave-1)*.15;
-  const scaledHp=Math.ceil(def.hp*diffCfg.enemyHpMult);
-  const isElite=Math.random()<.08&&wave>=3;
+  const scaledHp=Math.ceil(def.hp*diffCfg.enemyHpMult*(1+(wave-1)*0.1));
+  const isElite=Math.random()<0.05+wave*0.01&&wave>=3;
   const e={...def,maxHp:scaledHp*(isElite?2.5:1),hp:scaledHp*(isElite?2.5:1),x,y,vx:0,vy:0,st:Math.random()*1.5,wob:Math.random()*Math.PI*2,wm,ang:0,spdMod:1,stunT:0,
     spd:def.spd*diffCfg.enemySpdMult,sRate:def.sRate*diffCfg.enemyFireMult,isElite
   };
@@ -74,15 +74,20 @@ function spawnTitan(wave){
 }
 function spawnEnemyVariant(){
   if(Math.random()>0.08||enemies.length>=getSpawnCap())return;
-  const pool=[];if(wave>=4){pool.push('elite','berserker');}if(wave>=5){pool.push('tribune','phantom','bomber','necromancer','viper','leech');}if(wave>=6){pool.push('irontitan','thunderer','corruptor','zealot');}if(wave>=7){pool.push('warlord','colossusg','stormeagle','inferno','frostgiant');}if(wave>=8){pool.push('voidwalker','chaoslord','goliath','reaper','plaguebringer');}if(wave>=9){pool.push('herald','voidreaver','stormlord');}if(wave>=10){pool.push('caesar','titangod','titanoverlord');}pool.push('skirmisher','soldier');
-  const def=EDEFS.find(d=>d.type===pool[Math.floor(Math.random()*pool.length)]);
+  if(!_variantPool||_variantPool.wave!==wave){
+    _variantPool={wave,types:[]};
+    const p=_variantPool.types;
+    if(wave>=4){p.push('elite','berserker');}if(wave>=5){p.push('tribune','phantom','bomber','necromancer','viper','leech');}if(wave>=6){p.push('irontitan','thunderer','corruptor','zealot');}if(wave>=7){p.push('warlord','colossusg','stormeagle','inferno','frostgiant');}if(wave>=8){p.push('voidwalker','chaoslord','goliath','reaper','plaguebringer');}if(wave>=9){p.push('herald','voidreaver','stormlord');}if(wave>=10){p.push('caesar','titangod','titanoverlord');}p.push('skirmisher','soldier');
+  }
+  const def=EDEFS.find(d=>d.type===_variantPool.types[Math.floor(Math.random()*_variantPool.types.length)]);
   if(def)spawnEnemy(def);
 }
+let _variantPool=null;
 function drawEnemy(e){
-  if(e.ability==='phase'&&!e.visible&&Math.floor(Date.now()/150)%3===0)return;
+  if(e.ability==='phase'&&!e.visible&&Math.floor(_frameNow/150)%3===0)return;
   cx.save();cx.translate(e.x,e.y);
   if(e.ability==='phase')cx.globalAlpha=e.visible?1:0.25;
-  if(shouldDrawShadow()){cx.shadowColor=e.col;cx.shadowBlur=e.type==='titangod'||e.type==='caesar'||e.type==='chaoslord'?30:14;}
+   if(Perf.shadowBlur){cx.shadowColor=e.col;cx.shadowBlur=e.type==='titangod'||e.type==='caesar'||e.type==='chaoslord'?30:14;}
   cx.strokeStyle='rgba(255,60,60,0.7)';cx.lineWidth=2.5;
   cx.beginPath();cx.arc(0,0,e.sz+4,0,Math.PI*2);cx.stroke();
   if(e.isElite){cx.shadowColor='#FFD700';cx.shadowBlur=20;cx.strokeStyle='rgba(255,215,0,.9)';cx.lineWidth=2.5;cx.beginPath();cx.arc(0,0,e.sz+7,0,Math.PI*2);cx.stroke();}
@@ -139,7 +144,7 @@ function drawEnemy(e){
     default:cx.rotate(e.ang+Math.PI/2);cx.fillStyle=e.col;cx.beginPath();cx.moveTo(0,-s);cx.lineTo(-s*.6,s*.65);cx.lineTo(0,s*.25);cx.lineTo(s*.6,s*.65);cx.closePath();cx.fill();
   }
   if(e.maxHp>1){cx.setTransform(1,0,0,1,e.x,e.y);const bw=e.sz*1.9,bh=3;cx.fillStyle='rgba(0,0,0,.7)';cx.fillRect(-bw/2,e.sz+5,bw,bh);const pct=e.hp/e.maxHp;cx.fillStyle=pct>.5?'#4CAF50':pct>.25?'#C8A84B':'#C0001A';cx.fillRect(-bw/2,e.sz+5,bw*pct,bh);}
-  if(e.ability==='regen'){cx.setTransform(1,0,0,1,e.x,e.y);cx.strokeStyle='rgba(76,175,80,.5)';cx.lineWidth=1.5;cx.beginPath();cx.arc(0,0,e.sz+8+Math.sin(Date.now()*.005)*3,0,Math.PI*2);cx.stroke();}
+   if(e.ability==='regen'){cx.setTransform(1,0,0,1,e.x,e.y);cx.strokeStyle='rgba(76,175,80,.5)';cx.lineWidth=1.5;cx.beginPath();cx.arc(0,0,e.sz+8+Math.sin(_frameNow*.005)*3,0,Math.PI*2);cx.stroke();}
   cx.restore();
   if(e.ability==='poison'&&e.trail){
     e.trail.forEach((t,i)=>{cx.save();cx.globalAlpha=i/e.trail.length*.5;cx.fillStyle='rgba(174,213,129,.6)';cx.beginPath();cx.arc(t.x,t.y,4,0,Math.PI*2);cx.fill();cx.restore();});

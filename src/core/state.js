@@ -14,7 +14,7 @@ let smokeClods=[];
 let powerups=[];
 let keys={},mxP=0,myP=0;
 let DOM={};
-function cacheDOM(){DOM.vignette=document.getElementById('vignette');DOM.combo=document.getElementById('combo');DOM.waveMod=document.getElementById('wave-modifier');DOM.ammoFlash=document.getElementById('ammo-flash');DOM.lowAmmo=document.getElementById('low-ammo-warn');DOM.killsLeft=document.getElementById('kills-left-num');DOM.xhair=document.getElementById('xhair');}
+function cacheDOM(){DOM.vignette=document.getElementById('vignette');DOM.combo=document.getElementById('combo');DOM.waveMod=document.getElementById('wave-modifier');DOM.ammoFlash=document.getElementById('ammo-flash');DOM.lowAmmo=document.getElementById('low-ammo-warn');DOM.killsLeft=document.getElementById('kills-left-num');DOM.xhair=document.getElementById('xhair');DOM.fireBtn=document.getElementById('fire-btn');}
 let shooting=false;
 let lastTS=0,timerID=null,animID=null;
 let totalKills=0,bestCombo=0;
@@ -33,6 +33,11 @@ let curWeapon=0,weaponSwitchCD=0,waveModifier=null,waveModifierTimer=0;
 let activePowerups=[];
 let dmgNums=[],killFeed=[];
 let muzzleFlashes=[],bulletTrails=[],hitSparks=[],activeTurrets=[];
+let deadEnemies=[];
+let _lastCombatIntensity=-1;
+let _combatGradient=null;
+let _nearestEnemy=null;
+let _frameNow=0;
 let gameStartTime=0;
 function initStars(){stars=[];for(let i=0;i<80;i++)stars.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.2+.2,spd:Math.random()*16+3,a:Math.random()*.35+.07});}
 function buildDots(){const el=document.getElementById('ldots');el.innerHTML='';for(let i=0;i<lives;i++){const d=document.createElement('div');d.className='ldot';d.id='d'+i;el.appendChild(d);}}
@@ -88,7 +93,7 @@ function updateWeaponHUD(){
 }
 function updateFireButtonState(){
   if(!Mobile.isMobile)return;
-  const fb=document.getElementById('fire-btn');
+  const fb=DOM.fireBtn||(DOM.fireBtn=document.getElementById('fire-btn'));
   if(!fb)return;
   if(ammo<=0){fb.classList.add('disabled');fb.style.opacity='0.4';}
   else{fb.classList.remove('disabled');fb.style.opacity='1';}

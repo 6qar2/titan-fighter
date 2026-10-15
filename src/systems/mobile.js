@@ -87,17 +87,9 @@ const GameModes={
   current:'campaign',
   endless:false,
   endlessWave:0,
-  endlessScore:0,
-  dailyChallenge:null,
-  bossRush:false,
-  bossRushIndex:0,
-  modifiers:[],
-  specialRules:null,
   getModeConfig(){
     switch(this.current){
       case 'endless':return{name:'ENDLESS',desc:'How long can you survive?',color:'#FF1744',icon:'♾️',lives:1,timeLimit:0};
-      case 'daily':return{name:'DAILY CHALLENGE',desc:'Special daily modifiers',color:'#FFD700',icon:'📅',lives:2,timeLimit:300};
-      case 'bossrush':return{name:'BOSS RUSH',desc:'Face all bosses back to back',color:'#E040FB',icon:'⚔️',lives:3,timeLimit:0};
       default:return{name:'CAMPAIGN',desc:'Survive 10 waves',color:'#C8A84B',icon:'⚔️',lives:diffCfg.lives,timeLimit:300};
     }
   },
@@ -105,7 +97,6 @@ const GameModes={
     this.current='endless';
     this.endless=true;
     this.endlessWave=1;
-    this.endlessScore=0;
     this.modifiers=[];
     const mCount=Math.floor(Math.random()*2)+1;
     const available=[...WAVE_MODIFIERS];
@@ -116,67 +107,19 @@ const GameModes={
     }
     showPowerAnnounce('♾️ ENDLESS MODE');
   },
-  startDaily(){
-    this.current='daily';
-    this.endless=false;
-    this.bossRush=false;
-    const today=new Date().toISOString().split('T')[0];
-    const seed=parseInt(today.replace(/-/g,''));
-    this.dailyChallenge={
-      date:today,
-      seed:seed,
-      modifiers:[],
-      targetScore:5000+Math.floor(seed%5000),
-      targetWave:5+Math.floor(seed%6)
-    };
-    const available=[...WAVE_MODIFIERS];
-    for(let i=0;i<2&&available.length>0;i++){
-      const idx=(seed+i)%available.length;
-      this.dailyChallenge.modifiers.push(available[idx].effect);
-      available.splice(idx,1);
-    }
-    showPowerAnnounce('📅 DAILY CHALLENGE');
-  },
-  startBossRush(){
-    this.current='bossrush';
-    this.bossRush=true;
-    this.bossRushIndex=0;
-    showPowerAnnounce('⚔️ BOSS RUSH');
-  },
-  getEndlessModifier(){
-    if(this.current!=='endless')return null;
-    const wave=this.endlessWave;
-    const mods=['hordes','fast','armored','slow','burning'];
-    return mods[wave%mods.length];
-  },
-  getBossRushEnemy(){
-    if(this.current!=='bossrush')return null;
-    const bosses=['warlord','chaoslord','herald','caesar','titangod'];
-    return bosses[this.bossRushIndex%bosses.length];
-  },
   onWaveComplete(){
     if(this.current==='endless'){
       this.endlessWave++;
-      this.endlessScore+=score;
       if(this.endlessWave%3===0){
         const mods=['hordes','fast','armored','slow','burning'];
         this.modifiers.push(mods[Math.floor(Math.random()*mods.length)]);
         showPowerAnnounce('⚠ MODIFIER ADDED');
       }
-    }else if(this.current==='bossrush'){
-      this.bossRushIndex++;
-      showPowerAnnounce('⚔ BOSS '+(this.bossRushIndex+1)+' DEFEATED');
     }
   },
   getResult(){
     if(this.current==='endless'){
-      return{title:'ENDLESS RUN',subtitle:'Wave '+this.endlessWave,score:this.endlessScore||score};
-    }else if(this.current==='daily'){
-      const dc=this.dailyChallenge;
-      const completed=score>=dc.targetScore&&wave>=dc.targetWave;
-      return{title:completed?'DAILY COMPLETE':'DAILY FAILED',subtitle:completed?'★ Stars earned':'Try again tomorrow',score:score};
-    }else if(this.current==='bossrush'){
-      return{title:'BOSS RUSH',subtitle:'Defeated '+this.bossRushIndex+' bosses',score:score};
+      return{title:'ENDLESS RUN',subtitle:'Wave '+this.endlessWave,score:score};
     }
     return null;
   },
@@ -184,11 +127,7 @@ const GameModes={
     this.current='campaign';
     this.endless=false;
     this.endlessWave=0;
-    this.endlessScore=0;
-    this.bossRush=false;
-    this.bossRushIndex=0;
     this.modifiers=[];
-    this.dailyChallenge=null;
   }
 };
 
@@ -249,7 +188,7 @@ const CharProgression={
     if(!base)return;
     ch.spd=base.spd*(1+level*0.02);
     ch.dmg=base.dmg*(1+level*0.02);
-    ch.fire=Math.max(0.05,base.fire+level*0.01);
+    ch.fire=base.fire*Math.max(0.5,1-(level-1)*0.02);
     ch.shield=base.shield+Math.floor(level/2);
     ch.maxAmmo=base.maxAmmo+Math.floor(level/3);
   },
@@ -324,26 +263,21 @@ const DailyRewards={
 /* ═══ STATS EXPANSION ═══ */
 const ExpandedStats={
   endlessBestWave:0,
-  bossesDefeated:0,
-  dailyCompleted:0,
-  totalPlayTime:0,
   weaponsUnlocked:['pistol'],
-  charactersUnlocked:['legionary','centurion','praetor','imperator','guardian','colossus','vortex','sunfire','phantom_assassin','berserker','sniper','engineer','medic','juggernaut'],
+  charactersUnlocked:['legionary','centurion','praetor','imperator','guardian','colossus','vortex','sunfire'],
   skinsOwned:[],
   load(){
     try{
       const s=JSON.parse(localStorage.getItem('titans_expanded_stats'));
-      if(s){this.endlessBestWave=s.endlessBestWave||0;this.bossesDefeated=s.bossesDefeated||0;this.dailyCompleted=s.dailyCompleted||0;this.totalPlayTime=s.totalPlayTime||0;this.weaponsUnlocked=s.weaponsUnlocked||['pistol'];this.charactersUnlocked=s.charactersUnlocked||CHARS.map(c=>c.id);this.skinsOwned=s.skinsOwned||[];}
+      if(s){this.endlessBestWave=s.endlessBestWave||0;this.totalPlayTime=s.totalPlayTime||0;this.weaponsUnlocked=s.weaponsUnlocked||['pistol'];this.charactersUnlocked=s.charactersUnlocked||CHARS.map(c=>c.id);this.skinsOwned=s.skinsOwned||[];}
     }catch(e){}
   },
   save(){
-    localStorage.setItem('titans_expanded_stats',JSON.stringify({endlessBestWave:this.endlessBestWave,bossesDefeated:this.bossesDefeated,dailyCompleted:this.dailyCompleted,totalPlayTime:this.totalPlayTime,weaponsUnlocked:this.weaponsUnlocked,charactersUnlocked:this.charactersUnlocked,skinsOwned:this.skinsOwned}));
+    localStorage.setItem('titans_expanded_stats',JSON.stringify({endlessBestWave:this.endlessBestWave,totalPlayTime:this.totalPlayTime,weaponsUnlocked:this.weaponsUnlocked,charactersUnlocked:this.charactersUnlocked,skinsOwned:this.skinsOwned}));
   },
   recordEndlessWave(wave){
     if(wave>this.endlessBestWave){this.endlessBestWave=wave;this.save();}
-  },
-  recordBossDefeated(){this.bossesDefeated++;this.save();},
-  recordDailyComplete(){this.dailyCompleted++;this.save();}
+  }
 };
 
 /* ═══ ACCESSIBILITY ═══ */

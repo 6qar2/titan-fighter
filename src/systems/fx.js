@@ -1,12 +1,13 @@
 /* ═══ PARTICLES / POPS ═══ */
-function spawnParts(x,y,col,n){
+function spawnParts(x,y,col,n,force){
   const density=settings.particleDensity||3;
   const mult=Perf.particleMult||1;
   const max= density===1?80:density===2?150:220;
   const adjMax=Math.floor(max*mult);
-  if(parts.length>adjMax)return;
   const count=density===1?Math.ceil(n/3):density===2?Math.ceil(n/1.5):n;
-  const adjCount=Math.max(1,Math.floor(count*mult));
+  const adjCount=Math.max(force?Math.min(3,Math.floor(count*mult)):0,Math.floor(count*mult));
+  if(parts.length>adjMax&&!force)return;
+  if(parts.length>adjMax){const excess=parts.length-adjMax;for(let i=0;i<excess&&i<adjCount;i++)parts.shift();parts.length=adjMax;}
   for(let i=0;i<adjCount;i++){const a=Math.random()*Math.PI*2,sp=35+Math.random()*110;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,dec:.05+Math.random()*.07,r:1.2+Math.random()*2.8,col});}
 }
 function spawnPop(x,y,txt,cls){const el=document.createElement('div');el.className='spop'+(cls?' '+cls:'');el.textContent=txt;el.style.left=(x-30)+'px';el.style.top=(y-15)+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),750);}

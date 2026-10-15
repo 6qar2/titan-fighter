@@ -1,6 +1,9 @@
 /* ═══ HAPTIC FEEDBACK ═══ */
+let _lastHaptic=0;
 function haptic(type){
   if(!navigator.vibrate)return;
+  const now=performance.now();
+  if(now-_lastHaptic<150)return;
   const patterns={
     light:[10],
     medium:[20],
@@ -10,6 +13,7 @@ function haptic(type){
     power:[20,50,20]
   };
   const p=patterns[type]||patterns.light;
+  _lastHaptic=now;
   try{navigator.vibrate(p);}catch(e){}
 }
 
@@ -222,7 +226,7 @@ function renderMobileSettings(){
 function wireUI(){
   document.getElementById('btn-start').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();Profile.setName(pName);showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
   document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-game-modes');});
-  document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);cancelAnimationFrame(menuRAF);});
+  document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF&&cancelAnimationFrame(menuRAF);menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-enter-arena').addEventListener('click',()=>{
     wake();showScr(null);document.getElementById('hud').classList.remove('off');
     if('ontouchstart' in window||window.innerWidth<=900)document.getElementById('mctrl').classList.remove('off');

@@ -1,17 +1,16 @@
 /* ═══ ENHANCED KILL SYSTEM ═══ */
 function killEnemy(e,idx){
-  const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord';
+  const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='titanoverlord';
   const isTitanClub=e.type==='irontitan'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='colossusg';
   if(isBoss){sfxBigBoom();triggerSlowMo(0.5,0.35);triggerShake(14,400);earnCredits(e.pts);haptic('heavy');}
   else if(isTitanClub){sfxBigBoom();triggerSlowMo(0.35,0.3);triggerShake(8,250);earnCredits(Math.floor(e.pts/2));haptic('medium');}
   else{sfxExplode();haptic('light');}
   combo++;comboT=2.5;totalKills++;if(combo>bestCombo)bestCombo=combo;
   killstreakBonus=Math.min(5,Math.floor(combo/5));
-  const mult=combo>=5?2:combo>=3?1.5:1;
-  const killstreakMult=1+killstreakBonus*.25;
-  const eliteMult=e.isElite?2:1;
-  const pts=Math.round(e.pts*mult*diffCfg.scoreMult*killstreakMult*eliteMult);
-  score+=pts;spawnParts(e.x,e.y,e.col,isBoss?12:isTitanClub?6:5);
+  const comboMult=Math.min(2,1+combo*0.1);
+  const killstreakMult=1+killstreakBonus*0.2;
+  const eliteMult=e.isElite?1.5:1;
+  const pts=Math.round(e.pts*comboMult*diffCfg.scoreMult*killstreakMult*eliteMult);score+=pts;spawnParts(e.x,e.y,e.col,isBoss?12:isTitanClub?6:5);
   if(isTitanClub&&!isBoss)spawnPop(e.x,e.y,`+${pts} ♛ TITANS CLUB`,'boss');
   else spawnPop(e.x,e.y,combo>=3?`+${pts} ×${combo}`:`+${pts}`,isBoss||isTitanClub?'boss':'');
   if(combo>=3){
@@ -32,14 +31,14 @@ function killEnemy(e,idx){
   CharProgression.addXp(CHARS[selChar].id,xpGain);
   if(e.isElite)spawnPop(e.x,e.y-20,`+${Math.round(e.pts*.5)} ELITE`,'boss');
   if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
-  enemies.splice(idx,1);waveKills++;updateHUD();
+  const last=enemies[enemies.length-1];enemies[idx]=last;enemies.pop();waveKills++;updateHUD();
 }
 
 /* ═══ POWER-UPS ═══ */
 function spawnPowerup(){
   if(Math.random()>0.003)return;
   const type=POWERUP_TYPES[Math.floor(Math.random()*POWERUP_TYPES.length)];
-  const margin=60;powerups.push({x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:16,type,...type,age:0,maxAge:20,pulse:0});
+  const margin=60;powerups.push({...type,x:margin+Math.random()*(cv.width-margin*2),y:80+Math.random()*(cv.height*.6),r:16,age:0,maxAge:20,pulse:0});
 }
 function updatePowerups(dt){
   powerups=powerups.filter(pu=>{
@@ -75,23 +74,20 @@ function activatePowerup(pu){
   triggerShake(2,100);
 }
 function updateActivePowerups(dt){
-  activePowerups=activePowerups.filter(pu=>{
-    pu.timer-=dt;
-    if(pu.timer<=0){
-      const sameTypeCount=activePowerups.filter(p=>p.type===pu.type).length;
-      if(sameTypeCount<=1){
-        if(pu.type==='speed')P.spdBuff=null;
-        if(pu.type==='damage')window.dmgBuff=1;
-        if(pu.type==='rapid')window.fireRateBuff=null;
-        if(pu.type==='magnet')window.magnetRange=null;
-        if(pu.type==='timewarp'){enemies.forEach(e=>{e.spdMod=1;});}
-        if(pu.type==='shieldgen'){window.shieldHits=Math.max(0,(window.shieldHits||0)-3);}
-        if(pu.type==='doubleshot'){window.doubleShot=false;}
-        if(pu.type==='crit_boost'){window.critChance=Math.max(0,(window.critChance||0)-0.3);}
-      }
-      return false;
-    }
-    return true;
+  activePowerups.forEach(pu=>{pu.timer-=dt;});
+  const expired=activePowerups.filter(pu=>pu.timer<=0);
+  activePowerups=activePowerups.filter(pu=>pu.timer>0);
+  const remainingTypes=new Set(activePowerups.map(pu=>pu.type));
+  expired.forEach(pu=>{
+    if(remainingTypes.has(pu.type))return;
+    if(pu.type==='speed'||pu.type==='nano_speed')P.spdBuff=null;
+    if(pu.type==='damage')window.dmgBuff=1;
+    if(pu.type==='rapid')window.fireRateBuff=null;
+    if(pu.type==='magnet')window.magnetRange=null;
+    if(pu.type==='timewarp'){enemies.forEach(e=>{e.spdMod=1;});}
+    if(pu.type==='shieldgen'){window.shieldHits=Math.max(0,(window.shieldHits||0)-3);}
+    if(pu.type==='doubleshot'){window.doubleShot=false;}
+    if(pu.type==='crit_boost'){window.critChance=Math.max(0,(window.critChance||0)-0.3);}
   });
 }
 function drawPowerups(){

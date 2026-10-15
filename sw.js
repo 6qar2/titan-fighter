@@ -1,4 +1,4 @@
-const CACHE='titans-strike-v6';
+const CACHE='titans-strike-v7';
 const ASSETS=[
   '/',
   '/index.html',
@@ -29,6 +29,7 @@ const ASSETS=[
   '/src/audio/sfx.js',
   '/src/audio/music.js',
   '/src/perf.js',
+  '/src/main.js',
   '/sw.js'
 ];
 self.addEventListener('install',e=>{
