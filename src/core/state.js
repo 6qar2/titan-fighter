@@ -58,7 +58,7 @@ function updateHUD(){
   const m=Math.floor(timeLeft/60),s=timeLeft%60;
   document.getElementById('htimer').textContent=`${m}:${s.toString().padStart(2,'0')}`;
   document.getElementById('hwave').textContent=toRoman(wave);
-  const quota=6+wave*3,remaining=Math.max(0,quota-waveKills);
+  const quota=Math.min(60,6+wave*2),remaining=Math.max(0,quota-waveKills);
   const kl=document.getElementById('kills-left');
   if(!gateOpen&&!waveAdvancing&&gState==='play'){kl.style.display='block';document.getElementById('kills-left-num').textContent=remaining;}
   else kl.style.display='none';
@@ -106,14 +106,13 @@ function updateFireButtonState(){
 }
 function showPowerAnnounce(txt,dur=2000){const el=document.getElementById('power-announce');el.textContent=txt;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},dur);document.getElementById('power-flash').style.opacity='1';setTimeout(()=>{document.getElementById('power-flash').style.opacity='0';},200);}
 function showWaveAnnounce(n){
-  const el=document.getElementById('wave-announce');const prof=getWaveMusic(n);const moodLabel=n<=2?'MARCH':n<=4?'ADVANCE':n<=5?'ASSAULT':'FURY';
-  const clubMsg=n>=10?'♛ TITANS CLUB · FINAL STAND':n>=7?'✦ TITANS CLUB · ELITE ONSLAUGHT':n>=5?'⚔ TITANS CLUB · ADVANCE':n>=3?'✦ TITANS CLUB · MARCH':'♛ TITANS CLUB · RECRUIT TRIAL';
-  const extraMsg=n>=10?'☀ FACE THE TITAN GOD':n>=9?'⚑ TITAN HERALD APPROACHES':'';
+  const el=document.getElementById('wave-announce');const prof=getWaveMusic(n);const moodLabel=n<=2?'MARCH':n<=4?'ADVANCE':n<=6?'ASSAULT':n<=10?'FURY':'TITAN';
+  const clubMsg=n>=15?'♛ TITANS CLUB · TITAN ASCENDANT':n>=10?'♛ TITANS CLUB · FINAL STAND':n>=7?'✦ TITANS CLUB · ELITE ONSLAUGHT':n>=5?'⚔ TITANS CLUB · ADVANCE':n>=3?'✦ TITANS CLUB · MARCH':'♛ TITANS CLUB · RECRUIT TRIAL';
+  const extraMsg=n>=15?'☀ ASCENDANT TITAN':n>=10?'☀ FACE THE TITAN GOD':n>=9?'⚑ TITAN HERALD APPROACHES':'';
   el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} · ${prof.bpm} BPM</span><br><span style="font-family:'Cinzel';font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);">${clubMsg}</span>${extraMsg?`<br><span style="font-family:'Cinzel Decorative';font-size:.6rem;letter-spacing:2px;color:var(--red-hot);">${extraMsg}</span>`:''}`;
   el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2500);
   if(n>=5)triggerShake(3,200);
   if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
-  applyWaveModifier();
   bgTransition(n);
 }
 function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
@@ -146,29 +145,7 @@ function updateFireButtonState(){
   const pct=(fireInterval-shootCD)/fireInterval;
   let after=fb.querySelector('.cooldown-overlay');
   if(!after){after=document.createElement('div');after.className='cooldown-overlay';after.style.cssText='position:absolute;inset:0;background:linear-gradient(90,rgba(0,0,0,0.6),transparent);width:'+((1-pct)*100)+'%;transition:width .1s;z-index:1;';fb.appendChild(after);}
-  else{after.style.width=((1-pct)*100)+'%';}
-}
-function showPowerAnnounce(txt,dur=2000){const el=document.getElementById('power-announce');el.textContent=txt;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},dur);document.getElementById('power-flash').style.opacity='1';setTimeout(()=>{document.getElementById('power-flash').style.opacity='0';},200);}
-function showWaveAnnounce(n){
-  const el=document.getElementById('wave-announce');const prof=getWaveMusic(n);const moodLabel=n<=2?'MARCH':n<=4?'ADVANCE':n<=5?'ASSAULT':'FURY';
-  const clubMsg=n>=10?'♛ TITANS CLUB · FINAL STAND':n>=7?'✦ TITANS CLUB · ELITE ONSLAUGHT':n>=5?'⚔ TITANS CLUB · ADVANCE':n>=3?'✦ TITANS CLUB · MARCH':'♛ TITANS CLUB · RECRUIT TRIAL';
-  const extraMsg=n>=10?'☀ FACE THE TITAN GOD':n>=9?'⚑ TITAN HERALD APPROACHES':'';
-  el.innerHTML=`WAVE ${toRoman(n)}<br><span style="font-family:'Barlow Condensed';font-size:.72rem;letter-spacing:4px;color:var(--ash);">${moodLabel} · ${prof.bpm} BPM</span><br><span style="font-family:'Cinzel';font-size:.55rem;letter-spacing:3px;color:var(--gold-dim);">${clubMsg}</span>${extraMsg?`<br><span style="font-family:'Cinzel Decorative';font-size:.6rem;letter-spacing:2px;color:var(--red-hot);">${extraMsg}</span>`:''}`;
-  el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2500);
-  if(n>=5)triggerShake(3,200);
-  if(n>=10){triggerSlowMo(0.6,0.3);triggerShake(10,400);spawnParts(cv.width/2,cv.height/2,'#FFD700',40);sfxBigBoom();}
-  bgTransition(n);
-}
-function showEnemyWarn(msg){const el=document.getElementById('enemy-warn');el.textContent=msg;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0';},2200);}
-function triggerSlowMo(duration, intensity){slowMoTimer=duration;slowMo=intensity||0.25;}
-function triggerShake(intensity, duration){if(!Mobile.screenShake)return;shakeIntensity=intensity||8;setTimeout(()=>{shakeIntensity=0;},duration||300);}
-function activatePower(){
-  const ch=CHARS[selChar];if(powerCharge<1||powerCooldownTimer>0)return;
-  powerCharge=0;powerCooldownTimer=ch.powerCooldown;
-  triggerSlowMo(0.4, 0.3);
-  triggerShake(6, 250);
-  sfxPower();spawnPop(P.x,P.y-30,'✦ '+ch.powerName,'power');
-  ch.power(gameState2);updatePowerHUD();haptic('power');
+   else{after.style.width=((1-pct)*100)+'%';}
 }
 function showWeaponDetail(wp){
   const pop=document.createElement('div');

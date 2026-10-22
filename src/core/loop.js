@@ -76,8 +76,8 @@ function update(dt){
     if(comboT<=0){combo=0;comboEl.classList.remove('decay');comboEl.style.opacity='0';}
     else if(comboT<1&&combo>=3){comboEl.classList.add('decay');}
   }
-  const spawnBase=diffCfg.spawnRateBase;const sr=Math.max(.3,(spawnBase-wave*.08));
-  let waveQuota=6+wave*3;
+  const spawnBase=diffCfg.spawnRateBase;const sr=Math.max(.8,(spawnBase-wave*.04));
+  let waveQuota=Math.min(60,6+wave*2);
   spawnT-=dt;
   if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){
     const spawnCount=1;
@@ -123,7 +123,7 @@ function update(dt){
     if(!target)target=P;
     const dx=target.x-e.x,dy=target.y-e.y,dist=Math.hypot(dx,dy)||1;
     let spdMult=(e.spdMod||1);
-    const wm=1+Math.sqrt(wave-1)*0.25;
+    const wm=1+Math.min(3,Math.sqrt(wave-1)*0.08);
     const baseSpd=e.spd*spdMult*wm*90;
     if(e.ability==='regen'){e.regenT-=dt;if(e.regenT<=0){e.hp=Math.min(e.maxHp,e.hp+1);e.regenT=2;spawnParts(e.x,e.y,'#4CAF50',2);}}
     if(e.ability==='phase'){e.teleportCD-=dt;if(e.teleportCD<=0){e.visible=!e.visible;e.teleportCD=1.5+Math.random()*2;}}

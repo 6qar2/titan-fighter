@@ -6,8 +6,8 @@ function spawnEnemy(forceDef,forceX,forceY){
   else if(side===0){x=mg+Math.random()*(cv.width-mg*2);y=-def.sz;}
   else if(side===1){x=-def.sz;y=mg+Math.random()*cv.height*.5;}
   else{x=cv.width+def.sz;y=mg+Math.random()*cv.height*.5;}
-  const wm=1+(wave-1)*.15;
-  const scaledHp=Math.ceil(def.hp*diffCfg.enemyHpMult*(1+(wave-1)*0.1));
+  const wm=1+(wave-1)*.08;
+  const scaledHp=Math.ceil(def.hp*diffCfg.enemyHpMult*(1+(wave-1)*0.08));
   const isElite=Math.random()<0.05+wave*0.01&&wave>=3;
   const e={...def,maxHp:scaledHp*(isElite?2.5:1),hp:scaledHp*(isElite?2.5:1),x,y,vx:0,vy:0,st:Math.random()*1.5,wob:Math.random()*Math.PI*2,wm,ang:0,spdMod:1,stunT:0,
     spd:def.spd*diffCfg.enemySpdMult,sRate:def.sRate*diffCfg.enemyFireMult,isElite
