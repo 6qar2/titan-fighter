@@ -202,7 +202,7 @@ function update(dt){
       if(b.pierce){if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){e.hp-=b.dmg;spawnParts(b.x,b.y,e.col,3);if(!b.hit){stats.accuracy.hits++;b.hit=true;}if(e.hp<=0){toKill.push({enemy:e,idx:i});}continue;}}
       else{if(Math.hypot(b.x-e.x,b.y-e.y)<e.sz+b.r){checkBulletCollision(b,e,i);return false;}}
     }
-    for(const k of toKill)killEnemy(k.enemy,k.idx);
+    for(const k of toKill){const idx=enemies.indexOf(k.enemy);if(idx>=0)killEnemy(k.enemy,idx);}
     return true;
   });
   deadEnemies.forEach(e=>{const idx=enemies.indexOf(e);if(idx>=0)killEnemy(e,idx);});
