@@ -78,24 +78,16 @@ function update(dt){
   }
   const spawnBase=diffCfg.spawnRateBase;const sr=Math.max(.3,(spawnBase-wave*.08));
   let waveQuota=6+wave*3;
-  if(GameModes.current==='endless')waveQuota=8+wave*4;
   spawnT-=dt;
   if(spawnT<=0&&!gateOpen&&!waveAdvancing&&waveKills<waveQuota){
-    const spawnCount=waveModifier==='hordes'?3:GameModes.current==='endless'?2:1;
+    const spawnCount=1;
     for(let s=0;s<spawnCount;s++){if(enemies.length<getSpawnCap()){
       spawnEnemy();spawnEnemyVariant();
     }}
     spawnT=sr;
   }
   if(!waveAdvancing&&!gateOpen&&gate===null&&waveKills>=waveQuota&&enemies.length===0){
-    if(GameModes.current==='endless'){
-      wave++;waveKills=0;GameModes.onWaveComplete();
-      showWaveAnnounce(wave);
-      if(wave%5===0){const mods=['hordes','fast','armored','slow','burning'];waveModifier=mods[Math.floor(Math.random()*mods.length)];applyWaveModifier();showPowerAnnounce('⚠ WAVE '+wave+' · '+waveModifier.toUpperCase());}
-      else{waveModifier=null;(DOM.waveMod||document.getElementById('wave-modifier')).style.display='none';}
-    }else{
-      if(wave>=10){endGame();return;}gateOpen=true;openGate();
-    }
+    gateOpen=true;openGate();
   }
   if(gate&&!waveAdvancing&&Math.hypot(P.x-gate.x,P.y-gate.y)<gate.r+P.w*.5)enterGate();
   bgCol.r+=(bgColTarget.r-bgCol.r)*.018;bgCol.g+=(bgColTarget.g-bgCol.g)*.018;bgCol.b+=(bgColTarget.b-bgCol.b)*.018;
@@ -121,8 +113,6 @@ function update(dt){
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='heal'){gameState2.healAccum=(gameState2.healAccum||0)+dt*2;const gained=Math.floor(gameState2.healAccum);if(gained>0){lives=Math.min(lives+gained,diffCfg.lives);gameState2.healAccum-=gained;}}
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='smoke'&&P.invinc>0){P.invinc=Math.max(P.invinc,4);}
   if(gameState2.powerBuff&&gameState2.powerBuff.type==='nano_speed'){P.spdBuff=Math.max(P.spdBuff||1,2.2);}
-  if(waveModifier==='burning'&&P.invinc<=0){takeDmg(dt*2);spawnParts(P.x,P.y,'#FF6D00',1);}
-    if(waveModifierTimer>0){waveModifierTimer-=dt;if(waveModifierTimer<=0){waveModifier=null;(DOM.waveMod||document.getElementById('wave-modifier')).style.display='none';}}
 
   /* ─── ENEMY UPDATE ─── */
    deadEnemies.length=0;
@@ -133,8 +123,6 @@ function update(dt){
     if(!target)target=P;
     const dx=target.x-e.x,dy=target.y-e.y,dist=Math.hypot(dx,dy)||1;
     let spdMult=(e.spdMod||1);
-    if(waveModifier==='fast')spdMult*=1.6;
-    if(waveModifier==='slow')spdMult*=.6;
     const wm=1+Math.sqrt(wave-1)*0.25;
     const baseSpd=e.spd*spdMult*wm*90;
     if(e.ability==='regen'){e.regenT-=dt;if(e.regenT<=0){e.hp=Math.min(e.maxHp,e.hp+1);e.regenT=2;spawnParts(e.x,e.y,'#4CAF50',2);}}

@@ -68,8 +68,8 @@ let upgrades={};
 function loadUpgrades(){try{const u=JSON.parse(localStorage.getItem('titans_upgrades'));if(u){upgrades=u;credits=u.credits||0;}const u2=JSON.parse(localStorage.getItem('titans_upgrade_levels'));if(u2)UPGRADES.forEach(ug=>{if(u2[ug.id]!==undefined)ug.current=u2[ug.id];});}catch(e){}}
 function saveUpgrades(){localStorage.setItem('titans_upgrades',JSON.stringify({...upgrades,credits}));localStorage.setItem('titans_upgrade_levels',JSON.stringify(UPGRADES.reduce((a,u)=>(a[u.id]=u.current,a),{})));}
 function earnCredits(amount){credits+=amount;const creditsEl=document.getElementById('credits-count');if(creditsEl)creditsEl.textContent=credits;saveUpgrades();}
-function storeBaseStats(){_CHARS_BASE=CHARS.map(c=>({fire:c.fire,dmg:c.dmg,spd:c.spd}));_diffBase=null;}
-function reapplyUpgrades(){if(_CHARS_BASE.length===0){storeBaseStats();}CHARS.forEach((c,i)=>{c.fire=_CHARS_BASE[i].fire;c.dmg=_CHARS_BASE[i].dmg;c.spd=_CHARS_BASE[i].spd;});if(_diffBase){diffCfg={..._diffBase};}window.critChance=0;if(typeof CharProgression!=='undefined'&&CharProgression._baseStats)CharProgression.reapplyAllBonuses();maxAmmo=CHARS[selChar].maxAmmo;UPGRADES.forEach(ug=>{if(ug.current>0)ug.apply(ug.current);});}
+function storeBaseStats(){_CHARS_BASE=CHARS.map(c=>({fire:c.fire,dmg:c.dmg,spd:c.spd,weapon:c.weapon}));_diffBase=null;}
+function reapplyUpgrades(){if(_CHARS_BASE.length===0){storeBaseStats();}CHARS.forEach((c,i)=>{c.fire=_CHARS_BASE[i].fire;c.dmg=_CHARS_BASE[i].dmg;c.spd=_CHARS_BASE[i].spd;c.weapon=_CHARS_BASE[i].weapon||'pistol';});if(_diffBase){diffCfg={..._diffBase};}window.critChance=0;if(typeof CharProgression!=='undefined'&&CharProgression._baseStats)CharProgression.reapplyAllBonuses();maxAmmo=CHARS[selChar].maxAmmo;UPGRADES.forEach(ug=>{if(ug.current>0)ug.apply(ug.current);});}
 function renderUpgrades(){document.getElementById('credits-count').textContent=credits;const list=document.getElementById('upgrades-list');list.innerHTML='';UPGRADES.forEach(upg=>{const owned=upg.current>=upg.maxLevel;const canAfford=credits>=upg.cost;const card=document.createElement('div');card.className='upgrade-card'+(owned?' owned':'');card.innerHTML=`<div class="upg-icon">${upg.icon}</div><div class="upg-info"><div class="upg-name">${upg.name} ${owned?'[MAX]':`[${upg.current}/${upg.maxLevel}]`}</div><div class="upg-desc">${upg.desc}</div></div><div class="upg-cost">${owned?'MAXED':upg.cost+' CREDITS'}</div>`;if(!owned&&canAfford){card.addEventListener('click',()=>{if(credits>=upg.cost&&upg.current<upg.maxLevel){credits-=upg.cost;upg.current++;saveUpgrades();reapplyUpgrades();renderUpgrades();showPowerAnnounce('⬆ '+upg.name+' UPGRADED');sfxCombo();}});}list.appendChild(card);});}
 
 /* ═══ SHOP ═══ */
@@ -79,10 +79,7 @@ function renderShop(){
   if(creditsEl)creditsEl.textContent=credits;
   grid.innerHTML='';
   const items=[
-    {id:'plasma_gun',name:'PLASMA GUN',icon:'🔮',cost:500,type:'weapon',desc:'High damage piercing energy weapon'},
-    {id:'flamethrower',name:'FLAMETHROWER',icon:'🔥',cost:400,type:'weapon',desc:'Close range area damage'},
-    {id:'crossbow',name:'CROSSBOW',icon:'🏹',cost:600,type:'weapon',desc:'Extreme damage, slow fire rate'},
-    {id:'skin_gold',name:'GOLD SKIN',icon:'🎨',cost:300,type:'skin',desc:'Legendary golden appearance'},
+    {id:'skin_gold',name:'GOLD SKIN',icon:'🎨',cost:500,type:'skin',desc:'Legendary golden appearance'},
     {id:'ammo_pack',name:'AMMO PACK',icon:'📦',cost:50,type:'consumable',desc:'Refill all ammo'},
     {id:'extra_life',name:'EXTRA LIFE',icon:'❤️',cost:150,type:'consumable',desc:'+1 life for next game'}
   ];
@@ -225,7 +222,7 @@ function renderMobileSettings(){
 /* ═══ BUTTON WIRING ═══ */
 function wireUI(){
   document.getElementById('btn-start').addEventListener('click',()=>{wake();const raw=document.getElementById('pname').value.trim();const clean=raw.replace(/[<>]/g,'');if(!clean){alert('Enter your name, Warrior');return;}pName=clean.toUpperCase();Profile.setName(pName);showScr('s-diff');menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;});
-  document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-game-modes');});
+  document.getElementById('btn-diff-next').addEventListener('click',()=>{showScr('s-chars');});
   document.getElementById('btn-diff-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF&&cancelAnimationFrame(menuRAF);menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-enter-arena').addEventListener('click',()=>{
     wake();showScr(null);document.getElementById('hud').classList.remove('off');
@@ -233,7 +230,6 @@ function wireUI(){
     gState='play';menuAnimActive=false;initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   });
   document.getElementById('btn-back-diff').addEventListener('click',()=>{showScr('s-diff');});
-  document.getElementById('btn-mode-next').addEventListener('click',()=>{showScr('s-chars');});
   document.getElementById('btn-replay').addEventListener('click',()=>{
     wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr(null);
     document.getElementById('hud').classList.remove('off');
@@ -264,10 +260,6 @@ function wireUI(){
   document.getElementById('btn-progression-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-daily-rewards-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-mobile-settings-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-mode-back').addEventListener('click',()=>{showScr('s-diff');});
-  document.querySelectorAll('.mode-card').forEach(card=>{
-    card.addEventListener('click',()=>{document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');GameModes.current=card.dataset.mode;});
-  });
   document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
 
   /* ═══ PAUSE MENU ═══ */

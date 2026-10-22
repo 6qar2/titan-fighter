@@ -12,7 +12,6 @@ function checkBulletCollision(b,e,i){
     if(e.ability==='shield'){const ba=Math.atan2(-b.vy,-b.vx);const ad=Math.abs(((ba-e.shieldAngle+Math.PI*3)%(Math.PI*2))-Math.PI);if(ad<1.05){spawnParts(b.x,b.y,'#4A7EC7',4);return false;}}
     if(e.ability==='fortify'&&e.fortified){const actualDmg=b.dmg*0.15;e.hp-=actualDmg;spawnParts(b.x,b.y,'#5C6BC0',3);return false;}
     let dmgMult=e.ability==='armored'?e.armorMod:1;
-    if(waveModifier==='armored')dmgMult*=.5;
     if(e.ability==='phase'&&!e.visible){spawnParts(b.x,b.y,'#37474F',3);return false;}
     if(e.ability==='godmode'&&e.godShield&&e.hp/e.maxHp>0.66){spawnParts(b.x,b.y,'#FFD700',4);return false;}
     let finalDmg=b.dmg*dmgMult;

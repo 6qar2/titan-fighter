@@ -19,10 +19,8 @@ function enterGate(){
   fl.style.background=`rgba(${r2},${g2},${b2},0.38)`;fl.style.opacity='1';setTimeout(()=>{fl.style.opacity='0';fl.style.background='rgba(200,0,26,0.35)';},200);
   sfxGateEnter();
   const timeBonus=Math.floor(timeLeft*10);score+=timeBonus;if(timeBonus>0)spawnPop(cv.width/2,cv.height/2-40,`+${timeBonus} WAVE BONUS`,'boss');
-  if(wave>=10){endGame();return;}
   gateOpen=true;openGate();
   wave++;
-  waveModifier=null;document.getElementById('wave-modifier').style.display='none';
   bgColTarget={...WAVE_BGS[Math.min(wave-1,WAVE_BGS.length-1)]};showWaveAnnounce(wave);sfxCombo();haptic('success');
   document.getElementById('hwave').textContent=toRoman(wave);spawnParts(cv.width/2,cv.height/2,WAVE_GATE_COLS[Math.min(wave-2,WAVE_GATE_COLS.length-1)],22);
   bgTransition(wave);waveKills=0;setTimeout(()=>{waveAdvancing=false;spawnT=1.8;},1400);

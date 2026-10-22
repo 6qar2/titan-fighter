@@ -3,16 +3,7 @@ const WAVE_BGS=[
   {r:4,g:4,b:10},{r:4,g:10,b:18},{r:8,g:4,b:18},{r:14,g:4,b:22},{r:18,g:4,b:14},
   {r:22,g:6,b:4},{r:24,g:10,b:0},{r:20,g:4,b:4},{r:10,g:0,b:20},{r:28,g:2,b:2}
 ];
-const WAVE_GATE_COLS=['#4A9EFF','#2ADAFF','#A855F7','#C026D3','#EF4444','#F97316','#FBBF24','#DC2626','#8B5CF6','#FF2020'];
-
-/* ═══ WAVE MODIFIERS ═══ */
-const WAVE_MODIFIERS=[
-  {name:'⚡ HORDES',effect:'hordes',desc:'More enemies'},
-  {name:'🚀 FAST',effect:'fast',desc:'Enemies move faster'},
-  {name:'🛡️ ARMORED',effect:'armored',desc:'Enemies take reduced damage'},
-  {name:'❄️ FROZEN',effect:'slow',desc:'Enemies move slower'},
-  {name:'🔥 BURNING',effect:'burning',desc:'Player takes damage over time'}
-];
+const WAVE_GATE_COLS=['#4A9EFF','#2ADAFF','#A855F7','#C026D3','#EF4444','#F97316','#FBBF24','#DC2626','#8B5CF6','#FF2020','#FF1744','#FFD700'];
 
 /* ═══ MUSIC ENGINE ═══ */
 const WAVE_MUSIC=[

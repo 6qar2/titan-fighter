@@ -71,8 +71,10 @@ const pb2=document.getElementById('power-btn');
 pb2.addEventListener('touchstart',e=>{e.preventDefault();activatePower();wake();},{passive:false});
 pb2.addEventListener('mousedown',()=>{activatePower();wake();});
 const wb=document.getElementById('weapon-btn');
-wb.addEventListener('touchstart',e=>{e.preventDefault();switchWeapon();wake();},{passive:false});
-wb.addEventListener('mousedown',()=>{switchWeapon();wake();});
+  if(wb){
+    wb.addEventListener('touchstart',e=>{e.preventDefault();wake();},{passive:false});
+    wb.addEventListener('mousedown',()=>{wake();});
+  }
 const ab=document.getElementById('autofire-btn');
 if(ab){ab.addEventListener('touchstart',e=>{e.preventDefault();Mobile.toggleAutoFire();ab.classList.toggle('active');},{passive:false});ab.addEventListener('mousedown',()=>{Mobile.toggleAutoFire();ab.classList.toggle('active');});}
-document.addEventListener('keydown',e=>{if(isInputFocused())return;if(e.code==='KeyQ'||e.code==='KeyR'){e.preventDefault();switchWeapon();}});
+

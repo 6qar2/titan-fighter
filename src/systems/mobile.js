@@ -81,57 +81,6 @@ const Mobile={
     return 72;
   }
 };
-
-/* ═══ GAME MODES ═══ */
-const GameModes={
-  current:'campaign',
-  endless:false,
-  endlessWave:0,
-  getModeConfig(){
-    switch(this.current){
-      case 'endless':return{name:'ENDLESS',desc:'How long can you survive?',color:'#FF1744',icon:'♾️',lives:1,timeLimit:0};
-      default:return{name:'CAMPAIGN',desc:'Survive 10 waves',color:'#C8A84B',icon:'⚔️',lives:diffCfg.lives,timeLimit:300};
-    }
-  },
-  startEndless(){
-    this.current='endless';
-    this.endless=true;
-    this.endlessWave=1;
-    this.modifiers=[];
-    const mCount=Math.floor(Math.random()*2)+1;
-    const available=[...WAVE_MODIFIERS];
-    for(let i=0;i<mCount&&available.length>0;i++){
-      const idx=Math.floor(Math.random()*available.length);
-      this.modifiers.push(available[idx].effect);
-      available.splice(idx,1);
-    }
-    showPowerAnnounce('♾️ ENDLESS MODE');
-  },
-  onWaveComplete(){
-    if(this.current==='endless'){
-      this.endlessWave++;
-      if(this.endlessWave%3===0){
-        const mods=['hordes','fast','armored','slow','burning'];
-        this.modifiers.push(mods[Math.floor(Math.random()*mods.length)]);
-        showPowerAnnounce('⚠ MODIFIER ADDED');
-      }
-    }
-  },
-  getResult(){
-    if(this.current==='endless'){
-      return{title:'ENDLESS RUN',subtitle:'Wave '+this.endlessWave,score:score};
-    }
-    return null;
-  },
-  reset(){
-    this.current='campaign';
-    this.endless=false;
-    this.endlessWave=0;
-    this.modifiers=[];
-  }
-};
-
-/* ═══ CHARACTER PROGRESSION ═══ */
 const CharProgression={
   levels:{},
   xp:{},
@@ -146,19 +95,20 @@ const CharProgression={
     CHARS.forEach(c=>{
       if(!this.levels[c.id])this.levels[c.id]=1;
       if(!this.xp[c.id])this.xp[c.id]=0;
-      this._baseStats[c.id]={spd:c.spd,dmg:c.dmg,fire:c.fire,shield:c.shield,maxAmmo:c.maxAmmo};
+      this._baseStats[c.id]={spd:c.spd,dmg:c.dmg,fire:c.fire,shield:c.shield,maxAmmo:c.maxAmmo,weapon:c.weapon};
     });
     this.reapplyAllBonuses();
   },
   reapplyAllBonuses(){
     CHARS.forEach(c=>{
       const base=this._baseStats[c.id];
-      if(!base){this._baseStats[c.id]={spd:c.spd,dmg:c.dmg,fire:c.fire,shield:c.shield,maxAmmo:c.maxAmmo};return;}
+      if(!base){this._baseStats[c.id]={spd:c.spd,dmg:c.dmg,fire:c.fire,shield:c.shield,maxAmmo:c.maxAmmo,weapon:c.weapon};return;}
       c.spd=base.spd*(1+(this.levels[c.id]||1)*0.00);
       c.dmg=base.dmg*(1+(this.levels[c.id]||1)*0.00);
       c.fire=base.fire;
       c.shield=base.shield;
       c.maxAmmo=base.maxAmmo;
+      c.weapon=base.weapon;
     });
     CHARS.forEach(c=>{
       this.applyLevelBonus(c.id,false);

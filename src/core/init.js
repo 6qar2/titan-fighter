@@ -2,8 +2,6 @@
 function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   
-  if(GameModes.current==='endless'){diffCfg={...diffCfg,lives:1,timeLimit:0};}
-  
   _diffBase={...diffCfg};
   reapplyUpgrades();
   cacheDOM();
@@ -20,7 +18,7 @@ function initGame(){
   gameState2={powerBuff:null,shockwave:null,meteorCount:0,meteorTimer:0,healAccum:0};
   bullets=[];eBullets=[];enemies=[];parts=[];ammoPacks=[];poisonTrails=[];smokeClods=[];powerups=[];dmgNums=[];killFeed=[];
   muzzleFlashes=[];bulletTrails=[];hitSparks=[];activeTurrets=[];
-  curWeapon=0;weaponSwitchCD=0;waveModifier=null;waveModifierTimer=0;killstreakBonus=0;
+  curWeapon=WEAPONS.findIndex(w=>w.id===ch.weapon);weaponSwitchCD=0;killstreakBonus=0;
   window.shieldHits=0;window.doubleShot=false;window.dmgBuff=1;window.fireRateBuff=null;window.magnetRange=null;window.critChance=0;
   P.x=cv.width/2;P.y=cv.height-100;P.invinc=0;P.spdBuff=null;
   lowAmmoWarnShown=false;slowMo=1;slowMoTimer=0;shakeIntensity=0;shakeX=0;shakeY=0;activePowerups=[];
@@ -36,42 +34,16 @@ function initGame(){
   initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();updateWeaponHUD();
   document.getElementById('minimap').style.display='block';
   bgStart(1);startTimer();gameStartTime=Date.now();
-  
-  if(GameModes.current==='endless'){
-    GameModes.startEndless();
-  }
-  
-  if(GameModes.current==='endless'){
-    const modeBadge=document.getElementById('mode-badge');
-    if(modeBadge){
-      modeBadge.textContent=GameModes.getModeConfig().name;
-      modeBadge.className='mode-badge '+GameModes.current;
-      modeBadge.style.display='block';
-    }
-  }else{
-    const modeBadge=document.getElementById('mode-badge');
-    if(modeBadge)modeBadge.style.display='none';
-  }
-  
-  applyWaveModifier();
 }
 /* ═══ END GAME ═══ */
 function endGame(){
   if(gState==='over')return;
   gState='over';clearInterval(timerID);bgStop();cancelAnimationFrame(animID);
   document.getElementById('minimap').style.display='none';
-  document.getElementById('mode-badge').style.display='none';
   
-  const modeResult=GameModes.getResult();
-  if(modeResult){
-    document.getElementById('f-score').textContent=modeResult.score.toLocaleString();
-    document.getElementById('f-rank').textContent=modeResult.title;
-    document.getElementById('f-club-rank').textContent=modeResult.subtitle;
-  }else{
-    document.getElementById('f-score').textContent=score.toLocaleString();
-    document.getElementById('f-rank').textContent=rankMsg(score);
-    document.getElementById('f-club-rank').textContent=clubRank(score);
-  }
+  document.getElementById('f-score').textContent=score.toLocaleString();
+  document.getElementById('f-rank').textContent=rankMsg(score);
+  document.getElementById('f-club-rank').textContent=clubRank(score);
   document.getElementById('fstat-wave').textContent=toRoman(wave);
   document.getElementById('fstat-kills').textContent=totalKills;
   document.getElementById('fstat-combo').textContent=bestCombo+'×';
@@ -82,12 +54,7 @@ function endGame(){
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
   updateStats();checkAchievements();sfxVictory();
   
-  if(GameModes.current==='endless'){ExpandedStats.recordEndlessWave(GameModes.endlessWave);}
-  
-   CharProgression.addXp(CHARS[selChar].id,score);
-   
-   GameModes.reset();
-   
-   Profile.setLastChar(selChar);
+  CharProgression.addXp(CHARS[selChar].id,score);
+  Profile.setLastChar(selChar);
   Profile.setLastDiff(selDiff);
 }
