@@ -264,7 +264,6 @@ function wireUI(){
   document.getElementById('btn-progression-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-daily-rewards-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-mobile-settings-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-mode-next').addEventListener('click',()=>{showScr('s-chars');});
   document.getElementById('btn-mode-back').addEventListener('click',()=>{showScr('s-diff');});
   document.querySelectorAll('.mode-card').forEach(card=>{
     card.addEventListener('click',()=>{document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');GameModes.current=card.dataset.mode;});
