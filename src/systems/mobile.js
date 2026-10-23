@@ -8,17 +8,11 @@ const Mobile={
   portrait:window.innerHeight>window.innerWidth,
   safeArea:0,
   init(){
-    if(this.isMobile){
-      this.autoFire=true;
-    }
     try{
       const s=JSON.parse(localStorage.getItem('titans_mobile_settings'));
-      if(s){this.oneHanded=s.oneHanded||false;this.autoFire=s.autoFire!==undefined?s.autoFire:this.isMobile;this.autoAim=s.autoAim!==undefined?s.autoAim:true;this.screenShake=s.screenShake!==false;}
+      if(s){this.oneHanded=s.oneHanded||false;this.autoFire=s.autoFire!==undefined?s.autoFire:false;this.autoAim=s.autoAim!==undefined?s.autoAim:true;this.screenShake=s.screenShake!==false;}
     }catch(e){}
     this.safeArea=window.innerWidth<=360?20:window.innerHeight<=640?20:0;
-    if(this.isMobile){
-      this.autoFire=true;
-    }
     window.addEventListener('resize',()=>{
       this.portrait=window.innerHeight>window.innerWidth;
       this.safeArea=window.innerWidth<=360?20:window.innerHeight<=640?20:0;

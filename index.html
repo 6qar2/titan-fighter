@@ -81,13 +81,15 @@
 <div id="mctrl" class="off">
   <div id="joystick-zone"><div id="joystick-knob"></div></div>
   <div class="right-btns">
-    <button id="weapon-btn" style="width:58px;height:28px;border-radius:6px;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.42rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;"><span id="weapon-btn-icon">🔫</span> <span id="weapon-btn-name" style="margin-left:3px;">PISTOL</span></button>
-    <button id="power-btn"><span class="power-icon">✦</span><span class="power-lbl">POWER</span></button>
+    <div class="btn-row-top">
+      <button id="weapon-btn" style="width:48px;height:24px;border-radius:4px;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.36rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;"><span id="weapon-btn-icon">🔫</span></button>
+      <button id="autofire-btn" style="width:36px;height:36px;border-radius:50%;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.4rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;">🔥</button>
+    </div>
+     <button id="power-btn"><span class="power-icon">✦</span><span class="power-lbl">POWER</span></button>
      <button id="fire-btn"><span class="fire-icon">⚔</span><span class="fire-lbl">FIRE</span></button>
-     <button id="autofire-btn" style="width:42px;height:42px;border-radius:50%;background:rgba(184,152,64,0.12);border:1px solid rgba(184,152,64,0.3);font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:1px;color:var(--gold-pale);touch-action:none;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .2s;">🔥</button>
    </div>
 </div>
-<canvas id="minimap" width="100" height="100" style="position:fixed;bottom:110px;right:10px;width:100px;height:100px;z-index:99;pointer-events:none;border:1px solid rgba(184,152,64,0.2);background:rgba(6,6,14,0.6);display:none;"></canvas>
+<canvas id="minimap" width="100" height="100" style="position:fixed;bottom:130px;right:10px;width:100px;height:100px;z-index:120;pointer-events:none;border:1px solid rgba(184,152,64,0.2);background:rgba(6,6,14,0.6);display:none;"></canvas>
 
 <!-- CINEMATIC INTRO OVERLAY -->
 <div id="cinematic-intro" class="cinematic-intro active">

@@ -134,19 +134,7 @@ function switchWeapon(){
   showWeaponDetail(wp);
   updateWeaponHUD();
 }
-function updateFireButtonState(){
-  if(!Mobile.isMobile)return;
-  const fb=DOM.fireBtn||(DOM.fireBtn=document.getElementById('fire-btn'));
-  if(!fb)return;
-  if(ammo<=0){fb.classList.add('disabled');fb.style.opacity='0.4';}
-  else{fb.classList.remove('disabled');fb.style.opacity='1';}
-  const wp=WEAPONS[curWeapon];
-  const fireInterval=CHARS[selChar].fire/(window.fireRateBuff||1);
-  const pct=(fireInterval-shootCD)/fireInterval;
-  let after=fb.querySelector('.cooldown-overlay');
-  if(!after){after=document.createElement('div');after.className='cooldown-overlay';after.style.cssText='position:absolute;inset:0;background:linear-gradient(90,rgba(0,0,0,0.6),transparent);width:'+((1-pct)*100)+'%;transition:width .1s;z-index:1;';fb.appendChild(after);}
-   else{after.style.width=((1-pct)*100)+'%';}
-}
+
 function showWeaponDetail(wp){
   const pop=document.createElement('div');
   pop.className='spop weapon-detail';
