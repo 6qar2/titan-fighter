@@ -449,6 +449,7 @@ body{font-family:'Barlow Condensed',sans-serif;color:var(--parchment);user-selec
 .version-stamp{margin-top:1.6rem;font-family:'Cinzel',serif;font-size:clamp(.5rem,1.6vw,.62rem);letter-spacing:3px;color:var(--ash2);opacity:.6;text-transform:uppercase;}
 @media (max-width:480px){.club-btn{width:42px;height:42px;font-size:1.05rem;}.cta-row{gap:.7rem;}}
 @media (max-width:360px){.club-row{gap:.5rem;}.club-btn{width:38px;height:38px;font-size:.95rem;}}
+.club-icon{display:block;font-size:1.3rem;}
 @media (prefers-reduced-motion: reduce){.intro-crest,.start-crest,.btn-shine,.intro-prompt{animation:none!important;}.crest-draw path{stroke-dashoffset:0;}}
 /* ===== Cohesive menu polish (rebrand extension, additive) ===== */
 .scr{background:
