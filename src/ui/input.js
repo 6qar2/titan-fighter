@@ -43,9 +43,10 @@ document.addEventListener('touchend',e=>{
 function isInputFocused(){const t=document.activeElement;return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
 document.addEventListener('keydown',e=>{if(isInputFocused())return;keys[e.code]=true;if(e.code==='Space'){e.preventDefault();shooting=true;wake();}});
 document.addEventListener('keyup',e=>{if(isInputFocused())return;keys[e.code]=false;if(e.code==='Space')shooting=false;});
-cv.addEventListener('mousemove',e=>{mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
-cv.addEventListener('mousedown',e=>{if(e.button===0){shooting=true;wake();}});
-cv.addEventListener('mouseup',e=>{if(e.button===0)shooting=false;});
+const IS_TOUCH='ontouchstart' in window;
+cv.addEventListener('mousemove',e=>{if(IS_TOUCH)return;mxP=e.clientX;myP=e.clientY;const xh=document.getElementById('xhair');xh.style.left=e.clientX+'px';xh.style.top=e.clientY+'px';},{passive:true});
+cv.addEventListener('mousedown',e=>{if(IS_TOUCH)return;if(e.button===0){shooting=true;wake();}});
+cv.addEventListener('mouseup',e=>{if(IS_TOUCH)return;if(e.button===0)shooting=false;});
 cv.style.cursor='none';
 if('ontouchstart' in window)document.getElementById('xhair').style.display='none';
 
@@ -59,22 +60,21 @@ jz.addEventListener('touchstart',e=>{e.preventDefault();wake();if(joyTouchId!==n
 document.addEventListener('touchmove',e=>{if(!joystick.active||joyTouchId===null)return;for(let i=0;i<e.touches.length;i++){if(e.touches[i].identifier===joyTouchId){jMove(e.touches[i].clientX,e.touches[i].clientY);break;}}},{passive:false});
 document.addEventListener('touchend',e=>{if(joyTouchId===null)return;for(let i=0;i<e.touches.length;i++){if(e.touches[i].identifier===joyTouchId)return;}jReset();},{passive:false});
 document.addEventListener('touchcancel',e=>{jReset();},{passive:false});
-jz.addEventListener('mousedown',e=>{joystick.active=true;jMove(e.clientX,e.clientY);});
-document.addEventListener('mousemove',e=>{if(joystick.active)jMove(e.clientX,e.clientY);});
-document.addEventListener('mouseup',()=>{if(joystick.active){joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';}});
+jz.addEventListener('mousedown',e=>{if(IS_TOUCH)return;joystick.active=true;jMove(e.clientX,e.clientY);});
+document.addEventListener('mousemove',e=>{if(IS_TOUCH)return;if(joystick.active)jMove(e.clientX,e.clientY);});
+document.addEventListener('mouseup',()=>{if(IS_TOUCH)return;if(joystick.active){joystick.active=false;joystick.dx=0;joystick.dy=0;jk.style.left='50%';jk.style.top='50%';}});
 const fb=document.getElementById('fire-btn');
 fb.addEventListener('touchstart',e=>{e.preventDefault();shooting=true;wake();},{passive:false});
 fb.addEventListener('touchend',e=>{e.preventDefault();shooting=false;},{passive:false});
-fb.addEventListener('mousedown',()=>{shooting=true;wake();});
-fb.addEventListener('mouseup',()=>shooting=false);
+fb.addEventListener('mousedown',()=>{if(IS_TOUCH)return;shooting=true;wake();});
+fb.addEventListener('mouseup',()=>{if(IS_TOUCH)return;shooting=false;});
 const pb2=document.getElementById('power-btn');
 pb2.addEventListener('touchstart',e=>{e.preventDefault();activatePower();wake();},{passive:false});
-pb2.addEventListener('mousedown',()=>{activatePower();wake();});
+pb2.addEventListener('mousedown',()=>{if(IS_TOUCH)return;activatePower();wake();});
 const wb=document.getElementById('weapon-btn');
   if(wb){
     wb.addEventListener('touchstart',e=>{e.preventDefault();wake();},{passive:false});
-    wb.addEventListener('mousedown',()=>{wake();});
+    wb.addEventListener('mousedown',()=>{if(IS_TOUCH)return;wake();});
   }
-const ab=document.getElementById('autofire-btn');
-if(ab){ab.addEventListener('touchstart',e=>{e.preventDefault();Mobile.toggleAutoFire();ab.classList.toggle('active');},{passive:false});ab.addEventListener('mousedown',()=>{Mobile.toggleAutoFire();ab.classList.toggle('active');});}
+if(ab){ab.addEventListener('touchstart',e=>{e.preventDefault();Mobile.toggleAutoFire();ab.classList.toggle('active');},{passive:false});ab.addEventListener('mousedown',()=>{if(IS_TOUCH)return;Mobile.toggleAutoFire();ab.classList.toggle('active');});}
 
