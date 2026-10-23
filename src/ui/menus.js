@@ -32,6 +32,7 @@ function renderStats(){document.getElementById('st-total-kills').textContent=sta
 
 /* ═══ LEADERBOARD ═══ */
 function renderLeaderboard(){
+  if(!Profile.getName()){showScr('s-start');return;}
   const list=Leaderboard.getAll();
   const container=document.getElementById('leaderboard-list');
   container.innerHTML='';
@@ -117,6 +118,7 @@ document.getElementById('btn-start-leaderboard').addEventListener('click',()=>{w
 document.getElementById('btn-leaderboard-back').addEventListener('click',()=>{
   const from=getScreenFrom();
   if(from==='s-pause'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else if(from==='s-over'){showScr('s-over');}
   else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
 });
   document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
