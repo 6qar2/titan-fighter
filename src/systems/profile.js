@@ -6,15 +6,7 @@ const Profile={
     lastChar:0,
     lastDiff:'normal',
     stats:{totalKills:0,gamesPlayed:0,bestScore:0,bestWave:1,bestCombo:0,headshots:0,playTime:0,accuracy:{shots:0,hits:0}},
-    credits:0,
-    upgrades:{},
-    achievements:[],
-    weaponsUnlocked:['pistol'],
-    charactersUnlocked:[0,1,2,3,4,5,6,7],
-    skinsOwned:[],
-    settings:{musicVol:0.8,sfxVol:1.0,particleDensity:3},
-    dailyRewards:{lastClaim:null,streak:0},
-    progression:{levels:{},xp:{}}
+    settings:{musicVol:0.8,sfxVol:1.0,particleDensity:3}
   },
   init(){
     try{
@@ -38,25 +30,12 @@ const Profile={
   setLastChar(i){this.data.lastChar=i;this.save();},
   getLastDiff(){return this.data.lastDiff||'normal';},
   setLastDiff(d){this.data.lastDiff=d;this.save();},
-  getCredits(){return this.data.credits||0;},
-  addCredits(amt){this.data.credits=(this.data.credits||0)+amt;this.save();},
-  spendCredits(amt){if(this.data.credits>=amt){this.data.credits-=amt;this.save();return true;}return false;},
-  getUpgrades(){return this.data.upgrades||{};},
-  setUpgrade(id,val){this.data.upgrades[id]=val;this.save();},
   getStats(){return this.data.stats||{};},
   updateStats(s){this.data.stats={...this.data.stats,...s};this.save();},
-  getAchievements(){return this.data.achievements||[];},
-  unlockAchievement(id){if(!this.data.achievements.includes(id)){this.data.achievements.push(id);this.save();}},
-  hasAchievement(id){return this.data.achievements.includes(id);},
-  getWeapons(){return this.data.weaponsUnlocked||['pistol'];},
-  unlockWeapon(id){if(!this.data.weaponsUnlocked.includes(id)){this.data.weaponsUnlocked.push(id);this.save();}},
-    getCharacters(){return this.data.charactersUnlocked||[0,1,2,3,4,5,6,7];},
   getSettings(){return this.data.settings||{musicVol:0.8,sfxVol:1.0,particleDensity:3};},
   updateSettings(s){this.data.settings={...this.data.settings,...s};this.save();},
-  getProgression(){return this.data.progression||{levels:{},xp:{}};},
-  setProgression(p){this.data.progression=p;this.save();},
   reset(){
-    this.data={name:'TITAN',lastChar:0,lastDiff:'normal',stats:{totalKills:0,gamesPlayed:0,bestScore:0,bestWave:1,bestCombo:0,headshots:0,playTime:0,accuracy:{shots:0,hits:0}},credits:0,upgrades:{},achievements:[],weaponsUnlocked:['pistol'],charactersUnlocked:[0,1,2,3,4,5,6,7],skinsOwned:[],settings:{musicVol:0.8,sfxVol:1.0,particleDensity:3},dailyRewards:{lastClaim:null,streak:0},progression:{levels:{},xp:{}}};
+    this.data={name:'TITAN',lastChar:0,lastDiff:'normal',stats:{totalKills:0,gamesPlayed:0,bestScore:0,bestWave:1,bestCombo:0,headshots:0,playTime:0,accuracy:{shots:0,hits:0}},settings:{musicVol:0.8,sfxVol:1.0,particleDensity:3}};
     this.save();
   }
 };

@@ -4,17 +4,9 @@ function boot(){
   Profile.init();
   loadSettings();
   loadStats();
-  loadAchievements();
-  loadUpgrades();
-  storeBaseStats();
   
   Mobile.init();
-  CharProgression.init();
-  DailyRewards.init();
-  Social.init();
-  ExpandedStats.load();
   Accessibility.init();
-  Cosmetics.init();
   
   wireUI();
 

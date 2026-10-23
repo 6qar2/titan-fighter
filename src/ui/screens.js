@@ -26,8 +26,11 @@ function drawStartBG(){if(!menuAnimActive)return;startCtx.clearRect(0,0,startCv.
 
 /* ═══ SCREEN MANAGEMENT ═══ */
 let previousScreen='s-start';
+let screenFrom=null;
 function getPreviousScreen(){return previousScreen;}
 function setPreviousScreen(screen){previousScreen=screen;}
+function setScreenFrom(from,to){screenFrom=from;showScr(to);}
+function getScreenFrom(){return screenFrom;}
 function showScr(id){
   if(id){
     setPreviousScreen(id);

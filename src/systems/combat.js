@@ -2,8 +2,8 @@
 function killEnemy(e,idx){
   const isBoss=e.type==='caesar'||e.type==='warlord'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='titanoverlord';
   const isTitanClub=e.type==='irontitan'||e.type==='titangod'||e.type==='herald'||e.type==='chaoslord'||e.type==='colossusg';
-  if(isBoss){sfxBigBoom();triggerSlowMo(0.5,0.35);triggerShake(14,400);earnCredits(e.pts);haptic('heavy');}
-  else if(isTitanClub){sfxBigBoom();triggerSlowMo(0.35,0.3);triggerShake(8,250);earnCredits(Math.floor(e.pts/2));haptic('medium');}
+   if(isBoss){sfxBigBoom();triggerSlowMo(0.5,0.35);triggerShake(14,400);haptic('heavy');}
+   else if(isTitanClub){sfxBigBoom();triggerSlowMo(0.35,0.3);triggerShake(8,250);haptic('medium');}
   else{sfxExplode();haptic('light');}
   combo++;comboT=2.5;totalKills++;if(combo>bestCombo)bestCombo=combo;
   killstreakBonus=Math.min(5,Math.floor(combo/5));
@@ -27,8 +27,6 @@ function killEnemy(e,idx){
   else if(isTitanClub){addKillFeed('♛ '+e.label+' SLAIN','#C8A84B');}
   else{addKillFeed('⚔ '+e.label+' KILLED','#E2C06A');}
   powerCharge=Math.min(1,powerCharge+0.18);updatePowerHUD();
-  const xpGain=Math.round(e.pts*0.1);
-  CharProgression.addXp(CHARS[selChar].id,xpGain);
   if(e.isElite)spawnPop(e.x,e.y-20,`+${Math.round(e.pts*.5)} ELITE`,'boss');
   if(e.ability==='split'&&!e.splitDone){const smallDef={...EDEFS.find(d=>d.type==='scout'),pts:40};for(let i=0;i<2;i++){const a=(i/2)*Math.PI*2+Math.random();spawnEnemy(smallDef,e.x+Math.cos(a)*30,e.y+Math.sin(a)*30);}}
   const last=enemies[enemies.length-1];enemies[idx]=last;enemies.pop();waveKills++;updateHUD();

@@ -2,8 +2,6 @@
 function initGame(){
   diffCfg=DIFFICULTIES[selDiff]||DIFFICULTIES.normal;
   
-  _diffBase={...diffCfg};
-  reapplyUpgrades();
   cacheDOM();
   
   const ch=CHARS[selChar];
@@ -25,12 +23,10 @@ function initGame(){
   const [mn,mx]=diffCfg.ammoPackInterval;nextAmmoPackTime=timeLeft-(mn+Math.random()*(mx-mn));
   mxP=cv.width/2;myP=cv.height/2;
   const badge=document.getElementById('diff-badge-hud');badge.textContent=diffCfg.label;badge.className='';badge.classList.add(selDiff);
-  document.getElementById('club-hud').style.display='flex';
-  document.getElementById('pname-hud').style.display='flex';
-  document.getElementById('credits-hud').style.display='block';
+   document.getElementById('club-hud').style.display='flex';
+   document.getElementById('pname-hud').style.display='flex';
+   document.getElementById('hname').textContent=pName;
   const ab=document.getElementById('autofire-btn');if(ab){ab.style.display=Mobile.isMobile?'flex':'none';ab.classList.toggle('active',Mobile.autoFire);}
-  document.getElementById('hname').textContent=pName;
-  document.getElementById('credits-count').textContent=credits;
   initStars();buildDots();updateHUD();updateAmmoHUD();updatePowerHUD();updateWeaponHUD();
   document.getElementById('minimap').style.display='block';
   bgStart(1);startTimer();gameStartTime=Date.now();
@@ -48,13 +44,12 @@ function endGame(){
   document.getElementById('fstat-kills').textContent=totalKills;
   document.getElementById('fstat-combo').textContent=bestCombo+'×';
   showScr('s-over');document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
-  document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';document.getElementById('credits-hud').style.display='none';
+   document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
-  updateStats();checkAchievements();sfxVictory();
+   updateStats();sfxVictory();
   
-  CharProgression.addXp(CHARS[selChar].id,score);
   Profile.setLastChar(selChar);
   Profile.setLastDiff(selDiff);
 }
