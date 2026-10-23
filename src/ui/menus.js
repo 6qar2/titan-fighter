@@ -120,20 +120,14 @@ function wireUI(){
   document.getElementById('sfx-vol').addEventListener('input',e=>{settings.sfxVol=e.target.value/100;updateSettingsLabels();saveSettings();});
   document.getElementById('particle-density').addEventListener('input',e=>{settings.particleDensity=parseInt(e.target.value);updateSettingsLabels();saveSettings();});
   
-  /* ═══ PROFILE ═══ */
-  function updateProfileNameField(){const el=document.getElementById('profile-name');if(el)el.value=Profile.getName();}
-  const profileNameInput=document.getElementById('profile-name');
-  if(profileNameInput){
-    updateProfileNameField();
-    profileNameInput.addEventListener('change',()=>{
+   /* ═══ PROFILE NAME ═══ */
+   function updateProfileNameField(){const el=document.getElementById('profile-name');if(el)el.value=Profile.getName();}
+   const profileNameInput=document.getElementById('profile-name');
+   if(profileNameInput){
+     updateProfileNameField();
+     profileNameInput.addEventListener('change',()=>{
       const name=profileNameInput.value.trim().replace(/[<>]/g,'');
-      if(name){Profile.setName(name);pName=Profile.getName();showPowerAnnounce('NAME UPDATED');}
-    });
-  }
-  const btnResetProfile=document.getElementById('btn-reset-profile');
-  if(btnResetProfile){
-    btnResetProfile.addEventListener('click',()=>{
-      if(confirm('Reset all profile data? This cannot be undone.')){Profile.reset();updateProfileNameField();pName=Profile.getName();showPowerAnnounce('PROFILE RESET');}
-    });
-  }
+       if(name){Profile.setName(name);pName=Profile.getName();showPowerAnnounce('NAME UPDATED');}
+     });
+   }
 }

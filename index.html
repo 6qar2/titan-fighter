@@ -206,7 +206,7 @@
 <!-- SETTINGS SCREEN -->
 <div class="scr off overlay" id="s-settings">
   <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
+    <div class="screen-eyebrow">GAME SETTINGS</div>
     <div class="screen-title">SETTINGS</div>
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
   </div>
@@ -226,8 +226,7 @@
     <div style="display:flex;flex-direction:column;gap:.3rem;">
       <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">WARRIOR NAME</span></div>
       <input type="text" id="profile-name" maxlength="12" style="width:min(280px,80vw);padding:.5rem;background:rgba(18,14,12,.95);color:var(--gold-lit);border:1px solid rgba(184,152,64,.3);border-radius:6px;font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2px;text-align:center;">
-    </div>
-     <button class="btn-ghost" id="btn-reset-profile" style="margin-top:.2rem;color:var(--red-hot);border-color:rgba(217,0,31,.3);">⚠ RESET PROFILE</button>
+     </div>
     <div id="mobile-settings-container"></div>
     <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
   </div>
@@ -236,8 +235,8 @@
 <!-- STATISTICS SCREEN -->
 <div class="scr off overlay" id="s-stats">
   <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">WARRIOR STATISTICS</div>
+    <div class="screen-eyebrow">WARRIOR STATS</div>
+    <div class="screen-title">STATISTICS</div>
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
   </div>
   <div class="stat-grid" id="stats-grid">
@@ -272,13 +271,13 @@
 <!-- GAME OVER -->
 <div class="scr off" id="s-over">
   <div class="over-inner">
-    <div class="over-eyebrow">TITANS CLUB · BATTLE REPORT</div>
+    <div class="over-eyebrow">BATTLE REPORT</div>
     <div class="over-divline"><div class="over-diamond"></div></div>
-    <div style="font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:4px;color:var(--ash);margin-bottom:.4rem;text-transform:uppercase;">Club Rank Earned</div>
+    <div style="font-family:'Cinzel',serif;font-size:.52rem;letter-spacing:4px;color:var(--ash);margin-bottom:.4rem;text-transform:uppercase;">Performance</div>
     <div class="final-score-lbl">Final Score</div>
     <div class="final-num" id="f-score">0</div>
     <div class="final-rank" id="f-rank">TITAN RECRUIT</div>
-    <div style="font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.6rem;" id="f-club-rank">♛ TITANS CLUB MEMBER</div>
+    <div style="font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold-dim);margin-bottom:.6rem;" id="f-rank-desc">FORGED IN GLORY</div>
     <div class="final-stats">
       <div class="fstat"><span class="fstat-num" id="fstat-wave">I</span><span class="fstat-lbl">Wave</span></div>
       <div class="fstat"><span class="fstat-num" id="fstat-kills">0</span><span class="fstat-lbl">Kills</span></div>

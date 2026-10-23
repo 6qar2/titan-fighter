@@ -39,7 +39,7 @@ function endGame(){
   
   document.getElementById('f-score').textContent=score.toLocaleString();
   document.getElementById('f-rank').textContent=rankMsg(score);
-  document.getElementById('f-club-rank').textContent=clubRank(score);
+   document.getElementById('f-rank-desc').textContent=rankDesc(score);
   document.getElementById('fstat-wave').textContent=toRoman(wave);
   document.getElementById('fstat-kills').textContent=totalKills;
   document.getElementById('fstat-combo').textContent=bestCombo+'×';
