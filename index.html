@@ -153,10 +153,8 @@
       <button class="club-btn" id="btn-start-upgrades" title="Upgrades"><span>&#10548;</span></button>
       <button class="club-btn" id="btn-start-achievements" title="Achievements"><span>&#9733;</span></button>
       <button class="club-btn" id="btn-start-shop" title="Shop"><span>&#9734;</span></button>
-      <button class="club-btn" id="btn-start-events" title="Events"><span>&#9883;</span></button>
       <button class="club-btn" id="btn-start-progression" title="Progression"><span>&#9650;</span></button>
       <button class="club-btn" id="btn-start-daily" title="Daily Rewards"><span>&#128197;</span></button>
-      <button class="club-btn" id="btn-start-mobile" title="Mobile Settings"><span>&#128241;</span></button>
     </div>
     <div class="version-stamp">TITANS STRIKE · ARENA EDITION</div>
   </div>
@@ -194,9 +192,8 @@
 <div id="pause-overlay">
   <div class="pause-title">PAUSED</div>
   <button class="pause-btn primary" id="btn-resume">RESUME</button>
-  <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
-  <button class="pause-btn" id="btn-pause-mobile">📱 MOBILE</button>
-  <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
+   <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
+   <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
   <button class="pause-btn" id="btn-pause-upgrades">UPGRADES</button>
   <button class="pause-btn" id="btn-pause-achievements">🏆 ACHIEVEMENTS</button>
   <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
@@ -236,8 +233,8 @@
       <div style="display:flex;justify-content:space-between;align-items:center;width:min(340px,92vw);"><span style="font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--gold-lit);">WARRIOR NAME</span></div>
       <input type="text" id="profile-name" maxlength="12" style="width:min(280px,80vw);padding:.5rem;background:rgba(18,14,12,.95);color:var(--gold-lit);border:1px solid rgba(184,152,64,.3);border-radius:6px;font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2px;text-align:center;">
     </div>
-    <button class="btn-ghost" id="btn-reset-profile" style="margin-top:.2rem;color:var(--red-hot);border-color:rgba(217,0,31,.3);">⚠ RESET PROFILE</button>
-    <button class="btn-ghost" id="btn-mobile-settings" style="margin-top:.5rem;">📱 MOBILE SETTINGS</button>
+     <button class="btn-ghost" id="btn-reset-profile" style="margin-top:.2rem;color:var(--red-hot);border-color:rgba(217,0,31,.3);">⚠ RESET PROFILE</button>
+    <div id="mobile-settings-container"></div>
     <button class="btn-ghost" id="btn-settings-back" style="margin-top:.5rem;">← RETURN</button>
   </div>
 </div>
@@ -337,18 +334,7 @@
   <div class="shop-grid" id="shop-grid"></div>
   <button class="btn-ghost" id="btn-shop-back" style="margin-top:.5rem;">← RETURN</button>
 </div>
-
-<!-- EVENTS SCREEN -->
-<div class="scr off" id="s-events">
-  <div class="screen-header">
-    <div class="screen-eyebrow">TITANS CLUB</div>
-    <div class="screen-title">EVENTS</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div class="events-container" id="events-container"></div>
-  <button class="btn-ghost" id="btn-events-back" style="margin-top:.5rem;">← RETURN</button>
-</div>
-
+ 
 <!-- CHARACTER PROGRESSION SCREEN -->
 <div class="scr off" id="s-progression">
   <div class="screen-header">
@@ -368,18 +354,7 @@
     <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
   </div>
   <div id="daily-rewards-content" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;width:min(420px,94vw);margin:.5rem 0;"></div>
-  <button class="btn-ghost" id="btn-daily-rewards-back" style="margin-top:.5rem;">← RETURN</button>
-</div>
-
-<!-- MOBILE SETTINGS SCREEN -->
-<div class="scr off" id="s-mobile-settings">
-  <div class="screen-header">
-    <div class="screen-eyebrow">MOBILE</div>
-    <div class="screen-title">MOBILE SETTINGS</div>
-    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
-  </div>
-  <div class="settings-container" id="mobile-settings-container"></div>
-  <button class="btn-ghost" id="btn-mobile-settings-back" style="margin-top:.5rem;">← RETURN</button>
+     <button class="btn-ghost" id="btn-daily-rewards-back" style="margin-top:.5rem;">← RETURN</button>
 </div>
 
 <script src="src/config/canvas.js"></script>

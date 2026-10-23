@@ -110,23 +110,6 @@ function renderShop(){
   });
 }
 
-/* ═══ EVENTS ═══ */
-function renderEvents(){
-  const container=document.getElementById('events-container');
-  container.innerHTML='';
-  const events=Social.getActiveEvents();
-  if(events.length===0){
-    container.innerHTML='<div style="text-align:center;padding:2rem;color:var(--ash);font-family:\'Cinzel\',serif;font-size:.7rem;letter-spacing:2px;">NO ACTIVE EVENTS</div>';
-    return;
-  }
-  events.forEach(evt=>{
-    const card=document.createElement('div');
-    card.className='event-card';
-    card.innerHTML=`<div class="event-icon">🏆</div><div class="event-info"><div class="event-name">${evt.name}</div><div class="event-desc">${evt.desc}</div></div><div class="event-status">ACTIVE</div>`;
-    container.appendChild(card);
-  });
-}
-
 /* ═══ PROGRESSION ═══ */
 function renderProgression(){
   const container=document.getElementById('progression-content');
@@ -201,6 +184,10 @@ function renderMobileSettings(){
   const container=document.getElementById('mobile-settings-container');
   if(!container)return;
   container.innerHTML='';
+  const header=document.createElement('div');
+  header.style.cssText="font-family:'Cinzel Decorative',serif;font-size:.55rem;letter-spacing:2px;color:var(--gold-dim);margin:.3rem 0 .15rem;text-transform:uppercase;";
+  header.textContent='Mobile & Display';
+  container.appendChild(header);
   const settings=[
     {label:'ONE-HANDED MODE',desc:'Adjust HUD for one-handed play',active:Mobile.oneHanded,action:()=>{Mobile.toggleOneHanded();renderMobileSettings();}},
     {label:'AUTO FIRE',desc:'Automatically fire weapons',active:Mobile.autoFire,action:()=>{Mobile.toggleAutoFire();renderMobileSettings();}},
@@ -246,22 +233,18 @@ function wireUI(){
     ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
     document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
   });
-  document.getElementById('btn-start-settings').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr('s-settings');});
+  document.getElementById('btn-start-settings').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderMobileSettings();showScr('s-settings');});
   document.getElementById('btn-start-stats').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderStats();showScr('s-stats');});
   document.getElementById('btn-start-upgrades').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderUpgrades();showScr('s-upgrades');});
   document.getElementById('btn-start-achievements').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderAchievements();showScr('s-achievements');});
   document.getElementById('btn-start-shop').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderShop();showScr('s-shop');});
-  document.getElementById('btn-start-events').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderEvents();showScr('s-events');});
   document.getElementById('btn-start-progression').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderProgression();showScr('s-progression');});
   document.getElementById('btn-start-daily').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderDailyRewards();showScr('s-daily-rewards');});
-  document.getElementById('btn-start-mobile').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderMobileSettings();showScr('s-mobile-settings');});
+  document.getElementById('btn-start-mobile').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;showScr('s-settings');renderMobileSettings();});
   document.getElementById('btn-shop-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-events-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-progression-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('btn-daily-rewards-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-mobile-settings-back').addEventListener('click',()=>{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
   document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
-
   /* ═══ PAUSE MENU ═══ */
   const pauseOverlay=document.getElementById('pause-overlay');
   function togglePause(){
@@ -278,18 +261,16 @@ function wireUI(){
   document.getElementById('btn-quit').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.add('visible');});
   document.getElementById('btn-quit-no').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.remove('visible');});
   document.getElementById('btn-quit-yes').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.remove('visible');isPaused=false;pauseOverlay.classList.remove('visible');endGame();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
-  document.getElementById('btn-pause-settings').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-settings');});
-  document.getElementById('btn-pause-mobile').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-mobile-settings');renderMobileSettings();});
-  document.getElementById('btn-pause-stats').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-stats');renderStats();});
-  document.getElementById('btn-pause-upgrades').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-upgrades');renderUpgrades();});
-  document.getElementById('btn-settings-back').addEventListener('click',()=>{
-    const prev=getPreviousScreen();
-    if(prev&&prev!=='s-settings'&&prev!=='s-mobile-settings'){showScr(prev);}
-    else if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
-    else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
-  });
-  document.getElementById('btn-mobile-settings').addEventListener('click',()=>{showScr('s-mobile-settings');renderMobileSettings();});
-  document.getElementById('btn-stats-back').addEventListener('click',()=>{
+   document.getElementById('btn-pause-settings').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-settings');renderMobileSettings();});
+   document.getElementById('btn-pause-stats').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-stats');renderStats();});
+   document.getElementById('btn-pause-upgrades').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');showScr('s-upgrades');renderUpgrades();});
+   document.getElementById('btn-settings-back').addEventListener('click',()=>{
+     const prev=getPreviousScreen();
+     if(prev&&prev!=='s-settings'){showScr(prev);}
+     else if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+     else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+   });
+   document.getElementById('btn-stats-back').addEventListener('click',()=>{
     const prev=getPreviousScreen();
     if(prev&&prev!=='s-stats'){showScr(prev);}
     else if(gState==='play'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
