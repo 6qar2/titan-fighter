@@ -48,7 +48,7 @@ function endGame(){
   ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
   document.getElementById('kills-left').style.display='none';
   menuAnimActive=true;if(!menuRAF)menuRAF=requestAnimationFrame(drawStartBG);
-   updateStats();sfxVictory();
+   updateStats();Leaderboard.add(score,bestCombo);sfxVictory();
   
   Profile.setLastChar(selChar);
   Profile.setLastDiff(selDiff);

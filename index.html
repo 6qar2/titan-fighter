@@ -151,6 +151,7 @@
     <div class="club-row">
       <button class="club-btn" id="btn-start-settings" title="Settings"><span>&#9881;</span></button>
       <button class="club-btn" id="btn-start-stats" title="Statistics"><span>&#9620;</span></button>
+      <button class="club-btn" id="btn-start-leaderboard" title="Leaderboard"><span>&#9201;</span></button>
     </div>
     <div class="version-stamp">TITANS STRIKE · ARENA EDITION</div>
   </div>
@@ -190,7 +191,8 @@
   <button class="pause-btn primary" id="btn-resume">RESUME</button>
    <button class="pause-btn" id="btn-pause-settings">SETTINGS</button>
    <button class="pause-btn" id="btn-pause-stats">STATISTICS</button>
-  <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
+   <button class="pause-btn" id="btn-pause-leaderboard">LEADERBOARD</button>
+   <button class="pause-btn" id="btn-quit">QUIT TO MENU</button>
 </div>
 
 <!-- QUIT CONFIRMATION -->
@@ -252,6 +254,17 @@
 <button class="btn-ghost" id="btn-stats-back" style="margin-top:.5rem;">← RETURN</button>
 </div>
 
+<!-- LEADERBOARD -->
+<div class="scr off overlay" id="s-leaderboard">
+  <div class="screen-header">
+    <div class="screen-eyebrow">ARENA LEGEND</div>
+    <div class="screen-title">LEADERBOARD</div>
+    <div style="display:flex;align-items:center;gap:.6rem;width:min(260px,80vw);margin:.3rem auto;"><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div><div style="width:5px;height:5px;background:var(--gold-dim);transform:rotate(45deg);"></div><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(200,168,75,0.3),transparent);"></div></div>
+  </div>
+  <div id="leaderboard-list" style="width:min(400px,92vw);max-height:55vh;overflow-y:auto;"></div>
+  <button class="btn-ghost" id="btn-leaderboard-back" style="margin-top:.5rem;">← RETURN</button>
+</div>
+
 <!-- CHARACTER SELECT -->
 <div class="scr off" id="s-chars">
   <div class="screen-header">
@@ -290,6 +303,7 @@
     <div class="over-divline"><div class="over-diamond"></div></div>
     <button class="btn-enter" id="btn-replay" style="margin-top:1rem;">FIGHT AGAIN</button>
     <button class="btn-ghost" id="btn-menu">MAIN GATE</button>
+    <button class="btn-ghost" id="btn-over-leaderboard" style="margin-top:.3rem;">VIEW LEADERBOARD</button>
   </div>
 </div>
 
@@ -309,6 +323,7 @@
 <script src="src/systems/combat.js"></script>
 <script src="src/systems/fx.js"></script>
 <script src="src/systems/profile.js"></script>
+<script src="src/systems/leaderboard.js"></script>
 <script src="src/ui/screens.js"></script>
 <script src="src/ui/hud.js"></script>
 <script src="src/ui/menus.js"></script>

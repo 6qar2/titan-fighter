@@ -30,6 +30,32 @@ function saveStats(){localStorage.setItem('titans_stats',JSON.stringify(stats));
 function updateStats(){stats.totalKills+=totalKills;stats.gamesPlayed++;stats.bestScore=Math.max(stats.bestScore,score);stats.bestWave=Math.max(stats.bestWave,wave);stats.bestCombo=Math.max(stats.bestCombo,bestCombo);stats.playTime+=Math.floor((Date.now()-gameStartTime)/1000);saveStats();}
 function renderStats(){document.getElementById('st-total-kills').textContent=stats.totalKills.toLocaleString();document.getElementById('st-games').textContent=stats.gamesPlayed;document.getElementById('st-best-score').textContent=stats.bestScore.toLocaleString();document.getElementById('st-best-wave').textContent=toRoman(stats.bestWave);document.getElementById('st-best-combo').textContent=stats.bestCombo+'×';const acc=stats.accuracy.shots>0?Math.round(stats.accuracy.hits/stats.accuracy.shots*100):0;document.getElementById('st-accuracy').textContent=acc+'%';document.getElementById('st-headshots').textContent=stats.headshots;const hrs=Math.floor(stats.playTime/3600);const mins=Math.floor((stats.playTime%3600)/60);document.getElementById('st-time').textContent=hrs>0?`${hrs}h ${mins}m`:`${mins}m`;}
 
+/* ═══ LEADERBOARD ═══ */
+function renderLeaderboard(){
+  const list=Leaderboard.getAll();
+  const container=document.getElementById('leaderboard-list');
+  container.innerHTML='';
+  if(list.length===0){
+    container.innerHTML='<div style="text-align:center;padding:2rem;color:var(--ash);font-family:mono;font-size:.7rem;">No entries yet. Be the first to post a score!</div>';
+    return;
+  }
+  const frag=document.createDocumentFragment();
+  const header=document.createElement('div');
+  header.style.cssText="display:flex;font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--ash);margin-bottom:.4rem;";
+  header.innerHTML='<div style="width:40px;">RANK</div><div style="flex:1;">PILOT</div><div style="width:100px;text-align:right;">SCORE</div><div style="width:80px;text-align:right;">COMBO</div><div style="width:150px;text-align:right;">DATE</div>';
+  frag.appendChild(header);
+  list.forEach((entry,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText="display:flex;align-items:center;font-family:mono;font-size:.7rem;border-bottom:1px solid rgba(200,168,75,0.1);";
+    const isGold=i===0;
+    const rankColor=isGold?'var(--gold)':(i<3?'var(--gold-dim)':'var(--ash)');
+    const scoreColor=isGold?'var(--gold)':'';
+    row.innerHTML=`<div style="width:40px;color:${rankColor};">#${i+1}</div><div style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.name}</div><div style="width:100px;text-align:right;color:${scoreColor};">${entry.score.toLocaleString()}</div><div style="width:80px;text-align:right;">${entry.combo}×</div><div style="width:150px;text-align:right;color:var(--ash);">${Leaderboard.fmtDate(entry.date)}</div>`;
+    frag.appendChild(row);
+  });
+  container.appendChild(frag);
+}
+
 /* ═══ MOBILE SETTINGS ═══ */
 function renderMobileSettings(){
   const container=document.getElementById('mobile-settings-container');
@@ -76,16 +102,23 @@ function wireUI(){
     document.getElementById('kills-left').style.display='none';
     gState='play';initGame();lastTS=performance.now();showWaveAnnounce(1);sfxStartGame();animID=requestAnimationFrame(loop);
   });
-  document.getElementById('btn-menu').addEventListener('click',()=>{
+document.getElementById('btn-menu').addEventListener('click',()=>{
     bgStop();gState='menu';menuAnimActive=true;showScr('s-start');
     document.getElementById('hud').classList.add('off');document.getElementById('mctrl').classList.add('off');
     document.getElementById('club-hud').style.display='none';document.getElementById('pname-hud').style.display='none';
     document.getElementById('htimer').classList.remove('warn');
     ['wave-announce','low-ammo-warn','enemy-warn','gate-prompt','power-announce'].forEach(id=>{const el2=document.getElementById(id);el2.style.opacity='0';el2.classList.remove('visible');});
     document.getElementById('kills-left').style.display='none';initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);
-  });
+   });
+   document.getElementById('btn-over-leaderboard').addEventListener('click',()=>{wake();renderLeaderboard();setScreenFrom('s-over','s-leaderboard');});
   document.getElementById('btn-start-settings').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderMobileSettings();setScreenFrom('s-start','s-settings');});
   document.getElementById('btn-start-stats').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderStats();setScreenFrom('s-start','s-stats');});
+document.getElementById('btn-start-leaderboard').addEventListener('click',()=>{wake();menuAnimActive=false;cancelAnimationFrame(menuRAF);menuRAF=null;renderLeaderboard();setScreenFrom('s-start','s-leaderboard');});
+document.getElementById('btn-leaderboard-back').addEventListener('click',()=>{
+  const from=getScreenFrom();
+  if(from==='s-pause'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
+  else{showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);}
+});
   document.getElementById('pname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('btn-start').click();});
   /* ═══ PAUSE MENU ═══ */
   const pauseOverlay=document.getElementById('pause-overlay');
@@ -105,6 +138,7 @@ function wireUI(){
   document.getElementById('btn-quit-yes').addEventListener('click',()=>{document.getElementById('quit-confirm').classList.remove('visible');isPaused=false;pauseOverlay.classList.remove('visible');endGame();showScr('s-start');menuAnimActive=true;initStartCanvas();menuRAF=requestAnimationFrame(drawStartBG);});
    document.getElementById('btn-pause-settings').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');setScreenFrom('s-pause','s-settings');renderMobileSettings();});
    document.getElementById('btn-pause-stats').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');setScreenFrom('s-pause','s-stats');renderStats();});
+document.getElementById('btn-pause-leaderboard').addEventListener('click',()=>{pauseOverlay.classList.remove('visible');setScreenFrom('s-pause','s-leaderboard');renderLeaderboard();});
    document.getElementById('btn-settings-back').addEventListener('click',()=>{
       const from=getScreenFrom();
       if(from==='s-pause'){isPaused=false;showScr(null);pauseOverlay.classList.add('visible');lastTS=performance.now();animID=requestAnimationFrame(loop);}
