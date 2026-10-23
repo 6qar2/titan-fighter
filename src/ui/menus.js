@@ -34,12 +34,9 @@ function renderStats(){document.getElementById('st-total-kills').textContent=sta
 function renderLeaderboard(){
   if(!Profile.getName()){showScr('s-start');return;}
   const list=Leaderboard.getAll();
+  const playerName=Profile.getName()||'ANON';
   const container=document.getElementById('leaderboard-list');
   container.innerHTML='';
-  if(list.length===0){
-    container.innerHTML='<div style="text-align:center;padding:2rem;color:var(--ash);font-family:mono;font-size:.7rem;">No entries yet. Be the first to post a score!</div>';
-    return;
-  }
   const frag=document.createDocumentFragment();
   const header=document.createElement('div');
   header.style.cssText="display:flex;font-family:'Cinzel',serif;font-size:.6rem;letter-spacing:2px;color:var(--ash);margin-bottom:.4rem;";
@@ -51,9 +48,15 @@ function renderLeaderboard(){
     const isGold=i===0;
     const rankColor=isGold?'var(--gold)':(i<3?'var(--gold-dim)':'var(--ash)');
     const scoreColor=isGold?'var(--gold)':'';
+    const isPlayer=entry.name===playerName;
+    if(isPlayer){row.style.background='rgba(200,168,75,0.08)';row.style.borderLeft='2px solid var(--gold)';}
     row.innerHTML=`<div style="width:40px;color:${rankColor};">#${i+1}</div><div style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${entry.name}</div><div style="width:100px;text-align:right;color:${scoreColor};">${entry.score.toLocaleString()}</div><div style="width:80px;text-align:right;">${entry.combo}×</div><div style="width:150px;text-align:right;color:var(--ash);">${Leaderboard.fmtDate(entry.date)}</div>`;
     frag.appendChild(row);
   });
+  if(list.length===0){
+    container.innerHTML='<div style="text-align:center;padding:2rem;color:var(--ash);font-family:mono;font-size:.7rem;">No entries yet. Be the first to post a score!</div>';
+    return;
+  }
   container.appendChild(frag);
 }
 
